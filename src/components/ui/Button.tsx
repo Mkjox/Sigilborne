@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, ViewStyle, PressableProps } from 'react-native';
+import { Pressable as RNPressable, StyleSheet, ViewStyle, PressableProps } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
@@ -11,6 +11,10 @@ import { Text } from './Text';
 import { colors, borderRadius, spacing, shadows } from '../../theme';
 import { useSettingsStore } from '../../store';
 
+const Pressable = React.forwardRef((props, ref) => (
+    <RNPressable ref={ref} {...props} />
+));
+Pressable.displayName = 'ForwardedPressable';
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
