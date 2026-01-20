@@ -11,11 +11,7 @@ import { Text } from './Text';
 import { colors, borderRadius, spacing, shadows } from '../../theme';
 import { useSettingsStore } from '../../store';
 
-const Pressable = React.forwardRef((props, ref) => (
-    <RNPressable ref={ref} {...props} />
-));
-Pressable.displayName = 'ForwardedPressable';
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const AnimatedPressable = Animated.createAnimatedComponent(RNPressable);
 
 type ButtonVariant = 'primary' | 'secondary' | 'tertiary';
 
@@ -110,12 +106,12 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
     button: {
-        paddingHorizontal: spacing.lg,
-        paddingVertical: spacing.md,
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
         borderRadius: borderRadius.lg,
         alignItems: 'center',
         justifyContent: 'center',
-        minWidth: 120,
+        minWidth: 100,
     },
     primary: {
         backgroundColor: colors.primary[500],

@@ -194,8 +194,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.xs,
+        paddingHorizontal: spacing.sm,
+        paddingVertical: 2,
         backgroundColor: 'rgba(10, 10, 15, 0.8)',
     },
     roundScore: {
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     },
     boardContainer: {
         flex: 1,
-        paddingHorizontal: spacing.xs,
+        paddingHorizontal: 2,
     },
     aiSide: {
         flex: 1,
@@ -213,8 +213,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     divider: {
-        height: 28,
-        marginVertical: 4,
+        height: 20,
+        marginVertical: 2,
         borderRadius: borderRadius.sm,
         alignItems: 'center',
         justifyContent: 'center',
@@ -225,20 +225,21 @@ const styles = StyleSheet.create({
     },
     powerLabel: {
         fontWeight: 'bold',
-        minWidth: 30,
+        minWidth: 24,
         textAlign: 'center',
+        fontSize: 12,
     },
     actions: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: spacing.md,
-        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.sm,
+        paddingVertical: spacing.xs,
         backgroundColor: 'rgba(10, 10, 15, 0.9)',
     },
     actionButton: {
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.lg,
+        paddingVertical: spacing.xs,
+        paddingHorizontal: spacing.md,
         borderRadius: borderRadius.md,
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         borderWidth: 1,
@@ -252,6 +253,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     thinkingContainer: {
-        paddingHorizontal: spacing.md,
+        paddingHorizontal: spacing.sm,
     },
 });

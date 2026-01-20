@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, {
     useAnimatedStyle,
@@ -10,9 +10,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors } from '../../theme';
 
-const { width, height } = Dimensions.get('window');
-
 export const AnimatedBackground: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
+    const { width, height } = useWindowDimensions();
     const rotation = useSharedValue(0);
 
     useEffect(() => {
@@ -30,6 +29,9 @@ export const AnimatedBackground: React.FC<{ children?: React.ReactNode }> = ({ c
         transform: [{ rotate: `${rotation.value}deg` }],
     }));
 
+    // Calculate overlay size based on current dimensions
+    const overlaySize = Math.max(width, height) * 2;
+
     return (
         <>
             <LinearGradient
@@ -42,7 +44,16 @@ export const AnimatedBackground: React.FC<{ children?: React.ReactNode }> = ({ c
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
             />
-            <Animated.View style={[styles.overlay, animatedStyle]}>
+            <Animated.View style={[
+                styles.overlay,
+                {
+                    left: -width / 2,
+                    top: -height / 2,
+                    width: overlaySize,
+                    height: overlaySize,
+                },
+                animatedStyle
+            ]}>
                 <LinearGradient
                     colors={[
                         'rgba(102, 0, 255, 0.1)',
@@ -69,10 +80,6 @@ const styles = StyleSheet.create({
     },
     overlay: {
         position: 'absolute',
-        left: -width / 2,
-        top: -height / 2,
-        width: width * 2,
-        height: height * 2,
     },
     overlayGradient: {
         flex: 1,

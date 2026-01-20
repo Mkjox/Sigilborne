@@ -113,28 +113,28 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(20, 20, 32, 0.9)',
         borderTopWidth: 1,
         borderTopColor: colors.border.primary,
-        paddingTop: spacing.sm,
-        paddingBottom: spacing.sm,
+        paddingTop: spacing.xs,
+        paddingBottom: spacing.xs,
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: spacing.md,
-        marginBottom: spacing.xs,
+        paddingHorizontal: spacing.sm,
+        marginBottom: 2,
     },
     scrollView: {
-        maxHeight: 140,
+        maxHeight: 90,
     },
     scrollContent: {
-        paddingHorizontal: spacing.md,
-        gap: spacing.sm,
+        paddingHorizontal: spacing.sm,
+        gap: spacing.xs,
     },
     cardWrapper: {
-        marginHorizontal: 2,
+        marginHorizontal: 1,
     },
     emptyHand: {
-        height: 100,
+        height: 60,
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'rgba(20, 20, 32, 0.9)',
@@ -143,6 +143,6 @@ const styles = StyleSheet.create({
     },
     hint: {
         alignItems: 'center',
-        paddingTop: spacing.xs,
+        paddingTop: 2,
     },
 });

@@ -122,10 +122,10 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius: borderRadius.md,
+        borderRadius: borderRadius.sm,
         overflow: 'hidden',
-        marginHorizontal: spacing.sm,
-        marginVertical: spacing.xs,
+        marginHorizontal: spacing.xs,
+        marginVertical: 2,
         borderWidth: 1,
         borderColor: colors.border.secondary,
     },
@@ -134,52 +134,55 @@ const styles = StyleSheet.create({
     },
     activeTurn: {
         borderColor: colors.secondary[500],
-        borderWidth: 2,
+        borderWidth: 1,
     },
     gradient: {
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.xs,
+        paddingHorizontal: spacing.sm,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: spacing.xs,
     },
     name: {
         fontWeight: 'bold',
         color: colors.text.primary,
+        fontSize: 12,
     },
     turnIndicator: {
-        marginLeft: spacing.sm,
-        paddingHorizontal: spacing.sm,
-        paddingVertical: 2,
+        marginLeft: spacing.xs,
+        paddingHorizontal: spacing.xs,
+        paddingVertical: 1,
         backgroundColor: colors.secondary[600],
         borderRadius: borderRadius.sm,
     },
     passedIndicator: {
-        marginLeft: spacing.sm,
-        paddingHorizontal: spacing.sm,
-        paddingVertical: 2,
+        marginLeft: spacing.xs,
+        paddingHorizontal: spacing.xs,
+        paddingVertical: 1,
         backgroundColor: 'rgba(245, 158, 11, 0.2)',
         borderRadius: borderRadius.sm,
     },
     statsRow: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+        gap: spacing.md,
     },
     stat: {
         alignItems: 'center',
     },
     roundsContainer: {
         flexDirection: 'row',
-        gap: 4,
-        marginTop: 2,
+        gap: 2,
+        marginTop: 1,
     },
     roundDot: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
+        width: 8,
+        height: 8,
+        borderRadius: 4,
         backgroundColor: colors.background.tertiary,
         borderWidth: 1,
         borderColor: colors.border.primary,
@@ -191,5 +194,6 @@ const styles = StyleSheet.create({
     powerValue: {
         color: colors.secondary[400],
         fontWeight: 'bold',
+        fontSize: 14,
     },
 });

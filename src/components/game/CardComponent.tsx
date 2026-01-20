@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -12,9 +12,9 @@ import { Card, CardRarity } from '../../types';
 import { Text } from '../ui';
 import { colors, spacing, borderRadius, shadows } from '../../theme';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = Math.min(90, SCREEN_WIDTH / 5);
-const CARD_HEIGHT = CARD_WIDTH * 1.4;
+// Base card dimensions - will be scaled down for small screens
+const BASE_CARD_WIDTH = 70;
+const BASE_CARD_HEIGHT = BASE_CARD_WIDTH * 1.4;
 
 interface CardComponentProps {
     card: Card;
@@ -53,8 +53,8 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     const scale = useSharedValue(1);
     const translateY = useSharedValue(0);
 
-    const cardWidth = isSmall ? CARD_WIDTH * 0.7 : CARD_WIDTH;
-    const cardHeight = isSmall ? CARD_HEIGHT * 0.7 : CARD_HEIGHT;
+    const cardWidth = isSmall ? BASE_CARD_WIDTH * 0.65 : BASE_CARD_WIDTH;
+    const cardHeight = isSmall ? BASE_CARD_HEIGHT * 0.65 : BASE_CARD_HEIGHT;
 
     const handlePressIn = () => {
         scale.value = withSpring(0.95);
