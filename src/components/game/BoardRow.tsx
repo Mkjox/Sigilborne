@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import Animated, { FadeIn, Layout } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Card, RowType } from '../../types';
@@ -13,6 +13,7 @@ interface BoardRowProps {
     power: number;
     isPlayer: boolean;
     hasWeather: boolean;
+    onPress?: (row: RowType) => void;
 }
 
 const rowIcons: Record<RowType, string> = {
@@ -33,9 +34,14 @@ export const BoardRow: React.FC<BoardRowProps> = ({
     power,
     isPlayer,
     hasWeather,
+    onPress,
 }) => {
     return (
-        <View style={[styles.container, !isPlayer && styles.enemyRow]}>
+        <Pressable
+            style={[styles.container, !isPlayer && styles.enemyRow]}
+            onPress={() => onPress?.(row)}
+            disabled={!onPress}
+        >
             {/* Row label and power */}
             <View style={styles.labelContainer}>
                 <Text variant="caption" style={styles.rowIcon}>{rowIcons[row]}</Text>
@@ -88,7 +94,7 @@ export const BoardRow: React.FC<BoardRowProps> = ({
                     pointerEvents="none"
                 />
             )}
-        </View>
+        </Pressable>
     );
 };
 

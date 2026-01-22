@@ -10,6 +10,7 @@ import {
     startNextRound,
     getTotalPower,
     WeatherState,
+    useHeroAbility as engineUseHeroAbility,
 } from '../engine';
 import { makeAIDecision, getAIDelay } from '../engine/aiEngine';
 
@@ -24,6 +25,7 @@ interface GameStore extends GameState {
     // Actions
     startGame: (difficulty: Difficulty) => void;
     playCard: (cardId: string, targetRow?: RowType) => void;
+    useHeroAbility: () => void;
     passTurn: () => void;
     endTurn: () => void;
     resetGame: () => void;
@@ -59,6 +61,8 @@ const createEmptyState = (): GameState => ({
             ability: {
                 id: 'ability1',
                 name: 'Rally',
+                type: 'boost_all',
+                trigger: 'activate',
                 description: 'Boost all units by 1',
                 cooldown: 3,
                 currentCooldown: 0,
@@ -86,6 +90,8 @@ const createEmptyState = (): GameState => ({
             ability: {
                 id: 'ability2',
                 name: 'Dark Command',
+                type: 'damage_strongest',
+                trigger: 'activate',
                 description: 'Deal 2 damage to a unit',
                 cooldown: 3,
                 currentCooldown: 0,
@@ -177,6 +183,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
             selectedCardId: null,
             message: `Played ${card.name}`,
         });
+    },
+
+    useHeroAbility: () => {
+        const state = get();
+
+        if (state.currentTurn !== 'player' || state.gameOver || state.isAIThinking) {
+            return;
+        }
+
+        const { newState, success, message } = engineUseHeroAbility(state);
+
+        if (success) {
+            set({
+                ...newState,
+                message: message || 'Used Hero Ability',
+            });
+        } else {
+            set({ message: message || 'Cannot use ability' });
+        }
     },
 
     passTurn: () => {
@@ -346,8 +371,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         currentState.weather
                     );
 
+                    // Handle weather effects if AI played a weather card
+                    let newWeather = { ...currentState.weather };
+                    if (card?.type === 'weather') {
+                        const ability = card.abilities[0];
+                        if (ability?.id === 'frost') newWeather.melee = true;
+                        if (ability?.id === 'fog') newWeather.ranged = true;
+                        if (ability?.id === 'clear_weather') {
+                            newWeather.melee = false;
+                            newWeather.ranged = false;
+                            newWeather.siege = false;
+                        }
+                    }
+
                     set({
                         ai: newState.ai,
+                        weather: newWeather,
                         currentTurn: 'player',
                         isAIThinking: false,
                         message: card ? `AI played ${card.name}` : 'AI played a card',

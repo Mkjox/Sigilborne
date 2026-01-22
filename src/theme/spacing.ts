@@ -89,3 +89,42 @@ export const boardDimensions = {
     rowHeight: 180,
     cardSpacing: 8,
 };
+
+// Helper to calculate responsive card dimensions
+export const getCardDimensions = (screenWidth: number, screenHeight: number) => {
+    // Is landscape?
+    const isLandscape = screenWidth > screenHeight;
+
+    // In landscape, height is the constraint. 
+    // In portrait, width is the constraint.
+
+    // Target card width relative to screen
+    let targetWidth;
+    if (isLandscape) {
+        // Landscape: Cards shouldn't be too huge, maybe 15-18% of height
+        targetWidth = screenHeight * 0.18;
+    } else {
+        // Portrait: Cards take up ~25% of width in a row
+        targetWidth = screenWidth * 0.22;
+    }
+
+    // Clamp values
+    const width = Math.min(Math.max(targetWidth, 60), 140);
+    const height = width * 1.4;
+
+    return { width, height };
+};
+
+// Helper for general layout dimensions
+export const getLayoutDimensions = (screenWidth: number, screenHeight: number) => {
+    const isLandscape = screenWidth > screenHeight;
+
+    return {
+        isLandscape,
+        contentPadding: spacing.md,
+        // In landscape, left panel (decks) is 30% width
+        leftPanelWidth: isLandscape ? screenWidth * 0.3 : screenWidth,
+        // In landscape, right panel (cards) is 70% width
+        rightPanelWidth: isLandscape ? screenWidth * 0.7 : screenWidth,
+    };
+};

@@ -1,16 +1,19 @@
 import React from 'react';
-import { View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, Pressable, useWindowDimensions, Image } from 'react-native';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withSpring,
     withTiming,
     interpolate,
+    interpolateColor,
+    withSequence,
+    withDelay,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Card, CardRarity } from '../../types';
 import { Text } from '../ui';
-import { colors, spacing, borderRadius, shadows } from '../../theme';
+import { colors, spacing, borderRadius, shadows, getCardDimensions } from '../../theme';
 
 // Base card dimensions - will be scaled down for small screens
 const BASE_CARD_WIDTH = 70;
@@ -23,6 +26,8 @@ interface CardComponentProps {
     isPlayable?: boolean;
     isSmall?: boolean;
     faceDown?: boolean;
+    width?: number;
+    height?: number;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -42,6 +47,35 @@ const rarityGlow: Record<CardRarity, string> = {
     legendary: 'rgba(245, 158, 11, 0.6)',
 };
 
+const UnitPowerDisplay: React.FC<{ power: number; isHero?: boolean }> = ({ power, isHero }) => {
+    const prevPower = React.useRef(power);
+    const colorAnim = useSharedValue(0); // 0: neutral, 1: buff (green), -1: damage (red)
+
+    React.useEffect(() => {
+        if (power > prevPower.current) {
+            colorAnim.value = withSequence(withTiming(1, { duration: 200 }), withDelay(500, withTiming(0, { duration: 500 })));
+        } else if (power < prevPower.current) {
+            colorAnim.value = withSequence(withTiming(-1, { duration: 200 }), withDelay(500, withTiming(0, { duration: 500 })));
+        }
+        prevPower.current = power;
+    }, [power]);
+
+    const animatedStyle = useAnimatedStyle(() => {
+        const backgroundColor = interpolateColor(
+            colorAnim.value,
+            [-1, 0, 1],
+            [colors.error, colors.secondary[500], colors.success] // Red, Default, Green
+        );
+        return { backgroundColor };
+    });
+
+    return (
+        <Animated.View style={[styles.powerContainer, animatedStyle]}>
+            <Text variant="h3" style={styles.powerText}>{power}</Text>
+        </Animated.View>
+    );
+};
+
 export const CardComponent: React.FC<CardComponentProps> = ({
     card,
     onPress,
@@ -49,12 +83,24 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     isPlayable = true,
     isSmall = false,
     faceDown = false,
+    width,
+    height,
 }) => {
+    const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const scale = useSharedValue(1);
     const translateY = useSharedValue(0);
 
-    const cardWidth = isSmall ? BASE_CARD_WIDTH * 0.65 : BASE_CARD_WIDTH;
-    const cardHeight = isSmall ? BASE_CARD_HEIGHT * 0.65 : BASE_CARD_HEIGHT;
+    const defaultDims = getCardDimensions(windowWidth, windowHeight);
+
+    // Determine actual dimensions to use
+    let cardWidth = width || defaultDims.width;
+    let cardHeight = height || defaultDims.height;
+
+    // Apply small modifier if needed (legacy support)
+    if (isSmall && !width) {
+        cardWidth = cardWidth * 0.65;
+        cardHeight = cardHeight * 0.65;
+    }
 
     const handlePressIn = () => {
         scale.value = withSpring(0.95);
@@ -133,16 +179,24 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                         <Text variant="caption" style={styles.manaText}>{card.manaCost}</Text>
                     </View>
 
-                    {/* Card art placeholder */}
+                    {/* Card art */}
                     <View style={styles.artContainer}>
-                        <LinearGradient
-                            colors={['#1a1a2e', '#16213e']}
-                            style={styles.artPlaceholder}
-                        >
-                            <Text variant="caption" style={styles.artText}>
-                                {card.type === 'unit' ? '⚔️' : card.type === 'spell' ? '✨' : '🌧️'}
-                            </Text>
-                        </LinearGradient>
+                        {card.artwork ? (
+                            <Image
+                                source={card.artwork}
+                                style={styles.cardImage}
+                                resizeMode="cover"
+                            />
+                        ) : (
+                            <LinearGradient
+                                colors={['#1a1a2e', '#16213e']}
+                                style={styles.artPlaceholder}
+                            >
+                                <Text variant="caption" style={styles.artText}>
+                                    {card.type === 'unit' ? '⚔️' : card.type === 'spell' ? '✨' : '🌧️'}
+                                </Text>
+                            </LinearGradient>
+                        )}
                     </View>
 
                     {/* Card name */}
@@ -154,9 +208,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
 
                     {/* Power (for unit cards) */}
                     {card.type === 'unit' && card.power !== undefined && (
-                        <View style={styles.powerContainer}>
-                            <Text variant="h3" style={styles.powerText}>{card.power}</Text>
-                        </View>
+                        <UnitPowerDisplay power={card.power} isHero={false} />
                     )}
 
                     {/* Ability indicator */}
@@ -247,6 +299,11 @@ const styles = StyleSheet.create({
     },
     artText: {
         fontSize: 24,
+    },
+    cardImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: borderRadius.sm,
     },
     nameContainer: {
         backgroundColor: 'rgba(0, 0, 0, 0.6)',

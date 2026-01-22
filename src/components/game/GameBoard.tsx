@@ -12,11 +12,13 @@ import { useGameStore } from '../../store';
 interface GameBoardComponentProps {
     onPassTurn: () => void;
     onEndTurn: () => void;
+    onRowPress?: (row: RowType) => void;
 }
 
 export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
     onPassTurn,
     onEndTurn,
+    onRowPress,
 }) => {
     const {
         currentRound,
@@ -29,6 +31,7 @@ export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
         message,
         getPlayerPower,
         getAIPower,
+        useHeroAbility,
     } = useGameStore();
 
     const playerPower = getPlayerPower();
@@ -64,6 +67,7 @@ export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
                 cardsInDeck={ai.deck.length}
                 hasPassed={ai.hasPassed}
                 isCurrentTurn={currentTurn === 'ai'}
+                hero={ai.hero}
             />
 
             {/* Board area */}
@@ -119,6 +123,7 @@ export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
                         power={weather.melee ? player.board.melee.length : player.board.melee.reduce((s, c) => s + (c.power || 0), 0)}
                         isPlayer={true}
                         hasWeather={weather.melee}
+                        onPress={onRowPress}
                     />
                     <BoardRow
                         row="ranged"
@@ -126,6 +131,7 @@ export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
                         power={weather.ranged ? player.board.ranged.length : player.board.ranged.reduce((s, c) => s + (c.power || 0), 0)}
                         isPlayer={true}
                         hasWeather={weather.ranged}
+                        onPress={onRowPress}
                     />
                     <BoardRow
                         row="siege"
@@ -133,6 +139,7 @@ export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
                         power={weather.siege ? player.board.siege.length : player.board.siege.reduce((s, c) => s + (c.power || 0), 0)}
                         isPlayer={true}
                         hasWeather={weather.siege}
+                        onPress={onRowPress}
                     />
                 </View>
             </View>
@@ -148,6 +155,8 @@ export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
                 cardsInDeck={player.deck.length}
                 hasPassed={player.hasPassed}
                 isCurrentTurn={currentTurn === 'player'}
+                hero={player.hero}
+                onUseHeroAbility={useHeroAbility}
             />
 
             {/* Action buttons */}

@@ -1,7 +1,6 @@
-export interface HeroAbility {
-    id: string;
-    name: string;
-    description: string;
+import { Ability } from './card.types';
+
+export interface HeroAbility extends Ability {
     cooldown: number;
     currentCooldown: number;
     manaCost?: number;
@@ -13,6 +12,6 @@ export interface Hero {
     health: number;
     maxHealth: number;
     ability: HeroAbility;
-    artwork: string;
+    artwork: any;
     className: string; // e.g., "Warrior", "Mage", "Ranger"
 }

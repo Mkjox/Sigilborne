@@ -23,7 +23,7 @@ export interface Card {
     power?: number; // For unit cards
     row?: RowType; // For unit cards
     abilities: Ability[];
-    artwork: string;
+    artwork: any;
     description: string;
     flavorText?: string;
 }

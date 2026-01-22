@@ -180,6 +180,59 @@ export const abilityEffects = {
     clear: (_context: AbilityContext): void => {
         // Clear weather is handled in game engine
     },
+
+    // Rally - boost all friendly units
+    boost_all: (context: AbilityContext): void => {
+        const { state, player, card } = context;
+        const boostValue = card.abilities[0]?.value || 1;
+        const currentPlayer = player === 'player' ? 'player' : 'ai';
+        const board = state[currentPlayer].board;
+
+        (['melee', 'ranged', 'siege'] as RowType[]).forEach(row => {
+            board[row].forEach(c => {
+                c.power = (c.power || 0) + boostValue;
+            });
+        });
+    },
+
+    // Dark Command - damage strongest enemy
+    damage_strongest: (context: AbilityContext): void => {
+        const { state, player, card } = context;
+        const damageValue = card.abilities[0]?.value || 2;
+        const enemyPlayer = player === 'player' ? 'ai' : 'player';
+
+        const allEnemyUnits: { card: Card; row: RowType }[] = [];
+
+        (['melee', 'ranged', 'siege'] as RowType[]).forEach(row => {
+            state[enemyPlayer].board[row].forEach(c =>
+                allEnemyUnits.push({ card: c, row }));
+        });
+
+        if (allEnemyUnits.length === 0) return;
+
+        const maxPower = Math.max(...allEnemyUnits.map(u => u.card.power || 0));
+        const targets = allEnemyUnits.filter(u => u.card.power === maxPower);
+
+        // Damage all tied strongest units (or just one? "Deal 2 damage to A unit" implies single target. Scorch affects all.
+        // Let's affect all tied units for simplicity/fairness or just the first.
+        // If "Deal 2 damage to a unit", usually targeted.
+        // If I make it "Damage strongest enemy", usually affects one. 
+        // I'll damage the first one found to simulate single target auto-cast.
+        if (targets.length > 0) {
+            const target = targets[0];
+            target.card.power = (target.card.power || 0) - damageValue;
+
+            // Check death
+            if (target.card.power <= 0) {
+                const board = state[enemyPlayer].board[target.row];
+                const idx = board.findIndex(c => c.id === target.card.id);
+                if (idx !== -1) {
+                    const [dead] = board.splice(idx, 1);
+                    state[enemyPlayer].graveyard.push(dead);
+                }
+            }
+        }
+    },
 };
 
 // Execute an ability

@@ -76,86 +76,76 @@ const hardAI = (state: GameState): AIDecision => {
     const aiHand = state.ai.hand;
     const affordableCards = aiHand.filter(c => c.manaCost <= state.ai.mana);
 
+    // Calculate total scores
     const aiPower = getTotalPower(state, 'ai');
     const playerPower = getTotalPower(state, 'player');
     const roundsRemaining = 3 - state.currentRound;
     const aiRoundsWon = state.roundsWon.ai;
-    const playerRoundsWon = state.roundsWon.player;
 
     if (affordableCards.length === 0) {
         return { action: 'pass' };
     }
 
-    // If already won enough rounds, pass to end game
-    if (aiRoundsWon >= 2) {
-        return { action: 'pass' };
-    }
-
-    // Strategic sacrifice: if player ahead and it's early, save cards for later rounds
-    if (playerPower > aiPower + 15 && roundsRemaining > 0 && aiHand.length > 4) {
-        return { action: 'pass' };
-    }
-
-    // If player passed and we're winning, pass
+    // 1. Victory Condition: If we can pass and win the round/game, do it.
     if (state.player.hasPassed && aiPower > playerPower) {
         return { action: 'pass' };
     }
 
-    // Prioritize spells with powerful effects when behind
-    if (playerPower > aiPower + 10) {
-        const spells = affordableCards.filter(c => c.type === 'spell');
-        if (spells.length > 0) {
-            const card = spells[0];
-            return { action: 'play', cardId: card.id, targetRow: 'melee' };
+    // 2. Early Game Spy: Play spies early to get card advantage
+    const spyCards = affordableCards.filter(c => c.abilities.some(a => a.type === 'spy'));
+    if (spyCards.length > 0) {
+        return { action: 'play', cardId: spyCards[0].id, targetRow: spyCards[0].row || 'melee' };
+    }
+
+    // 3. Smart Weather: Neutralize biggest threat
+    const weatherCards = affordableCards.filter(c => c.type === 'weather');
+    if (weatherCards.length > 0 && playerPower > aiPower + 10) {
+        const playerMeleePower = state.player.board.melee.reduce((s, c) => s + (c.power || 0), 0);
+        const playerRangedPower = state.player.board.ranged.reduce((s, c) => s + (c.power || 0), 0);
+        const playerSiegePower = state.player.board.siege.reduce((s, c) => s + (c.power || 0), 0);
+
+        // Find best weather card
+        const frost = weatherCards.find(c => c.abilities.some(a => a.id === 'frost'));
+        const fog = weatherCards.find(c => c.abilities.some(a => a.id === 'fog'));
+
+        // Use Frost if melee is dominant
+        if (frost && playerMeleePower >= 10 && playerMeleePower > playerRangedPower) {
+            return { action: 'play', cardId: frost.id, targetRow: 'melee' };
+        }
+
+        // Use Fog if ranged is dominant
+        if (fog && playerRangedPower >= 10 && playerRangedPower > playerMeleePower) {
+            return { action: 'play', cardId: fog.id, targetRow: 'ranged' };
         }
     }
 
-    // Play units strategically - spread across rows
+    // 4. Strategic Sacrifice: If opponent is way ahead, save cards
+    if (playerPower > aiPower + 20 && roundsRemaining > 0 && !state.player.hasPassed) {
+        // Don't waste cards if we're going to lose anyway
+        return { action: 'pass' };
+    }
+
+    // 5. Play Strongest Unit
     const unitCards = affordableCards.filter(c => c.type === 'unit');
     if (unitCards.length > 0) {
-        // Check row populations and play to least populated
-        const rowCounts = {
-            melee: state.ai.board.melee.length,
-            ranged: state.ai.board.ranged.length,
-            siege: state.ai.board.siege.length,
-        };
+        // Sort by power
+        unitCards.sort((a, b) => (b.power || 0) - (a.power || 0));
 
-        // Find cards that can go to the least populated row
-        const sortedRows = Object.entries(rowCounts).sort((a, b) => a[1] - b[1]);
+        // Try to combo if possible (e.g. Tight Bond)
+        // Simple check: do we have a card that matches one on board?
+        const boardCards = [...state.ai.board.melee, ...state.ai.board.ranged, ...state.ai.board.siege];
+        const comboCard = unitCards.find(c => boardCards.some(b => b.name === c.name && c.abilities.some(a => a.type === 'bond')));
 
-        for (const [row] of sortedRows) {
-            const cardsForRow = unitCards.filter(c => c.row === row);
-            if (cardsForRow.length > 0) {
-                // Sort by power, play highest
-                cardsForRow.sort((a, b) => (b.power || 0) - (a.power || 0));
-                return { action: 'play', cardId: cardsForRow[0].id, targetRow: row as RowType };
-            }
+        if (comboCard) {
+            return { action: 'play', cardId: comboCard.id, targetRow: comboCard.row };
         }
 
-        // Just play highest power unit to its preferred row
-        unitCards.sort((a, b) => (b.power || 0) - (a.power || 0));
-        const card = unitCards[0];
-        return { action: 'play', cardId: card.id, targetRow: card.row };
+        const bestCard = unitCards[0];
+        return { action: 'play', cardId: bestCard.id, targetRow: bestCard.row };
     }
 
-    // Weather cards - use strategically
-    const weatherCards = affordableCards.filter(c => c.type === 'weather');
-    if (weatherCards.length > 0 && playerPower > aiPower) {
-        // Find row with most enemy power
-        const playerRows = {
-            melee: state.player.board.melee.reduce((s, c) => s + (c.power || 0), 0),
-            ranged: state.player.board.ranged.reduce((s, c) => s + (c.power || 0), 0),
-            siege: state.player.board.siege.reduce((s, c) => s + (c.power || 0), 0),
-        };
-
-        const targetRow = Object.entries(playerRows)
-            .sort((a, b) => b[1] - a[1])[0][0] as RowType;
-
-        const card = weatherCards[0];
-        return { action: 'play', cardId: card.id, targetRow };
-    }
-
-    return { action: 'pass' };
+    // 6. Fallback: Play anything else (Spells/Weather not used above)
+    return { action: 'play', cardId: affordableCards[0].id, targetRow: affordableCards[0].row || 'melee' };
 };
 
 // Main AI decision function

@@ -5,9 +5,9 @@ import { RouteProp } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeOut, SlideInDown, SlideInUp } from 'react-native-reanimated';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList, RowType } from '../../types';
 import { Text, Button } from '../../components/ui';
-import { GameBoardComponent, PlayerHand } from '../../components/game';
+import { GameBoardComponent, PlayerHand, GameSoundController } from '../../components/game';
 import { colors, spacing, borderRadius, shadows } from '../../theme';
 import { useGameStore } from '../../store';
 
@@ -62,6 +62,12 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
         // Auto end turn after playing card (handled in store)
     };
 
+    const handleRowPress = (row: RowType) => {
+        if (selectedCardId) {
+            playCard(selectedCardId, row);
+        }
+    };
+
     const handlePlayAgain = () => {
         startGame(difficulty);
     };
@@ -76,6 +82,7 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
         <View style={styles.container}>
             <StatusBar barStyle="light-content" hidden />
+            <GameSoundController />
 
             {/* Background gradient */}
             <LinearGradient
@@ -122,6 +129,7 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                 <GameBoardComponent
                     onPassTurn={handlePassTurn}
                     onEndTurn={handleEndTurn}
+                    onRowPress={handleRowPress}
                 />
 
                 {/* Player hand */}

@@ -89,7 +89,8 @@ const createCard = (
     row: RowType | undefined,
     abilities: Ability[],
     description: string,
-    flavorText?: string
+    flavorText?: string,
+    artwork: any = ''
 ): Card => ({
     id: createId(),
     name,
@@ -99,7 +100,7 @@ const createCard = (
     power,
     row,
     abilities,
-    artwork: '', // Will be populated with generated art later
+    artwork,
     description,
     flavorText,
 });
@@ -108,10 +109,10 @@ const createCard = (
 
 // Melee Units
 export const MELEE_UNITS: Card[] = [
-    createCard('Swordsman', 'unit', 'common', 1, 3, 'melee', [], 'A basic infantry soldier', 'The first line of defense.'),
-    createCard('Knight', 'unit', 'common', 2, 5, 'melee', [], 'Armored cavalry unit', 'For honor and glory!'),
-    createCard('Berserker', 'unit', 'rare', 3, 7, 'melee', [ABILITIES.MORALE_BOOST(1)], 'Fierce warrior that inspires allies', 'His rage is legendary.'),
-    createCard('Shield Captain', 'unit', 'rare', 3, 4, 'melee', [ABILITIES.TIGHT_BOND()], 'Stronger with fellow captains', 'Unity is strength.'),
+    createCard('Swordsman', 'unit', 'common', 1, 3, 'melee', [], 'A basic infantry soldier', 'The first line of defense.', require('../../assets/generated/unit_swordsman.png')),
+    createCard('Knight', 'unit', 'common', 2, 5, 'melee', [], 'Armored cavalry unit', 'For honor and glory!', require('../../assets/generated/unit_knight.png')),
+    createCard('Berserker', 'unit', 'rare', 3, 7, 'melee', [ABILITIES.MORALE_BOOST(1)], 'Fierce warrior that inspires allies', 'His rage is legendary.', require('../../assets/generated/unit_berserker.png')),
+    createCard('Shield Captain', 'unit', 'rare', 3, 4, 'melee', [ABILITIES.TIGHT_BOND()], 'Stronger with fellow captains', 'Unity is strength.', require('../../assets/generated/unit_shield_captain.png')),
     createCard('Champion', 'unit', 'epic', 4, 9, 'melee', [], 'Elite warrior of the realm', 'Undefeated in single combat.'),
     createCard('Warlord', 'unit', 'legendary', 6, 12, 'melee', [ABILITIES.MORALE_BOOST(2)], 'Commands respect on the battlefield', 'All bow before the warlord.'),
 ];

@@ -160,9 +160,10 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                 />
             </View>
 
-            {/* Main content - horizontal layout for landscape */}
+            {/* Main content - responsive layout */}
             <View style={[
                 styles.content,
+                isLandscape ? styles.contentLandscape : styles.contentPortrait,
                 {
                     paddingLeft: contentPadding + insets.left,
                     paddingRight: contentPadding + insets.right,
@@ -172,7 +173,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
             ]}>
                 {/* Left side - Logo and title */}
                 <Animated.View
-                    entering={SlideInLeft.springify()}
+                    entering={isLandscape ? SlideInLeft.springify() : FadeIn.duration(800)}
                     style={styles.brandSection}
                 >
                     <View style={styles.logoContainer}>
@@ -200,8 +201,8 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                     </Text>
                 </Animated.View>
 
-                {/* Divider */}
-                <View style={styles.divider} />
+                {/* Divider - responsive */}
+                <View style={isLandscape ? styles.dividerVertical : styles.dividerHorizontal} />
 
                 {/* Right side - Menu buttons */}
                 <View style={styles.menuSection}>
@@ -287,10 +288,15 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: spacing.xl,
+    },
+    contentLandscape: {
+        flexDirection: 'row',
+    },
+    contentPortrait: {
+        flexDirection: 'column',
     },
     brandSection: {
         flex: 1,
@@ -329,9 +335,14 @@ const styles = StyleSheet.create({
         letterSpacing: 2,
         textTransform: 'uppercase',
     },
-    divider: {
+    dividerVertical: {
         width: 1,
         height: '60%',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+    },
+    dividerHorizontal: {
+        width: '60%',
+        height: 1,
         backgroundColor: 'rgba(255,255,255,0.1)',
     },
     menuSection: {

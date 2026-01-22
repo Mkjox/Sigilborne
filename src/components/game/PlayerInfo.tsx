@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Pressable, Image } from 'react-native';
 import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
-import { PlayerType } from '../../types';
+import { PlayerType, Hero } from '../../types';
 import { Text } from '../ui';
 import { colors, spacing, borderRadius } from '../../theme';
 
@@ -16,6 +16,8 @@ interface PlayerInfoProps {
     cardsInDeck: number;
     hasPassed: boolean;
     isCurrentTurn: boolean;
+    hero?: Hero;
+    onUseHeroAbility?: () => void;
 }
 
 export const PlayerInfo: React.FC<PlayerInfoProps> = ({
@@ -28,6 +30,8 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
     cardsInDeck,
     hasPassed,
     isCurrentTurn,
+    hero,
+    onUseHeroAbility,
 }) => {
     const isPlayer = playerType === 'player';
     const name = isPlayer ? 'You' : 'Opponent';
@@ -50,17 +54,24 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
             >
                 {/* Name and turn indicator */}
                 <View style={styles.header}>
-                    <Text variant="body" style={styles.name}>{name}</Text>
-                    {isCurrentTurn && (
-                        <View style={styles.turnIndicator}>
-                            <Text variant="caption" color={colors.secondary[400]}>TURN</Text>
-                        </View>
+                    {hero?.artwork && (
+                        <Image source={hero.artwork} style={styles.heroAvatar} />
                     )}
-                    {hasPassed && (
-                        <View style={styles.passedIndicator}>
-                            <Text variant="caption" color={colors.warning}>PASSED</Text>
+                    <View>
+                        <View style={styles.nameRow}>
+                            <Text variant="body" style={styles.name}>{hero?.name || name}</Text>
+                            {isCurrentTurn && (
+                                <View style={styles.turnIndicator}>
+                                    <Text variant="caption" color={colors.secondary[400]}>TURN</Text>
+                                </View>
+                            )}
                         </View>
-                    )}
+                        {hasPassed && (
+                            <View style={styles.passedIndicator}>
+                                <Text variant="caption" color={colors.warning}>PASSED</Text>
+                            </View>
+                        )}
+                    </View>
                 </View>
 
                 {/* Stats row */}
@@ -114,6 +125,25 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
                             {cardsInDeck}
                         </Text>
                     </View>
+
+                    {/* Hero Ability Button (Player Only) */}
+                    {isPlayer && onUseHeroAbility && hero && (
+                        <Pressable
+                            onPress={onUseHeroAbility}
+                            disabled={!isCurrentTurn || hero.ability.currentCooldown > 0}
+                            style={({ pressed }) => [
+                                styles.abilityButton,
+                                (hero.ability.currentCooldown > 0) && styles.abilityDisabled,
+                                pressed && styles.abilityPressed
+                            ]}
+                        >
+                            <Text variant="caption" style={styles.abilityText}>
+                                {hero.ability.currentCooldown > 0
+                                    ? 'Used'
+                                    : 'Leader'}
+                            </Text>
+                        </Pressable>
+                    )}
                 </View>
             </LinearGradient>
         </Animated.View>
@@ -195,5 +225,42 @@ const styles = StyleSheet.create({
         color: colors.secondary[400],
         fontWeight: 'bold',
         fontSize: 14,
+    },
+    abilityButton: {
+        paddingVertical: 4,
+        paddingHorizontal: 8,
+        backgroundColor: colors.primary[600],
+        borderRadius: borderRadius.sm,
+        marginLeft: spacing.xs,
+        borderWidth: 1,
+        borderColor: colors.primary[500],
+    },
+    abilityDisabled: {
+        backgroundColor: colors.background.tertiary,
+        borderColor: colors.border.secondary,
+        opacity: 0.7,
+    },
+    abilityPressed: {
+        opacity: 0.8,
+        transform: [{ scale: 0.95 }],
+    },
+    abilityText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+        textTransform: 'uppercase',
+    },
+    heroAvatar: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        marginRight: spacing.sm,
+        borderWidth: 1,
+        borderColor: colors.border.secondary,
+        backgroundColor: colors.background.tertiary,
+    },
+    nameRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
     },
 });

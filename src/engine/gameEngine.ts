@@ -38,11 +38,15 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[]): PlayerSt
             ability: {
                 id: `ability_${id}`,
                 name: type === 'player' ? 'Rally' : 'Dark Command',
-                description: type === 'player' ? 'Boost all units by 1' : 'Deal 2 damage to a unit',
+                type: type === 'player' ? 'boost_all' : 'damage_strongest',
+                trigger: 'activate',
+                description: type === 'player' ? 'Boost all units by 1' : 'Deal 2 damage to strongest enemy',
                 cooldown: 3,
                 currentCooldown: 0,
             },
-            artwork: '',
+            artwork: type === 'player'
+                ? require('../../assets/generated/hero_commander.png')
+                : require('../../assets/generated/hero_darklord.png'),
             className: type === 'player' ? 'Warrior' : 'Warlock',
         },
         hasPassed: false,
@@ -64,6 +68,46 @@ export const createInitialGameState = (difficulty: Difficulty): GameState => {
         roundHistory: [],
         gameOver: false,
     };
+};
+
+export const useHeroAbility = (state: GameState): { newState: GameState; success: boolean; message?: string } => {
+    const currentPlayer = state.currentTurn;
+    const playerState = state[currentPlayer];
+
+    if (playerState.hero.ability.currentCooldown > 0) {
+        return { newState: state, success: false, message: 'Ability on cooldown' };
+    }
+
+    const newState = { ...state };
+
+    // Execute ability
+    const ability = playerState.hero.ability;
+
+    // Create a virtual card context for the ability
+    const virtualCard: Card = {
+        id: playerState.hero.id,
+        name: playerState.hero.name,
+        type: 'unit', // Fallback type
+        rarity: 'legendary',
+        manaCost: 0,
+        abilities: [ability],
+        description: ability.description,
+        artwork: playerState.hero.artwork
+    };
+
+    const context: AbilityContext = {
+        state: newState,
+        card: virtualCard,
+        player: currentPlayer,
+        updateState: () => { },
+    };
+
+    executeAbility(ability, context);
+
+    // Set cooldown (single use for now, so massive cooldown)
+    newState[currentPlayer].hero.ability.currentCooldown = 99;
+
+    return { newState, success: true, message: `Used ${ability.name}` };
 };
 
 // Play a card from hand to board
@@ -251,10 +295,17 @@ export const startNextRound = (state: GameState): GameState => {
     let newAI = moveToGraveyard(state.ai);
     newAI = drawForRound(newAI);
 
+    // Winner of previous round goes first
+    const lastRound = state.roundHistory[state.roundHistory.length - 1];
+    let nextStarter: PlayerType = 'player';
+    if (lastRound && lastRound.aiScore > lastRound.playerScore) {
+        nextStarter = 'ai';
+    }
+
     return {
         ...state,
         currentRound: state.currentRound + 1,
-        currentTurn: 'player',
+        currentTurn: nextStarter,
         phase: 'main',
         player: newPlayer,
         ai: newAI,
