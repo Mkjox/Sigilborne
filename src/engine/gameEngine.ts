@@ -54,8 +54,8 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[]): PlayerSt
 };
 
 // Create initial game state
-export const createInitialGameState = (difficulty: Difficulty): GameState => {
-    const playerDeck = createStarterDeck();
+export const createInitialGameState = (difficulty: Difficulty, customPlayerDeck?: Card[] | null): GameState => {
+    const playerDeck = customPlayerDeck || createStarterDeck();
     const aiDeck = createAIDeck();
 
     return {
@@ -129,7 +129,8 @@ export const playCard = (
     const card = playerState.hand[cardIndex];
 
     // Check mana cost
-    if (card.manaCost > playerState.mana) {
+    const manaCost = card.manaCost ?? 0;
+    if (manaCost > playerState.mana) {
         return { newState: state, success: false, message: 'Not enough mana' };
     }
 
@@ -138,7 +139,7 @@ export const playCard = (
     newHand.splice(cardIndex, 1);
 
     // Deduct mana
-    const newMana = playerState.mana - card.manaCost;
+    const newMana = playerState.mana - manaCost;
 
     // Create new state
     const newState = { ...state };

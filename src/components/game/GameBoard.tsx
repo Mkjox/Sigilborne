@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RowType } from '../../types';
@@ -37,6 +37,8 @@ export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
     const playerPower = getPlayerPower();
     const aiPower = getAIPower();
     const isPlayerTurn = currentTurn === 'player' && !isAIThinking;
+    const { height: screenHeight } = useWindowDimensions();
+    const dividerHeight = Math.max(16, screenHeight * 0.025);
 
     return (
         <View style={styles.container}>
@@ -102,7 +104,7 @@ export const GameBoardComponent: React.FC<GameBoardComponentProps> = ({
                     colors={[colors.primary[700], colors.primary[500], colors.primary[700]]}
                     start={{ x: 0, y: 0.5 }}
                     end={{ x: 1, y: 0.5 }}
-                    style={styles.divider}
+                    style={[styles.divider, { height: dividerHeight }]}
                 >
                     <View style={styles.powerComparison}>
                         <Text variant="body" color={colors.text.primary} style={styles.powerLabel}>
@@ -222,7 +224,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     divider: {
-        height: 20,
         marginVertical: 2,
         borderRadius: borderRadius.sm,
         alignItems: 'center',

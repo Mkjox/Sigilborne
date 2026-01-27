@@ -13,6 +13,8 @@ import {
     useHeroAbility as engineUseHeroAbility,
 } from '../engine';
 import { makeAIDecision, getAIDelay } from '../engine/aiEngine';
+import { useDeckStore } from './deckStore';
+import { createStarterDeck } from '../data/cardData';
 
 interface GameStore extends GameState {
     // Game settings
@@ -114,14 +116,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     message: null,
 
     startGame: (difficulty) => {
-        const initialState = createInitialGameState(difficulty);
+        // Check for custom deck
+        const activeDeck = useDeckStore.getState().getActiveDeck();
+        const playerDeck = activeDeck && activeDeck.cards.length >= 10
+            ? activeDeck.cards.map(c => ({ ...c, id: Math.random().toString(36).substring(2, 11) }))
+            : null;
+
+        const initialState = createInitialGameState(difficulty, playerDeck);
         set({
             ...initialState,
             difficulty,
             weather: { melee: false, ranged: false, siege: false },
             isAIThinking: false,
             selectedCardId: null,
-            message: 'Game started! Your turn.',
+            message: activeDeck ? `Playing with ${activeDeck.name}` : 'Game started!',
         });
     },
 

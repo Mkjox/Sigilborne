@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, StyleSheet, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import Animated, { FadeIn, Layout } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Card, RowType } from '../../types';
 import { CardComponent } from './CardComponent';
 import { Text } from '../ui';
-import { colors, spacing, borderRadius } from '../../theme';
+import { colors, spacing, borderRadius, getCardDimensions } from '../../theme';
 
 interface BoardRowProps {
     row: RowType;
@@ -36,9 +36,14 @@ export const BoardRow: React.FC<BoardRowProps> = ({
     hasWeather,
     onPress,
 }) => {
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+    const cardDims = getCardDimensions(screenWidth, screenHeight);
+    const rowCardWidth = cardDims.width * 0.55;
+    const rowCardHeight = cardDims.height * 0.55;
+    const rowHeight = rowCardHeight + 8; // Card height + padding
     return (
         <Pressable
-            style={[styles.container, !isPlayer && styles.enemyRow]}
+            style={[styles.container, !isPlayer && styles.enemyRow, { minHeight: rowHeight }]}
             onPress={() => onPress?.(row)}
             disabled={!onPress}
         >
@@ -60,7 +65,7 @@ export const BoardRow: React.FC<BoardRowProps> = ({
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.cardsContent}
-                style={styles.cardsArea}
+                style={[styles.cardsArea, { maxHeight: rowCardHeight + 4 }]}
             >
                 {cards.length === 0 ? (
                     <View style={styles.emptyRow}>
@@ -78,8 +83,9 @@ export const BoardRow: React.FC<BoardRowProps> = ({
                         >
                             <CardComponent
                                 card={card}
-                                isSmall
                                 isPlayable={false}
+                                width={rowCardWidth}
+                                height={rowCardHeight}
                             />
                         </Animated.View>
                     ))
@@ -107,7 +113,6 @@ const styles = StyleSheet.create({
         marginVertical: 1,
         paddingVertical: 2,
         paddingHorizontal: spacing.xs,
-        minHeight: 52,
         borderWidth: 1,
         borderColor: colors.border.secondary,
     },
@@ -141,7 +146,6 @@ const styles = StyleSheet.create({
     },
     cardsArea: {
         flex: 1,
-        maxHeight: 50,
     },
     cardsContent: {
         paddingVertical: 2,

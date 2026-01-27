@@ -1,12 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import Animated, { FadeIn, FadeOut, SlideInDown, Layout } from 'react-native-reanimated';
 import { Card } from '../../types';
 import { CardComponent } from './CardComponent';
 import { Text } from '../ui';
-import { colors, spacing } from '../../theme';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+import { colors, spacing, getCardDimensions } from '../../theme';
 
 interface PlayerHandProps {
     cards: Card[];
@@ -27,6 +25,12 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
     isPlayerTurn,
     hasPassed,
 }) => {
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+    const cardDims = getCardDimensions(screenWidth, screenHeight);
+    const handCardWidth = cardDims.width * 0.85;
+    const handCardHeight = cardDims.height * 0.85;
+    const containerHeight = handCardHeight + 30; // Card + header + hint
+
     const handleCardPress = (card: Card) => {
         if (!isPlayerTurn || hasPassed) return;
 
@@ -50,7 +54,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
 
     return (
         <Animated.View
-            style={styles.container}
+            style={[styles.container, { maxHeight: containerHeight }]}
             entering={SlideInDown.duration(500)}
         >
             <View style={styles.header}>
@@ -87,6 +91,8 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                                 onPress={() => handleCardPress(card)}
                                 isSelected={isSelected}
                                 isPlayable={isPlayable}
+                                width={handCardWidth}
+                                height={handCardHeight}
                             />
                         </Animated.View>
                     );
@@ -124,7 +130,7 @@ const styles = StyleSheet.create({
         marginBottom: 2,
     },
     scrollView: {
-        maxHeight: 90,
+        flex: 1,
     },
     scrollContent: {
         paddingHorizontal: spacing.sm,

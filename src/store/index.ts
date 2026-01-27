@@ -1,2 +1,3 @@
-export { useSettingsStore } from './settingsStore';
 export { useGameStore } from './gameStore';
+export { useSettingsStore } from './settingsStore';
+export { useDeckStore } from './deckStore';
