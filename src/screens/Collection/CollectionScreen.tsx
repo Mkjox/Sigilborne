@@ -1,13 +1,25 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, Pressable, FlatList, useWindowDimensions } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn } from 'react-native-reanimated';
-import { RootStackParamList, Card } from '../../types';
+import Animated, {
+    FadeIn,
+    FadeOut,
+    SlideInLeft,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withTiming,
+    withDelay,
+    interpolate
+} from 'react-native-reanimated';
+import { RootStackParamList, Card, CardType } from '../../types';
 import { Text } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing, borderRadius, getCardDimensions, getLayoutDimensions } from '../../theme';
+import { getAllCards } from '../../data/cardData';
+import { useDeckStore } from '../../store/deckStore';
 
 type CollectionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Collection'>;
 
@@ -15,52 +27,75 @@ interface Props {
     navigation: CollectionScreenNavigationProp;
 }
 
-// Reuse the mock data from DeckBuilder for consistency (in a real app this would come from a store)
-const COLLECTION_CARDS: Card[] = [
-    { id: 'u1', name: 'Knight', manaCost: 2, power: 4, type: 'unit', rarity: 'common', description: '', abilities: [], artwork: '' },
-    { id: 'u2', name: 'Archer', manaCost: 3, power: 3, type: 'unit', rarity: 'common', description: '', abilities: [], artwork: '' },
-    { id: 'u3', name: 'Giant', manaCost: 6, power: 8, type: 'unit', rarity: 'rare', description: '', abilities: [], artwork: '' },
-    { id: 's1', name: 'Rain', manaCost: 2, type: 'spell', rarity: 'common', description: '', abilities: [], artwork: '' },
-    { id: 'u4', name: 'Hero', manaCost: 10, power: 10, type: 'unit', rarity: 'legendary', description: '', abilities: [], artwork: '' },
-    { id: 's2', name: 'Storm', manaCost: 5, type: 'weather', rarity: 'epic', description: '', abilities: [], artwork: '' },
-    // More cards to demonstrate scrolling
-    { id: 'u5', name: 'Soldier', manaCost: 1, power: 2, type: 'unit', rarity: 'common', description: '', abilities: [], artwork: '' },
-    { id: 'u6', name: 'Captain', manaCost: 4, power: 5, type: 'unit', rarity: 'rare', description: '', abilities: [], artwork: '' },
-];
+const ALL_CARDS = getAllCards();
 
-export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
-    const insets = useSafeAreaInsets();
-    const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+const AnimatedBackground: React.FC = () => {
+    const orb1Pos = useSharedValue(0);
+    const orb2Pos = useSharedValue(0);
 
-    const layout = getLayoutDimensions(screenWidth, screenHeight);
-    const cardDims = getCardDimensions(screenWidth, screenHeight);
+    React.useEffect(() => {
+        orb1Pos.value = withRepeat(withTiming(1, { duration: 10000 }), -1, true);
+        orb2Pos.value = withRepeat(withTiming(1, { duration: 8000 }), -1, true);
+    }, []);
 
-    // Slightly larger cards for the collection view compared to deck builder
-    const cardWidth = cardDims.width;
-    const cardHeight = cardDims.height;
+    const orb1Style = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: interpolate(orb1Pos.value, [0, 1], [-50, 50]) },
+            { translateY: interpolate(orb1Pos.value, [0, 1], [-20, 20]) },
+        ],
+    }));
 
-    // Calculate columns based on available width and card size
-    // Using full width minus padding
-    const availableWidth = screenWidth - (layout.contentPadding * 2);
-    // Card width + gap
-    const itemWidth = cardWidth + 16;
-    const numColumns = Math.floor(availableWidth / itemWidth);
+    const orb2Style = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: interpolate(orb2Pos.value, [0, 1], [30, -30]) },
+            { translateY: interpolate(orb2Pos.value, [0, 1], [50, -50]) },
+        ],
+    }));
 
     return (
-        <View style={styles.container}>
-            {/* Background gradient */}
+        <View style={StyleSheet.absoluteFill}>
             <LinearGradient
                 colors={[colors.background.primary, '#0a0015', colors.background.primary]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
             />
+            <Animated.View style={[styles.glowOrb, styles.orb1, orb1Style]} />
+            <Animated.View style={[styles.glowOrb, styles.orb2, orb2Style]} />
+        </View>
+    );
+};
 
-            {/* Decorative glow */}
-            <Animated.View
-                entering={FadeIn.delay(200).duration(1000)}
-                style={styles.glowOrb}
-            />
+export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
+    const insets = useSafeAreaInsets();
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+    const { decks } = useDeckStore();
+
+    const [selectedCategory, setSelectedCategory] = useState<'all' | CardType>('all');
+
+    const layout = getLayoutDimensions(screenWidth, screenHeight);
+    const cardDims = getCardDimensions(screenWidth, screenHeight);
+
+    const cardWidth = cardDims.width * 1.1; // Slightly larger for collection
+    const cardHeight = cardDims.height * 1.1;
+
+    const categories: { id: 'all' | CardType; label: string }[] = [
+        { id: 'all', label: 'All' },
+        { id: 'unit', label: 'Units' },
+        { id: 'spell', label: 'Spells' },
+        { id: 'weather', label: 'Weather' },
+    ];
+
+    const filteredCards = useMemo(() => {
+        if (selectedCategory === 'all') return ALL_CARDS;
+        return ALL_CARDS.filter(card => card.type === selectedCategory);
+    }, [selectedCategory]);
+
+    const numColumns = Math.floor((screenWidth - layout.contentPadding * 2) / (cardWidth + 16));
+
+    return (
+        <View style={styles.container}>
+            <AnimatedBackground />
 
             <View style={[
                 styles.content,
@@ -73,72 +108,97 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
             ]}>
                 {/* Header */}
                 <Animated.View
-                    entering={FadeIn.delay(100)}
+                    entering={SlideInLeft.duration(600).springify()}
                     style={[styles.header, { paddingHorizontal: layout.contentPadding, paddingTop: spacing.sm }]}
                 >
                     <Pressable
                         onPress={() => navigation.goBack()}
                         style={styles.backButton}
                     >
-                        <Text variant="body" color={colors.primary[400]}>← Back</Text>
+                        <Text variant="body" color={colors.primary[400]} style={styles.backText}>← MENU</Text>
                     </Pressable>
-                    <Text variant="h3" style={styles.title}>Collection</Text>
+                    <View style={styles.titleContainer}>
+                        <Text variant="h2" style={styles.title}>COLLECTION</Text>
+                        <View style={styles.titleUnderline} />
+                    </View>
                     <View style={styles.backButton} />
                 </Animated.View>
 
-                {/* Stats bar */}
-                <Animated.View
-                    entering={FadeIn.delay(200)}
-                    style={styles.statsContainer}
-                >
-                    <View style={styles.statsBar}>
-                        <View style={styles.stat}>
-                            <Text variant="h4" color={colors.secondary[400]}>{COLLECTION_CARDS.length}</Text>
-                            <Text variant="caption" color={colors.text.disabled}>Cards</Text>
+                {/* Categories & Stats Row */}
+                <View style={[styles.metaRow, { paddingHorizontal: layout.contentPadding }]}>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.categoryScroll}
+                    >
+                        {categories.map((cat, idx) => (
+                            <Animated.View key={cat.id} entering={FadeIn.delay(300 + idx * 50)}>
+                                <Pressable
+                                    onPress={() => setSelectedCategory(cat.id)}
+                                    style={[
+                                        styles.categoryBtn,
+                                        selectedCategory === cat.id && styles.categoryBtnActive
+                                    ]}
+                                >
+                                    <Text
+                                        variant="caption"
+                                        color={selectedCategory === cat.id ? colors.background.primary : colors.text.secondary}
+                                        style={{ fontWeight: 'bold' }}
+                                    >
+                                        {cat.label.toUpperCase()}
+                                    </Text>
+                                </Pressable>
+                            </Animated.View>
+                        ))}
+                    </ScrollView>
+
+                    <Animated.View entering={FadeIn.delay(500)} style={styles.statsGlass}>
+                        <View style={styles.statItem}>
+                            <Text variant="h4" color={colors.secondary[400]}>{ALL_CARDS.length}</Text>
+                            <Text variant="caption" color={colors.text.tertiary}>CARDS</Text>
                         </View>
                         <View style={styles.statDivider} />
-                        <View style={styles.stat}>
-                            <Text variant="h4" color={colors.primary[400]}>8</Text>
-                            <Text variant="caption" color={colors.text.disabled}>Decks</Text>
+                        <View style={styles.statItem}>
+                            <Text variant="h4" color={colors.primary[400]}>{decks.length}</Text>
+                            <Text variant="caption" color={colors.text.tertiary}>DECKS</Text>
                         </View>
-                        <View style={styles.statDivider} />
-                        <View style={styles.stat}>
-                            <Text variant="h4" color={colors.accent[400]}>1250</Text>
-                            <Text variant="caption" color={colors.text.disabled}>Gold</Text>
-                        </View>
-                    </View>
-                </Animated.View>
+                    </Animated.View>
+                </View>
 
                 {/* Cards grid */}
                 <FlatList
-                    data={COLLECTION_CARDS}
+                    data={filteredCards}
                     keyExtractor={(item) => item.id}
                     numColumns={numColumns}
-                    // Force a fresh render when columns change
                     key={`grid-${numColumns}`}
                     contentContainerStyle={{
                         paddingHorizontal: layout.contentPadding,
-                        paddingBottom: spacing.xl
+                        paddingBottom: spacing.xl,
+                        paddingTop: spacing.md
                     }}
                     columnWrapperStyle={{
-                        justifyContent: 'center',
+                        justifyContent: 'flex-start',
                         gap: 16,
                         marginBottom: 16
                     }}
-                    renderItem={({ item }) => (
-                        <CardComponent
-                            card={item}
-                            width={cardWidth}
-                            height={cardHeight}
-                            isPlayable={false}
-                            onPress={() => { }}
-                        />
+                    renderItem={({ item, index }) => (
+                        <Animated.View entering={FadeIn.delay(idxToDelay(index))}>
+                            <CardComponent
+                                card={item}
+                                width={cardWidth}
+                                height={cardHeight}
+                                isPlayable={false}
+                                onPress={() => { }}
+                            />
+                        </Animated.View>
                     )}
                 />
             </View>
         </View>
     );
 };
+
+const idxToDelay = (index: number) => Math.min(index * 30, 1000);
 
 const styles = StyleSheet.create({
     container: {
@@ -147,13 +207,21 @@ const styles = StyleSheet.create({
     },
     glowOrb: {
         position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: 150,
-        backgroundColor: colors.accent[500],
+        width: 400,
+        height: 400,
+        borderRadius: 200,
+        opacity: 0.15,
+        filter: 'blur(60px)',
+    },
+    orb1: {
+        backgroundColor: colors.primary[500],
+        top: -100,
+        left: -100,
+    },
+    orb2: {
+        backgroundColor: colors.secondary[500],
         bottom: -150,
-        left: -150,
-        opacity: 0.2,
+        right: -100,
     },
     content: {
         flex: 1,
@@ -162,34 +230,71 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: spacing.md,
+        marginBottom: spacing.sm,
     },
     backButton: {
-        width: 60,
+        minWidth: 80,
+    },
+    backText: {
+        fontWeight: 'bold',
+        letterSpacing: 1,
+    },
+    titleContainer: {
+        alignItems: 'center',
     },
     title: {
         textAlign: 'center',
         color: colors.text.primary,
+        letterSpacing: 2,
     },
-    statsContainer: {
-        alignItems: 'center',
-        marginBottom: spacing.lg,
+    titleUnderline: {
+        width: 40,
+        height: 2,
+        backgroundColor: colors.secondary[400],
+        marginTop: 4,
     },
-    statsBar: {
+    metaRow: {
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: borderRadius.lg,
-        padding: spacing.sm,
+        justifyContent: 'space-between',
+        marginBottom: spacing.md,
+        gap: spacing.md,
     },
-    stat: {
+    categoryScroll: {
+        gap: spacing.xs,
+        paddingRight: spacing.md,
+    },
+    categoryBtn: {
+        paddingVertical: 6,
+        paddingHorizontal: 12,
+        borderRadius: borderRadius.full,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        marginRight: spacing.xs,
+    },
+    categoryBtnActive: {
+        backgroundColor: colors.secondary[400],
+        borderColor: colors.secondary[300],
+    },
+    statsGlass: {
+        flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: spacing.lg,
+        backgroundColor: 'rgba(20,20,32,0.8)',
+        borderRadius: borderRadius.lg,
+        paddingVertical: spacing.xs,
+        paddingHorizontal: spacing.md,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    statItem: {
+        alignItems: 'center',
+        minWidth: 60,
     },
     statDivider: {
         width: 1,
-        height: 30,
+        height: 20,
         backgroundColor: 'rgba(255,255,255,0.1)',
+        marginHorizontal: spacing.sm,
     },
 });

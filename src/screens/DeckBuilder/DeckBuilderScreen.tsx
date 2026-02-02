@@ -90,6 +90,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [viewingDeckId, setViewingDeckId] = useState<string | null>(null);
 
     // Store
     const {
@@ -174,6 +175,41 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
             addCardToDeck(decks[0].id, card);
         }
     };
+
+    // Active Deck List Component
+    const ActiveDeckList = ({ deck }: { deck: any }) => (
+        <Animated.View entering={FadeIn} style={styles.activeDeckContainer}>
+            <View style={styles.activeDeckHeader}>
+                <Pressable onPress={() => setViewingDeckId(null)} style={styles.tinyBackBtn}>
+                    <Text variant="caption" color={colors.primary[400]}>← ALL DECKS</Text>
+                </Pressable>
+                <Text variant="bodySmall" color={colors.text.primary} style={styles.activeDeckTitle}>
+                    {deck.name.toUpperCase()}
+                </Text>
+                <Text variant="caption" color={colors.text.disabled}>
+                    {deck.cards.length}/25
+                </Text>
+            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {deck.cards.map((card: Card, idx: number) => (
+                    <Pressable
+                        key={`${card.id}-${idx}`}
+                        onPress={() => removeCardFromDeck(deck.id, card.id)}
+                        style={styles.activeDeckCard}
+                    >
+                        <Text variant="bodySmall" color={colors.text.primary}>{card.name}</Text>
+                        <Text variant="caption" color={colors.text.disabled}>{card.manaCost}💧</Text>
+                    </Pressable>
+                ))}
+                {deck.cards.length === 0 && (
+                    <View style={styles.emptyDeckPlaceholder}>
+                        <Text variant="caption" color={colors.text.disabled}>No cards yet.</Text>
+                        <Text variant="caption" color={colors.text.disabled}>Double-tap cards to add!</Text>
+                    </View>
+                )}
+            </ScrollView>
+        </Animated.View>
+    );
 
     // Flying Card Component
     const FlyingCard = ({ item }: { item: { id: string; card: Card; x: number; y: number } }) => {
@@ -276,28 +312,36 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
 
                 <View style={styles.mainContent}>
-                    {/* Left Panel: Decks */}
+                    {/* Left Panel: Decks or Active Deck */}
                     <View style={[styles.leftPanel, { width: layout.leftPanelWidth, padding: layout.contentPadding }]}>
-                        <Text variant="bodySmall" color={colors.text.secondary} style={styles.sectionTitle}>
-                            YOUR DECKS
-                        </Text>
-                        <ScrollView showsVerticalScrollIndicator={false}>
-                            {/* Fixed 4 slots for decks */}
-                            {[0, 1, 2, 3].map((index) => {
-                                const deck = decks[index];
-                                return (
-                                    <DeckSlot
-                                        key={index}
-                                        index={index}
-                                        deck={deck}
-                                        isActive={deck && activeDeckId === deck.id}
-                                        onPress={() => setActiveDeck(deck.id)}
-                                        onCreate={handleCreateDeck}
-                                        width={layout.leftPanelWidth - (layout.contentPadding * 2)}
-                                    />
-                                );
-                            })}
-                        </ScrollView>
+                        {viewingDeckId && decks.find(d => d.id === viewingDeckId) ? (
+                            <ActiveDeckList deck={decks.find(d => d.id === viewingDeckId)!} />
+                        ) : (
+                            <>
+                                <Text variant="bodySmall" color={colors.text.secondary} style={styles.sectionTitle}>
+                                    YOUR DECKS
+                                </Text>
+                                <ScrollView showsVerticalScrollIndicator={false}>
+                                    {[0, 1, 2, 3].map((index) => {
+                                        const deck = decks[index];
+                                        return (
+                                            <DeckSlot
+                                                key={index}
+                                                index={index}
+                                                deck={deck}
+                                                isActive={deck && activeDeckId === deck.id}
+                                                onPress={() => {
+                                                    setActiveDeck(deck.id);
+                                                    setViewingDeckId(deck.id);
+                                                }}
+                                                onCreate={handleCreateDeck}
+                                                width={layout.leftPanelWidth - (layout.contentPadding * 2)}
+                                            />
+                                        );
+                                    })}
+                                </ScrollView>
+                            </>
+                        )}
                     </View>
 
                     {/* Divider */}
@@ -335,7 +379,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             card={item}
                                             width={gridCardWidth}
                                             height={gridCardHeight}
-                                            isPlayable={false}
+                                            isPlayable={true}
                                             onPress={(evt) => handleCardPress(item, evt)}
                                         />
                                         {countInDeck > 0 && (
@@ -451,5 +495,38 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: colors.background.primary,
         zIndex: 10,
+    },
+    activeDeckContainer: {
+        flex: 1,
+    },
+    activeDeckHeader: {
+        marginBottom: spacing.md,
+        paddingBottom: spacing.xs,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255,255,255,0.1)',
+    },
+    tinyBackBtn: {
+        marginBottom: 4,
+    },
+    activeDeckTitle: {
+        fontWeight: 'bold',
+        letterSpacing: 1,
+    },
+    activeDeckCard: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        borderRadius: borderRadius.sm,
+        marginBottom: 4,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.05)',
+    },
+    emptyDeckPlaceholder: {
+        marginTop: 40,
+        alignItems: 'center',
+        opacity: 0.5,
     }
 });
