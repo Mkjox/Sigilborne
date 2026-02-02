@@ -57,14 +57,14 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
         startGame, playCard, passTurn, resetGame, selectCard,
         player, ai, currentTurn, gameOver, winner, isAIThinking,
         selectedCardId, roundsWon, currentRound, weather,
-        getPlayerPower, getAIPower, useHeroAbility,
+        getPlayerPower, getAIPower, useHeroAbility, message,
     } = useGameStore();
 
     useEffect(() => { startGame(difficulty); }, [difficulty]);
 
     const cardDims = getCardDimensions(screenWidth, screenHeight);
-    const handCardW = cardDims.width * 0.7;
-    const handCardH = cardDims.height * 0.7;
+    const handCardW = cardDims.width * 2;
+    const handCardH = cardDims.height * 1;
     const boardCardW = cardDims.width * 0.45;
     const boardCardH = cardDims.height * 0.45;
 
@@ -80,6 +80,36 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
 
     const handleRowPress = (row: RowType) => {
         if (selectedCardId) playCard(selectedCardId, row);
+    };
+
+    // Toast Component
+    const Toast = () => {
+        if (!message) return null;
+        // Only show for round results or specific events if needed
+        const isRoundResult = message.includes('Won Round') || message.includes('Draw');
+
+        // Simple auto-hide effect managed by key-change or existing store timing?
+        // GameStore message stays until changed. We might want to clear it? 
+        // For now, just render it. The user sees it change.
+
+        if (!isRoundResult) return null;
+
+        return (
+            <Animated.View
+                entering={SlideInDown.springify()}
+                exiting={FadeOut}
+                style={styles.toastContainer}
+            >
+                <LinearGradient
+                    colors={['rgba(20, 20, 30, 0.95)', 'rgba(40, 40, 60, 0.9)']}
+                    style={styles.toastContent}
+                >
+                    <Text variant="h4" color={message.includes('You') ? colors.success : (message.includes('AI') ? colors.error : colors.text.primary)}>
+                        {message}
+                    </Text>
+                </LinearGradient>
+            </Animated.View>
+        );
     };
 
     return (
@@ -98,21 +128,38 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                     </View>
                     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.handScroll}>
                         {player.hand.map(card => (
-                            <Pressable key={card.id} onPress={() => handleCardPress(card)} style={styles.handCard}>
-                                <CardComponent
-                                    card={card}
-                                    width={handCardW}
-                                    height={handCardH}
-                                    isSelected={selectedCardId === card.id}
-                                    isPlayable={isPlayerTurn && !player.hasPassed && (card.manaCost ?? 0) <= player.mana}
-                                />
-                            </Pressable>
+                            <CardComponent
+                                key={card.id}
+                                card={card}
+                                width={handCardW}
+                                height={handCardH}
+                                isSelected={selectedCardId === card.id}
+                                isPlayable={isPlayerTurn && !player.hasPassed && (card.manaCost ?? 0) <= player.mana}
+                                onPress={() => handleCardPress(card)}
+                            />
                         ))}
                     </ScrollView>
                     <View style={styles.handFooter}>
                         <Text variant="caption" color={colors.accent[400]}>⚡{player.mana}</Text>
-                        <Pressable onPress={passTurn} disabled={!isPlayerTurn || player.hasPassed} style={styles.passBtn}>
-                            <Text variant="caption" color={isPlayerTurn ? colors.warning : colors.text.disabled}>Pass</Text>
+                        <Pressable
+                            onPress={passTurn}
+                            disabled={!isPlayerTurn || player.hasPassed}
+                            style={[
+                                styles.passBtn,
+                                isPlayerTurn && !player.hand.some(c => (c.manaCost ?? 0) <= player.mana) && !player.hasPassed
+                                    ? { backgroundColor: colors.warning, transform: [{ scale: 1.1 }], borderWidth: 1, borderColor: '#fff' }
+                                    : {}
+                            ]}
+                        >
+                            <Text
+                                variant="caption"
+                                color={isPlayerTurn && !player.hand.some(c => (c.manaCost ?? 0) <= player.mana) && !player.hasPassed
+                                    ? colors.text.primary
+                                    : (isPlayerTurn ? colors.warning : colors.text.disabled)}
+                                style={{ fontWeight: 'bold' }}
+                            >
+                                {isPlayerTurn && !player.hand.some(c => (c.manaCost ?? 0) <= player.mana) && !player.hasPassed ? "END ROUND" : "PASS"}
+                            </Text>
                         </Pressable>
                     </View>
                 </View>
@@ -171,13 +218,19 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                 </View>
             </View>
 
+            {/* Toast Overlay */}
+            <Toast />
+
             {/* Game Over Overlay */}
             {gameOver && (
                 <Animated.View style={styles.overlay} entering={FadeIn.duration(500)} exiting={FadeOut.duration(300)}>
                     <LinearGradient colors={['rgba(0,0,0,0.9)', 'rgba(10,0,21,0.95)']} style={StyleSheet.absoluteFill} />
                     <Animated.View style={styles.overlayCar} entering={SlideInDown.delay(200).springify()}>
-                        <Text variant="h2" style={{ color: winner === 'player' ? colors.secondary[300] : colors.error, marginBottom: 16 }}>
-                            {winner === 'player' ? '🏆 VICTORY!' : '💀 DEFEAT'}
+                        <Text variant="h2" style={{
+                            color: winner === 'player' ? colors.secondary[300] : (winner === 'draw' ? colors.text.disabled : colors.error),
+                            marginBottom: 16
+                        }}>
+                            {winner === 'player' ? '🏆 VICTORY!' : (winner === 'draw' ? '🤝 DRAW' : '💀 DEFEAT')}
                         </Text>
                         <Pressable onPress={() => startGame(difficulty)} style={styles.overlayBtn}>
                             <Text variant="button" color={colors.text.primary}>PLAY AGAIN</Text>
@@ -217,4 +270,25 @@ const styles = StyleSheet.create({
     overlayCard: { padding: 24, borderRadius: 16, backgroundColor: 'rgba(20,20,32,0.95)', alignItems: 'center', gap: 12 },
     overlayCar: { padding: 24, borderRadius: 16, backgroundColor: 'rgba(20,20,32,0.95)', alignItems: 'center', gap: 12 },
     overlayBtn: { paddingVertical: 12, paddingHorizontal: 24, borderRadius: 8, backgroundColor: colors.primary[600], minWidth: 150, alignItems: 'center' },
+    toastContainer: {
+        position: 'absolute',
+        top: '20%',
+        alignSelf: 'center',
+        zIndex: 100,
+        width: '50%',
+        maxWidth: 400,
+    },
+    toastContent: {
+        padding: 16,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.5,
+        shadowRadius: 8,
+        elevation: 8,
+    }
 });

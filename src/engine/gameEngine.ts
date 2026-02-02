@@ -255,7 +255,13 @@ export const resolveRound = (state: GameState, weather: WeatherState): GameState
     } else if (newState.currentRound >= MAX_ROUNDS) {
         // After 3 rounds, determine winner by rounds won
         newState.gameOver = true;
-        newState.winner = newState.roundsWon.player > newState.roundsWon.ai ? 'player' : 'ai';
+        if (newState.roundsWon.player > newState.roundsWon.ai) {
+            newState.winner = 'player';
+        } else if (newState.roundsWon.ai > newState.roundsWon.player) {
+            newState.winner = 'ai';
+        } else {
+            newState.winner = 'draw';
+        }
     }
 
     return newState;

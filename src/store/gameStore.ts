@@ -33,6 +33,7 @@ interface GameStore extends GameState {
     resetGame: () => void;
     selectCard: (cardId: string | null) => void;
     setMessage: (message: string | null) => void;
+    triggerAI: () => void;
 
     // Computed
     getPlayerPower: () => number;
@@ -107,6 +108,8 @@ const createEmptyState = (): GameState => ({
     gameOver: false,
 });
 
+
+
 export const useGameStore = create<GameStore>((set, get) => ({
     ...createEmptyState(),
     difficulty: 'medium',
@@ -118,6 +121,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     startGame: (difficulty) => {
         // Check for custom deck
         const activeDeck = useDeckStore.getState().getActiveDeck();
+        // If deck has at least 10 cards, use it. Otherwise uses default starter deck logic in engine
         const playerDeck = activeDeck && activeDeck.cards.length >= 10
             ? activeDeck.cards.map(c => ({ ...c, id: Math.random().toString(36).substring(2, 11) }))
             : null;
@@ -128,12 +132,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             difficulty,
             weather: { melee: false, ranged: false, siege: false },
             isAIThinking: false,
-            selectedCardId: null,
-            message: activeDeck ? `Playing with ${activeDeck.name}` : 'Game started!',
+            winner: undefined,
+            message: 'Game Started',
         });
     },
 
-    playCard: (cardId, targetRow) => {
+    playCard: (cardId: string, targetRow?: RowType) => {
         const state = get();
 
         // Can't play if not player's turn or game is over
@@ -191,6 +195,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             selectedCardId: null,
             message: `Played ${card.name}`,
         });
+
+        // End turn after playing
+        get().endTurn();
     },
 
     useHeroAbility: () => {
@@ -207,6 +214,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ...newState,
                 message: message || 'Used Hero Ability',
             });
+            // End turn after ability
+            get().endTurn();
         } else {
             set({ message: message || 'Cannot use ability' });
         }
@@ -245,16 +254,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (resolvedState.gameOver) {
                 set({
                     ...resolvedState,
-                    message: resolvedState.winner === 'player' ? 'Victory!' : 'Defeat!',
+                    message: resolvedState.winner === 'player' ? 'Victory!' : (resolvedState.winner === 'draw' ? 'Draw!' : 'Defeat!'),
                 });
             } else {
                 // Start next round
                 const nextRoundState = startNextRound(resolvedState);
+                const lastRound = resolvedState.roundHistory[resolvedState.roundHistory.length - 1];
+                const roundWinner = lastRound.playerScore > lastRound.aiScore ? 'You Won' : (lastRound.aiScore > lastRound.playerScore ? 'AI Won' : 'Draw');
+
                 set({
                     ...nextRoundState,
                     weather: { melee: false, ranged: false, siege: false },
-                    message: `Round ${resolvedState.currentRound} complete! Starting round ${nextRoundState.currentRound}`,
+                    message: `${roundWinner} Round ${resolvedState.currentRound}!`,
                 });
+
+                // Check if AI goes first next round
+                if (nextRoundState.currentTurn === 'ai') {
+                    get().triggerAI();
+                }
             }
         } else {
             // AI's turn
@@ -278,13 +295,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
         };
 
         const nextTurnState = engineEndTurn(gameState);
+        let finalTurnState = nextTurnState;
+
+        // Recursively skip if the next player has turned (passed)
+        // Since there are only 2 players, if next passed, switch back.
+        // If BOTH passed, shouldEndRound would have caught it in passTurn.
+        const nextPlayerId = finalTurnState.currentTurn;
+        const nextPlayerHasPassed = nextPlayerId === 'player' ? finalTurnState.player.hasPassed : finalTurnState.ai.hasPassed;
+
+        if (nextPlayerHasPassed) {
+            const otherPlayer = nextPlayerId === 'player' ? 'ai' : 'player';
+            finalTurnState = {
+                ...finalTurnState,
+                currentTurn: otherPlayer
+            };
+        }
 
         set({
-            ...nextTurnState,
+            ...finalTurnState,
         });
 
-        // If it's now AI's turn, make AI move
-        if (nextTurnState.currentTurn === 'ai' && !nextTurnState.ai.hasPassed) {
+        if (finalTurnState.currentTurn === 'ai' && !finalTurnState.ai.hasPassed) {
+            get().triggerAI();
+        }
+    },
+
+    triggerAI: () => {
+        const state = get();
+        if (state.currentTurn === 'ai' && !state.ai.hasPassed) {
             set({ isAIThinking: true });
 
             const delay = getAIDelay(state.difficulty);
@@ -349,8 +387,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                                 ...nextRoundState,
                                 weather: { melee: false, ranged: false, siege: false },
                                 isAIThinking: false,
-                                message: `Round complete! Starting round ${nextRoundState.currentRound}`,
+                                message: `Round ${nextRoundState.currentRound} started`,
                             });
+
+                            // Check if AI goes first next round
+                            if (nextRoundState.currentTurn === 'ai') {
+                                get().triggerAI();
+                            }
                         }
                     } else {
                         // Player's turn

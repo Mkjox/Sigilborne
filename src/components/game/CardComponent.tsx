@@ -21,7 +21,7 @@ const BASE_CARD_HEIGHT = BASE_CARD_WIDTH * 1.4;
 
 interface CardComponentProps {
     card: Card;
-    onPress?: () => void;
+    onPress?: (event?: any) => void;
     isSelected?: boolean;
     isPlayable?: boolean;
     isSmall?: boolean;

@@ -47,7 +47,7 @@ export interface GameState {
     ai: PlayerState;
     roundHistory: RoundInfo[];
     gameOver: boolean;
-    winner?: PlayerType;
+    winner?: PlayerType | 'draw';
 }
 
 // Difficulty levels
