@@ -26,12 +26,34 @@ export const calculateRowPower = (cards: Card[], hasWeather: boolean = false): n
 };
 
 // Calculate total board power for a player
-export const calculateBoardPower = (board: BoardRow, activeWeather: { melee: boolean; ranged: boolean; siege: boolean }): number => {
-    return (
-        calculateRowPower(board.melee, activeWeather.melee) +
-        calculateRowPower(board.ranged, activeWeather.ranged) +
-        calculateRowPower(board.siege, activeWeather.siege)
-    );
+// Calculate total board power for a player, considering Class Advantage
+export const calculateBoardPower = (
+    board: BoardRow,
+    activeWeather: { melee: boolean; ranged: boolean; siege: boolean },
+    opponentBoard?: BoardRow
+): number => {
+    let meleePower = calculateRowPower(board.melee, activeWeather.melee);
+    let rangedPower = calculateRowPower(board.ranged, activeWeather.ranged);
+    let siegePower = calculateRowPower(board.siege, activeWeather.siege);
+
+    // Apply Class Advantage (Rock-Paper-Scissors)
+    // +1 Power for each unit in the winning row if opponent has units in the losing row
+    if (opponentBoard) {
+        // Melee (Sword) > Ranged (Bow)
+        if (opponentBoard.ranged.length > 0) {
+            meleePower += board.melee.length; // +1 per Melee unit
+        }
+        // Ranged (Bow) > Siege (Catapult)
+        if (opponentBoard.siege.length > 0) {
+            rangedPower += board.ranged.length; // +1 per Ranged unit
+        }
+        // Siege (Catapult) > Melee (Sword)
+        if (opponentBoard.melee.length > 0) {
+            siegePower += board.siege.length; // +1 per Siege unit
+        }
+    }
+
+    return meleePower + rangedPower + siegePower;
 };
 
 // Shuffle an array (Fisher-Yates)
@@ -133,27 +155,32 @@ export const abilityEffects = {
 
     // Destroy strongest units
     destroy: (context: AbilityContext): void => {
-        const { state } = context;
+        const { state, card } = context;
 
         // Find highest power across all rows
         const allUnits: { card: Card; owner: PlayerType; row: RowType }[] = [];
 
         (['melee', 'ranged', 'siege'] as RowType[]).forEach(row => {
-            state.player.board[row].forEach(card =>
-                allUnits.push({ card, owner: 'player', row }));
-            state.ai.board[row].forEach(card =>
-                allUnits.push({ card, owner: 'ai', row }));
+            state.player.board[row].forEach(c =>
+                allUnits.push({ card: c, owner: 'player', row }));
+            state.ai.board[row].forEach(c =>
+                allUnits.push({ card: c, owner: 'ai', row }));
         });
 
         if (allUnits.length === 0) return;
 
-        const maxPower = Math.max(...allUnits.map(u => u.card.power || 0));
-        const unitsToDestroy = allUnits.filter(u => u.card.power === maxPower);
+        // Filter out the card acting (so Dragon Hunter doesn't kill himself)
+        const otherUnits = allUnits.filter(u => u.card.id !== card.id);
+
+        if (otherUnits.length === 0) return;
+
+        const maxPower = Math.max(...otherUnits.map(u => u.card.power || 0));
+        const unitsToDestroy = otherUnits.filter(u => u.card.power === maxPower);
 
         // Destroy all units with max power
-        unitsToDestroy.forEach(({ card, owner, row }) => {
+        unitsToDestroy.forEach(({ card: targetCard, owner, row }) => {
             const board = state[owner].board[row];
-            const index = board.findIndex(c => c.id === card.id);
+            const index = board.findIndex(c => c.id === targetCard.id);
             if (index !== -1) {
                 const [removed] = board.splice(index, 1);
                 state[owner].graveyard.push(removed);

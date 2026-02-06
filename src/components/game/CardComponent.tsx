@@ -28,6 +28,7 @@ interface CardComponentProps {
     faceDown?: boolean;
     width?: number;
     height?: number;
+    hideStats?: boolean;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -47,34 +48,7 @@ const rarityGlow: Record<CardRarity, string> = {
     legendary: 'rgba(245, 158, 11, 0.6)',
 };
 
-const UnitPowerDisplay: React.FC<{ power: number; isHero?: boolean }> = ({ power, isHero }) => {
-    const prevPower = React.useRef(power);
-    const colorAnim = useSharedValue(0); // 0: neutral, 1: buff (green), -1: damage (red)
-
-    React.useEffect(() => {
-        if (power > prevPower.current) {
-            colorAnim.value = withSequence(withTiming(1, { duration: 200 }), withDelay(500, withTiming(0, { duration: 500 })));
-        } else if (power < prevPower.current) {
-            colorAnim.value = withSequence(withTiming(-1, { duration: 200 }), withDelay(500, withTiming(0, { duration: 500 })));
-        }
-        prevPower.current = power;
-    }, [power]);
-
-    const animatedStyle = useAnimatedStyle(() => {
-        const backgroundColor = interpolateColor(
-            colorAnim.value,
-            [-1, 0, 1],
-            [colors.error, colors.secondary[500], colors.success] // Red, Default, Green
-        );
-        return { backgroundColor };
-    });
-
-    return (
-        <Animated.View style={[styles.powerContainer, animatedStyle]}>
-            <Text variant="h3" style={styles.powerText}>{power}</Text>
-        </Animated.View>
-    );
-};
+/* UnitPowerDisplay declaration removed (defined at bottom) */
 
 export const CardComponent: React.FC<CardComponentProps> = ({
     card,
@@ -85,6 +59,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     faceDown = false,
     width,
     height,
+    hideStats = false,
 }) => {
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const scale = useSharedValue(1);
@@ -101,6 +76,12 @@ export const CardComponent: React.FC<CardComponentProps> = ({
         cardWidth = cardWidth * 0.65;
         cardHeight = cardHeight * 0.65;
     }
+
+    // Dynamic Scaling Calculations
+    const badgeSize = cardHeight * 0.18; // 18% of card height
+    const badgeFontSize = badgeSize * 0.55;
+    const padding = cardHeight * 0.03;
+    const typeSize = cardHeight * 0.16;
 
     const handlePressIn = () => {
         scale.value = withSpring(0.95);
@@ -137,7 +118,6 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     }
 
     const gradientColors = rarityColors[card.rarity];
-    const glowColor = rarityGlow[card.rarity];
 
     return (
         <AnimatedPressable
@@ -148,16 +128,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
         >
             {/* Glow effect for rare+ cards */}
             {card.rarity !== 'common' && (
-                <View
-                    style={[
-                        styles.glowEffect,
-                        {
-                            backgroundColor: glowColor,
-                            width: cardWidth + 8,
-                            height: cardHeight + 8,
-                        },
-                    ]}
-                />
+                <View style={[styles.glowEffect]} />
             )}
 
             {/* Card border gradient */}
@@ -167,17 +138,40 @@ export const CardComponent: React.FC<CardComponentProps> = ({
             >
                 {/* Card inner content */}
                 <View style={[styles.cardInner, { width: cardWidth - 4, height: cardHeight - 4 }]}>
-                    {/* Card type indicator */}
-                    <View style={[styles.typeIndicator, { backgroundColor: gradientColors[0] }]}>
-                        <Text variant="caption" style={styles.typeText}>
-                            {card.type === 'unit' ? card.row?.charAt(0).toUpperCase() : card.type.charAt(0).toUpperCase()}
-                        </Text>
-                    </View>
 
-                    {/* Mana cost */}
-                    <View style={styles.manaCost}>
-                        <Text variant="caption" style={styles.manaText}>{card.manaCost}</Text>
-                    </View>
+                    {/* Card type indicator (Top Left) */}
+
+                    {!hideStats && (
+                        <View style={[
+                            styles.badgeBase,
+                            {
+                                top: padding, left: padding,
+                                width: typeSize, height: typeSize, borderRadius: typeSize / 4,
+                                backgroundColor: gradientColors[0],
+                                alignItems: 'center', justifyContent: 'center'
+                            }
+                        ]}>
+                            <Text style={[styles.badgeText, { fontSize: typeSize * 0.65, lineHeight: typeSize * 0.75, textAlign: 'center', textAlignVertical: 'center' }]}>
+                                {card.type === 'unit'
+                                    ? (card.row === 'melee' ? '⚔️' : (card.row === 'ranged' ? '🏹' : '🏰'))
+                                    : (card.type === 'spell' ? '✨' : '🌧️')}
+                            </Text>
+                        </View>
+                    )}
+
+                    {/* Mana cost (Top Right) */}
+                    {!hideStats && (
+                        <View style={[
+                            styles.badgeBase,
+                            {
+                                top: padding, right: padding,
+                                width: badgeSize, height: badgeSize, borderRadius: badgeSize / 4,
+                                backgroundColor: colors.accent[500]
+                            }
+                        ]}>
+                            <Text style={[styles.badgeText, { fontSize: badgeFontSize }]}>{card.manaCost}</Text>
+                        </View>
+                    )}
 
                     {/* Card art */}
                     <View style={styles.artContainer}>
@@ -192,7 +186,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                 colors={['#1a1a2e', '#16213e']}
                                 style={styles.artPlaceholder}
                             >
-                                <Text variant="caption" style={styles.artText}>
+                                <Text style={{ fontSize: cardHeight * 0.25 }}>
                                     {card.type === 'unit' ? '⚔️' : card.type === 'spell' ? '✨' : '🌧️'}
                                 </Text>
                             </LinearGradient>
@@ -201,20 +195,33 @@ export const CardComponent: React.FC<CardComponentProps> = ({
 
                     {/* Card name */}
                     <View style={styles.nameContainer}>
-                        <Text variant="caption" style={styles.cardName} numberOfLines={1}>
+                        <Text style={[styles.cardName, { fontSize: Math.max(8, cardHeight * 0.08) }]} numberOfLines={1}>
                             {card.name}
                         </Text>
                     </View>
 
-                    {/* Power (for unit cards) */}
+                    {/* Power (Bottom Right) */}
                     {card.type === 'unit' && card.power !== undefined && (
-                        <UnitPowerDisplay power={card.power} isHero={false} />
+                        <UnitPowerDisplay
+                            power={card.power}
+                            isHero={false}
+                            size={badgeSize}
+                            fontSize={badgeFontSize}
+                            style={{ bottom: padding + 16, right: padding }}
+                        />
                     )}
 
-                    {/* Ability indicator */}
-                    {card.abilities.length > 0 && (
-                        <View style={styles.abilityIndicator}>
-                            <Text variant="caption" style={styles.abilityText}>★</Text>
+                    {/* Ability indicator (Bottom Left) */}
+                    {card.abilities.length > 0 && !hideStats && (
+                        <View style={[
+                            styles.badgeBase,
+                            {
+                                bottom: padding + 16, left: padding,
+                                width: badgeSize, height: badgeSize, borderRadius: badgeSize / 4,
+                                backgroundColor: colors.primary[500]
+                            }
+                        ]}>
+                            <Text style={[styles.badgeText, { fontSize: badgeFontSize }]}>★</Text>
                         </View>
                     )}
                 </View>
@@ -222,14 +229,55 @@ export const CardComponent: React.FC<CardComponentProps> = ({
 
             {/* Selected overlay */}
             {isSelected && (
-                <View style={[styles.selectedOverlay, { width: cardWidth, height: cardHeight }]} />
+                <View style={[styles.selectedOverlay, { width: cardWidth, height: cardHeight, borderRadius: borderRadius.md }]} />
             )}
 
             {/* Disabled overlay */}
             {!isPlayable && (
-                <View style={[styles.disabledOverlay, { width: cardWidth, height: cardHeight }]} />
+                <View style={[styles.disabledOverlay, { width: cardWidth, height: cardHeight, borderRadius: borderRadius.md }]} />
             )}
         </AnimatedPressable>
+    );
+};
+
+// Modified UnitPowerDisplay to accept size props
+const UnitPowerDisplay: React.FC<{
+    power: number;
+    isHero?: boolean;
+    size: number;
+    fontSize: number;
+    style?: any;
+}> = ({ power, isHero, size, fontSize, style }) => {
+    const prevPower = React.useRef(power);
+    const colorAnim = useSharedValue(0);
+
+    React.useEffect(() => {
+        if (power > prevPower.current) {
+            colorAnim.value = withSequence(withTiming(1, { duration: 200 }), withDelay(500, withTiming(0, { duration: 500 })));
+        } else if (power < prevPower.current) {
+            colorAnim.value = withSequence(withTiming(-1, { duration: 200 }), withDelay(500, withTiming(0, { duration: 500 })));
+        }
+        prevPower.current = power;
+    }, [power]);
+
+    const animatedStyle = useAnimatedStyle(() => {
+        const backgroundColor = interpolateColor(
+            colorAnim.value,
+            [-1, 0, 1],
+            [colors.error, colors.secondary[500], colors.success]
+        );
+        return { backgroundColor };
+    });
+
+    return (
+        <Animated.View style={[
+            styles.badgeBase,
+            style,
+            animatedStyle,
+            { width: size, height: size, borderRadius: size / 4 }
+        ]}>
+            <Text style={[styles.badgeText, { fontSize }]}>{power}</Text>
+        </Animated.View>
     );
 };
 
@@ -240,6 +288,7 @@ const styles = StyleSheet.create({
     },
     glowEffect: {
         position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
         borderRadius: borderRadius.lg,
         opacity: 0.6,
     },
@@ -253,43 +302,25 @@ const styles = StyleSheet.create({
         borderRadius: borderRadius.md - 2,
         overflow: 'hidden',
     },
-    typeIndicator: {
+    badgeBase: {
         position: 'absolute',
-        top: 2,
-        left: 2,
-        width: 16,
-        height: 16,
-        borderRadius: borderRadius.sm,
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex: 2,
+        zIndex: 5,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.5,
+        shadowRadius: 1,
+        elevation: 2,
     },
-    typeText: {
-        fontSize: 8,
+    badgeText: {
         fontWeight: 'bold',
         color: colors.text.primary,
-    },
-    manaCost: {
-        position: 'absolute',
-        top: 2,
-        right: 2,
-        width: 18,
-        height: 18,
-        borderRadius: 9,
-        backgroundColor: colors.accent[500],
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 2,
-    },
-    manaText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: colors.text.primary,
+        textAlign: 'center',
     },
     artContainer: {
-        flex: 1,
-        margin: 4,
-        marginTop: 20,
+        ...StyleSheet.absoluteFillObject,
+        zIndex: 1,
     },
     artPlaceholder: {
         flex: 1,
@@ -297,66 +328,35 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    artText: {
-        fontSize: 24,
-    },
     cardImage: {
         width: '100%',
         height: '100%',
-        borderRadius: borderRadius.sm,
     },
     nameContainer: {
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
         paddingVertical: 2,
         paddingHorizontal: 4,
+        zIndex: 4,
     },
     cardName: {
-        fontSize: 8,
         textAlign: 'center',
         color: colors.text.primary,
     },
-    powerContainer: {
-        position: 'absolute',
-        bottom: 20,
-        right: 4,
-        width: 22,
-        height: 22,
-        borderRadius: 11,
-        backgroundColor: colors.secondary[500],
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    powerText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: colors.background.primary,
-    },
-    abilityIndicator: {
-        position: 'absolute',
-        bottom: 20,
-        left: 4,
-        width: 14,
-        height: 14,
-        borderRadius: 7,
-        backgroundColor: colors.primary[500],
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    abilityText: {
-        fontSize: 8,
-        color: colors.secondary[400],
-    },
     selectedOverlay: {
         position: 'absolute',
-        borderRadius: borderRadius.md,
         borderWidth: 2,
         borderColor: colors.secondary[400],
         backgroundColor: 'rgba(255, 185, 0, 0.1)',
+        zIndex: 10,
     },
     disabledOverlay: {
         position: 'absolute',
-        borderRadius: borderRadius.md,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 10,
     },
     card: {
         borderRadius: borderRadius.md,

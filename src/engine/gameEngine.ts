@@ -190,6 +190,10 @@ export const playCard = (
     } else if (card.type === 'weather') {
         // Weather effects are handled by the store
         newState[currentPlayer].graveyard.push(card);
+    } else {
+        // Fallback for any other type to avoid "disappearing" cards
+        console.warn(`Unknown card type: ${(card as any).type}, moving to graveyard`);
+        newState[currentPlayer].graveyard.push(card);
     }
 
     return { newState, success: true };
@@ -225,8 +229,8 @@ export const shouldEndRound = (state: GameState): boolean => {
 
 // Calculate round winner and update state
 export const resolveRound = (state: GameState, weather: WeatherState): GameState => {
-    const playerPower = calculateBoardPower(state.player.board, weather);
-    const aiPower = calculateBoardPower(state.ai.board, weather);
+    const playerPower = calculateBoardPower(state.player.board, weather, state.ai.board);
+    const aiPower = calculateBoardPower(state.ai.board, weather, state.player.board);
 
     const newState = { ...state };
 
@@ -321,15 +325,12 @@ export const startNextRound = (state: GameState): GameState => {
 
 // Get row power for display
 export const getRowPower = (cards: Card[], hasWeather: boolean): number => {
-    if (hasWeather) return cards.length; // All units reduced to 1
+    if (hasWeather) return cards.length;
     return cards.reduce((sum, card) => sum + (card.power || 0), 0);
 };
 
 // Get total player power
-export const getTotalPower = (board: BoardRow, weather: WeatherState): number => {
-    return (
-        getRowPower(board.melee, weather.melee) +
-        getRowPower(board.ranged, weather.ranged) +
-        getRowPower(board.siege, weather.siege)
-    );
+export const getTotalPower = (board: BoardRow, weather: WeatherState, opponentBoard?: BoardRow): number => {
+    // Determine raw power first
+    return calculateBoardPower(board, weather, opponentBoard);
 };

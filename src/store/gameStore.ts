@@ -438,10 +438,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     set({
                         ai: newState.ai,
                         weather: newWeather,
-                        currentTurn: 'player',
                         isAIThinking: false,
                         message: card ? `AI played ${card.name}` : 'AI played a card',
                     });
+
+                    // End turn to cycle back to player or keep handling AI if player passed
+                    get().endTurn();
                 } else {
                     // Fallback
                     set({ currentTurn: 'player', isAIThinking: false });
@@ -471,11 +473,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     getPlayerPower: () => {
         const state = get();
-        return getTotalPower(state.player.board, state.weather);
+        return getTotalPower(state.player.board, state.weather, state.ai.board);
     },
 
     getAIPower: () => {
         const state = get();
-        return getTotalPower(state.ai.board, state.weather);
+        return getTotalPower(state.ai.board, state.weather, state.player.board);
     },
 }));

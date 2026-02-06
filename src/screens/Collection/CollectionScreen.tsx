@@ -72,6 +72,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     const { decks } = useDeckStore();
 
     const [selectedCategory, setSelectedCategory] = useState<'all' | CardType>('all');
+    const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
     const layout = getLayoutDimensions(screenWidth, screenHeight);
     const cardDims = getCardDimensions(screenWidth, screenHeight);
@@ -122,6 +123,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                         <View style={styles.titleUnderline} />
                     </View>
                     <View style={styles.backButton} />
+                    <View style={styles.backButton} />
                 </Animated.View>
 
                 {/* Categories & Stats Row */}
@@ -134,7 +136,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                         {categories.map((cat, idx) => (
                             <Animated.View key={cat.id} entering={FadeIn.delay(300 + idx * 50)}>
                                 <Pressable
-                                    onPress={() => setSelectedCategory(cat.id)}
+                                    onPress={() => { setSelectedCategory(cat.id); setSelectedCardId(null); }}
                                     style={[
                                         styles.categoryBtn,
                                         selectedCategory === cat.id && styles.categoryBtnActive
@@ -165,6 +167,35 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                     </Animated.View>
                 </View>
 
+                {/* CARD DETAILS PANEL */}
+                {selectedCardId && (() => {
+                    const card = ALL_CARDS.find(c => c.id === selectedCardId);
+                    if (card) return (
+                        <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.cardDetailsPanel}>
+                            <View style={styles.cardDetailHeader}>
+                                <Text variant="h4" color={colors.text.primary} style={{ flex: 1 }}>{card.name}</Text>
+                                <View style={{ flexDirection: 'row', gap: 8 }}>
+                                    <View style={[styles.miniBadge, { backgroundColor: colors.accent[500] }]}>
+                                        <Text variant="caption">{card.manaCost}</Text>
+                                    </View>
+                                    {card.power !== undefined && (
+                                        <View style={[styles.miniBadge, { backgroundColor: colors.secondary[500] }]}>
+                                            <Text variant="caption">{card.power}</Text>
+                                        </View>
+                                    )}
+                                </View>
+                            </View>
+                            <Text variant="caption" color={colors.text.secondary} style={{ fontStyle: 'italic', marginBottom: 4 }}>
+                                {card.flavorText || "A mysterious card."}
+                            </Text>
+                            <Text variant="body" color={colors.text.primary} style={{ fontSize: 12 }}>
+                                {card.description}
+                            </Text>
+                        </Animated.View>
+                    );
+                    return null;
+                })()}
+
                 {/* Cards grid */}
                 <FlatList
                     data={filteredCards}
@@ -188,7 +219,8 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                                 width={cardWidth}
                                 height={cardHeight}
                                 isPlayable={false}
-                                onPress={() => { }}
+                                isSelected={selectedCardId === item.id}
+                                onPress={() => setSelectedCardId(selectedCardId === item.id ? null : item.id)}
                             />
                         </Animated.View>
                     )}
@@ -241,11 +273,13 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         alignItems: 'center',
+        flex: 1,
     },
     title: {
         textAlign: 'center',
         color: colors.text.primary,
         letterSpacing: 2,
+        alignSelf: 'center'
     },
     titleUnderline: {
         width: 40,
@@ -296,5 +330,36 @@ const styles = StyleSheet.create({
         height: 20,
         backgroundColor: 'rgba(255,255,255,0.1)',
         marginHorizontal: spacing.sm,
+    },
+    cardDetailsPanel: {
+        position: 'absolute',
+        bottom: spacing.xl + 20,
+        left: '10%',
+        right: '10%',
+        backgroundColor: 'rgba(20, 20, 30, 0.98)',
+        borderWidth: 1,
+        borderColor: colors.primary[500],
+        borderRadius: borderRadius.md,
+        padding: spacing.md,
+        zIndex: 100,
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.6,
+        shadowRadius: 8,
+    },
+    cardDetailHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
+    miniBadge: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 4,
     },
 });
