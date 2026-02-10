@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "CardGame",
-    "slug": "CardGame",
+    "name": "Dragon Forge",
+    "slug": "DragonForge",
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/icon.png",
@@ -22,7 +22,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.mkjox.CardGame"
+      "package": "com.mkjox.dragonforge"
     },
     "web": {
       "favicon": "./assets/favicon.png"
