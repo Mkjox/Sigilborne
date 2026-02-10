@@ -45,8 +45,8 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[]): PlayerSt
                 currentCooldown: 0,
             },
             artwork: type === 'player'
-                ? require('../../assets/generated/hero_commander.png')
-                : require('../../assets/generated/hero_darklord.png'),
+                ? require('../../assets/generated/hero_commander.jpg')
+                : require('../../assets/generated/hero_darklord.jpg'),
             className: type === 'player' ? 'Warrior' : 'Warlock',
         },
         hasPassed: false,
