@@ -15,7 +15,7 @@ import Animated, {
     interpolate
 } from 'react-native-reanimated';
 import { RootStackParamList, Card, CardType } from '../../types';
-import { Text } from '../../components/ui';
+import { Text, BoardSurface } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing, borderRadius, getCardDimensions, getLayoutDimensions } from '../../theme';
 import { getAllCards } from '../../data/cardData';
@@ -95,8 +95,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     const numColumns = Math.floor((screenWidth - layout.contentPadding * 2) / (cardWidth + 16));
 
     return (
-        <View style={styles.container}>
-            <AnimatedBackground />
+        <BoardSurface style={styles.container}>
 
             <View style={[
                 styles.content,
@@ -226,7 +225,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                     )}
                 />
             </View>
-        </View>
+        </BoardSurface>
     );
 };
 

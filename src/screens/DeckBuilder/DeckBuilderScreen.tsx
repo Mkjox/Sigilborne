@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, SlideInLeft, SlideInRight, SlideInDown, FadeOut } from 'react-native-reanimated';
 import { RootStackParamList, Card, CardRarity, CardType } from '../../types';
-import { Text } from '../../components/ui';
+import { Text, BoardSurface } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing, borderRadius, getLayoutDimensions, getCardDimensions } from '../../theme';
 
@@ -280,13 +280,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
-            <LinearGradient
-                colors={[colors.background.primary, '#0a0015', colors.background.primary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-            />
+        <BoardSurface style={styles.container}>
 
             {/* Flying Cards Layer */}
             {flyingCards.map(fc => (
@@ -308,7 +302,15 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                         <Text variant="body" color={colors.primary[400]}>← Back</Text>
                     </Pressable>
                     <Text variant="h3" style={styles.title}>Deck Builder</Text>
-                    <View style={styles.backButton} />
+                    <Pressable
+                        onPress={() => navigation.navigate('GameBoard', { difficulty: 'medium' })}
+                        style={({ pressed }) => [
+                            styles.playButton,
+                            pressed && { opacity: 0.8 }
+                        ]}
+                    >
+                        <Text variant="bodySmall" style={{ fontWeight: 'bold', color: '#1A1410' }}>PLAY</Text>
+                    </Pressable>
                 </View>
 
                 <View style={styles.mainContent}>
@@ -396,7 +398,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                     </View>
                 </View>
             </View>
-        </View>
+        </BoardSurface>
     );
 };
 
@@ -422,6 +424,14 @@ const styles = StyleSheet.create({
     },
     title: {
         color: colors.text.primary,
+    },
+    playButton: {
+        backgroundColor: colors.primary[400],
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: colors.accent[500],
     },
     mainContent: {
         flex: 1,

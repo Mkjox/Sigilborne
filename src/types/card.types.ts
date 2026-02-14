@@ -1,7 +1,6 @@
-// Card-related types
 export type CardType = 'unit' | 'spell' | 'weather';
 export type CardRarity = 'common' | 'rare' | 'epic' | 'legendary';
-export type RowType = 'melee' | 'ranged' | 'siege';
+// RowType removed
 export type AbilityTrigger = 'onPlay' | 'onDeath' | 'passive' | 'activate';
 
 export interface Ability {
@@ -11,7 +10,7 @@ export interface Ability {
     trigger: AbilityTrigger;
     value?: number;
     description: string;
-    effect?: (context: any) => void; // Will be properly typed in Phase 4
+    effect?: (context: any) => void;
 }
 
 export interface Card {
@@ -20,8 +19,11 @@ export interface Card {
     type: CardType;
     rarity: CardRarity;
     manaCost: number;
-    power?: number; // For unit cards
-    row?: RowType; // For unit cards
+    power: number; // Current Health / Score Contribution
+    basePower?: number; // Original/Max Health
+    attack: number; // Damage dealt
+    isExhausted?: boolean; // Cannot attack this turn
+    // row removed
     abilities: Ability[];
     artwork: any;
     description: string;

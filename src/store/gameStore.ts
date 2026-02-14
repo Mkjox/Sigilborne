@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GameState, PlayerType, Difficulty, RowType } from '../types';
+import { GameState, PlayerType, Difficulty } from '../types';
 import {
     createInitialGameState,
     playCard as enginePlayCard,
@@ -11,6 +11,7 @@ import {
     getTotalPower,
     WeatherState,
     useHeroAbility as engineUseHeroAbility,
+    attackUnit,
 } from '../engine';
 import { makeAIDecision, getAIDelay } from '../engine/aiEngine';
 import { useDeckStore } from './deckStore';
@@ -26,7 +27,7 @@ interface GameStore extends GameState {
 
     // Actions
     startGame: (difficulty: Difficulty) => void;
-    playCard: (cardId: string, targetRow?: RowType) => void;
+    playCard: (cardId: string) => void;
     useHeroAbility: () => void;
     passTurn: () => void;
     endTurn: () => void;
@@ -34,6 +35,8 @@ interface GameStore extends GameState {
     selectCard: (cardId: string | null) => void;
     setMessage: (message: string | null) => void;
     triggerAI: () => void;
+    setAttackingCard: (cardId: string | null) => void;
+    attackCard: (targetId: string) => void;
 
     // Computed
     getPlayerPower: () => number;
@@ -54,7 +57,7 @@ const createEmptyState = (): GameState => ({
         maxMana: 10,
         deck: [],
         hand: [],
-        board: { melee: [], ranged: [], siege: [] },
+        board: [],
         graveyard: [],
         hero: {
             id: 'hero1',
@@ -83,7 +86,7 @@ const createEmptyState = (): GameState => ({
         maxMana: 10,
         deck: [],
         hand: [],
-        board: { melee: [], ranged: [], siege: [] },
+        board: [],
         graveyard: [],
         hero: {
             id: 'hero2',
@@ -126,7 +129,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? activeDeck.cards.map(c => ({ ...c, id: Math.random().toString(36).substring(2, 11) }))
             : null;
 
-        const initialState = createInitialGameState(difficulty, playerDeck);
+        const initialState = createInitialGameState(difficulty, playerDeck || undefined);
         set({
             ...initialState,
             difficulty,
@@ -137,7 +140,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         });
     },
 
-    playCard: (cardId: string, targetRow?: RowType) => {
+    playCard: (cardId: string) => {
         const state = get();
 
         // Can't play if not player's turn or game is over
@@ -145,11 +148,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return;
         }
 
-        // Find the card to determine its row
+        // Find the card
         const card = state.player.hand.find(c => c.id === cardId);
         if (!card) return;
-
-        const row = card.row || targetRow || 'melee';
 
         // Play the card using game engine
         const gameState: GameState = {
@@ -167,7 +168,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const { newState, success, message } = enginePlayCard(
             gameState,
             cardId,
-            row,
             state.weather
         );
 
@@ -176,18 +176,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return;
         }
 
-        // Handle weather cards
+        // Handle weather cards (Simplified/Disabled for now or needs update)
         if (card.type === 'weather') {
-            const newWeather = { ...state.weather };
-            const ability = card.abilities[0];
-            if (ability?.id === 'frost') newWeather.melee = true;
-            if (ability?.id === 'fog') newWeather.ranged = true;
-            if (ability?.id === 'clear_weather') {
-                newWeather.melee = false;
-                newWeather.ranged = false;
-                newWeather.siege = false;
+            // Weather logic needs refactor for single zone
+            // For now, doing nothing or simple clear
+            if (card.abilities[0]?.id === 'clear_weather') {
+                set({ weather: { melee: false, ranged: false, siege: false } });
             }
-            set({ weather: newWeather });
         }
 
         set({
@@ -240,16 +235,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             winner: state.winner,
         };
 
-        const passedState = enginePassTurn(gameState);
+        const passedState = enginePassTurn(gameState, 'player');
 
         set({
             ...passedState,
             message: 'You passed',
         });
 
-        // Check if round ends
         if (shouldEndRound(passedState)) {
-            const resolvedState = resolveRound(passedState, state.weather);
+            const resolvedState = resolveRound(passedState);
 
             if (resolvedState.gameOver) {
                 set({
@@ -292,6 +286,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             roundHistory: state.roundHistory,
             gameOver: state.gameOver,
             winner: state.winner,
+            attackingCardId: state.attackingCardId,
         };
 
         const nextTurnState = engineEndTurn(gameState);
@@ -309,16 +304,60 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 ...finalTurnState,
                 currentTurn: otherPlayer
             };
+            // Also need to refresh if we skipped back? 
+            // engineEndTurn handles refresh for the *active* player. 
+            // If we skip back, we might need to refresh the "other" player again?
+            // Simplified: The engineEndTurn refreshes the *target* of the switch.
         }
 
         set({
             ...finalTurnState,
+            attackingCardId: null, // Clear interaction
         });
 
         if (finalTurnState.currentTurn === 'ai' && !finalTurnState.ai.hasPassed) {
             get().triggerAI();
         }
     },
+
+    setAttackingCard: (cardId: string | null) => {
+        set({ attackingCardId: cardId, selectedCardId: null });
+    },
+
+    attackCard: (targetId: string) => {
+        const state = get();
+        const attackerId = state.attackingCardId;
+
+        if (!attackerId) return;
+
+        const gameState: GameState = {
+            currentRound: state.currentRound,
+            roundsWon: state.roundsWon,
+            currentTurn: state.currentTurn,
+            phase: state.phase,
+            player: state.player,
+            ai: state.ai,
+            roundHistory: state.roundHistory,
+            gameOver: state.gameOver,
+            winner: state.winner,
+            attackingCardId: state.attackingCardId,
+        };
+
+        const { newState, success, message } = attackUnit(gameState, attackerId, targetId);
+
+        if (success) {
+            set({
+                ...newState,
+                attackingCardId: null, // Reset after attack
+                message: 'Attack!',
+            });
+            // Update UI/Sound?
+        } else {
+            set({ message: message || 'Attack failed', attackingCardId: null });
+        }
+    },
+
+
 
     triggerAI: () => {
         const state = get();
@@ -358,7 +397,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         winner: currentState.winner,
                     };
 
-                    const aiPassedState = enginePassTurn(aiGameState);
+                    const aiPassedState = enginePassTurn(aiGameState, 'ai');
                     // Swap currentTurn back to ai before checking
                     aiPassedState.currentTurn = 'ai';
 
@@ -371,8 +410,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     // Check if round ends
                     if (currentState.player.hasPassed) {
                         const resolvedState = resolveRound(
-                            { ...aiPassedState, ai: { ...aiPassedState.ai, hasPassed: true } },
-                            currentState.weather
+                            { ...aiPassedState, ai: { ...aiPassedState.ai, hasPassed: true } }
                         );
 
                         if (resolvedState.gameOver) {
@@ -399,7 +437,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         // Player's turn
                         set({ currentTurn: 'player', isAIThinking: false });
                     }
-                } else if (decision.cardId && decision.targetRow) {
+                } else if (decision.cardId) {
                     // AI plays a card
                     const aiGameState: GameState = {
                         currentRound: currentState.currentRound,
@@ -418,20 +456,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     const { newState } = enginePlayCard(
                         aiGameState,
                         decision.cardId,
-                        decision.targetRow,
                         currentState.weather
                     );
 
-                    // Handle weather effects if AI played a weather card
+                    // Handle weather effects if AI played a weather card (Simplified)
                     let newWeather = { ...currentState.weather };
                     if (card?.type === 'weather') {
-                        const ability = card.abilities[0];
-                        if (ability?.id === 'frost') newWeather.melee = true;
-                        if (ability?.id === 'fog') newWeather.ranged = true;
-                        if (ability?.id === 'clear_weather') {
-                            newWeather.melee = false;
-                            newWeather.ranged = false;
-                            newWeather.siege = false;
+                        if (card.abilities[0]?.id === 'clear_weather') {
+                            newWeather = { melee: false, ranged: false, siege: false };
                         }
                     }
 

@@ -2,11 +2,11 @@
 export const typography = {
     // Font families
     fonts: {
-        heading: 'Cinzel-Bold', // Will load via expo-font
-        body: 'Inter-Regular',
-        bodyBold: 'Inter-Bold',
-        bodySemiBold: 'Inter-SemiBold',
-        mono: 'SpaceMono-Regular',
+        heading: 'serif', // Fallback to system serif for fantasy feel
+        body: 'sans-serif',
+        bodyBold: 'sans-serif-medium',
+        bodySemiBold: 'sans-serif-medium',
+        mono: 'monospace',
     },
 
     // Font sizes

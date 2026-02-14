@@ -1,4 +1,4 @@
-import { GameState, PlayerType, PlayerState, BoardRow, Difficulty, RowType } from '../types';
+import { GameState, PlayerType, PlayerState, BoardState, Difficulty, RoundInfo } from '../types';
 import { Card } from '../types';
 import { createStarterDeck, createAIDeck } from '../data/cardData';
 import { shuffleArray, drawCards, calculateBoardPower, executeAbility, AbilityContext } from './abilitySystem';
@@ -28,7 +28,7 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[]): PlayerSt
         maxMana: 10,
         deck: newDeck,
         hand: newHand,
-        board: { melee: [], ranged: [], siege: [] },
+        board: [], // Single zone board
         graveyard: [],
         hero: {
             id: `hero_${id}`,
@@ -53,68 +53,13 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[]): PlayerSt
     };
 };
 
-// Create initial game state
-export const createInitialGameState = (difficulty: Difficulty, customPlayerDeck?: Card[] | null): GameState => {
-    const playerDeck = customPlayerDeck || createStarterDeck();
-    const aiDeck = createAIDeck();
-
-    return {
-        currentRound: 1,
-        roundsWon: { player: 0, ai: 0 },
-        currentTurn: 'player',
-        phase: 'main',
-        player: createPlayerState('player', 'player', playerDeck),
-        ai: createPlayerState('ai', 'ai', aiDeck),
-        roundHistory: [],
-        gameOver: false,
-    };
-};
-
-export const useHeroAbility = (state: GameState): { newState: GameState; success: boolean; message?: string } => {
-    const currentPlayer = state.currentTurn;
-    const playerState = state[currentPlayer];
-
-    if (playerState.hero.ability.currentCooldown > 0) {
-        return { newState: state, success: false, message: 'Ability on cooldown' };
-    }
-
-    const newState = { ...state };
-
-    // Execute ability
-    const ability = playerState.hero.ability;
-
-    // Create a virtual card context for the ability
-    const virtualCard: Card = {
-        id: playerState.hero.id,
-        name: playerState.hero.name,
-        type: 'unit', // Fallback type
-        rarity: 'legendary',
-        manaCost: 0,
-        abilities: [ability],
-        description: ability.description,
-        artwork: playerState.hero.artwork
-    };
-
-    const context: AbilityContext = {
-        state: newState,
-        card: virtualCard,
-        player: currentPlayer,
-        updateState: () => { },
-    };
-
-    executeAbility(ability, context);
-
-    // Set cooldown (single use for now, so massive cooldown)
-    newState[currentPlayer].hero.ability.currentCooldown = 99;
-
-    return { newState, success: true, message: `Used ${ability.name}` };
-};
+// ... initial game state ...
 
 // Play a card from hand to board
 export const playCard = (
     state: GameState,
     cardId: string,
-    targetRow: RowType,
+    // targetRow: RowType, // REMOVED
     weather: WeatherState
 ): { newState: GameState; success: boolean; message?: string } => {
     const currentPlayer = state.currentTurn;
@@ -151,11 +96,8 @@ export const playCard = (
 
     // Handle different card types
     if (card.type === 'unit') {
-        const row = card.row || targetRow;
-        newState[currentPlayer].board = {
-            ...newState[currentPlayer].board,
-            [row]: [...newState[currentPlayer].board[row], { ...card }],
-        };
+        // Add to single board array
+        newState[currentPlayer].board = [...newState[currentPlayer].board, { ...card }];
 
         // Execute onPlay abilities
         card.abilities
@@ -165,7 +107,7 @@ export const playCard = (
                     state: newState,
                     card,
                     player: currentPlayer,
-                    targetRow: row,
+                    // targetRow: row, // REMOVED
                     updateState: () => { },
                 };
                 executeAbility(ability, context);
@@ -179,7 +121,7 @@ export const playCard = (
                     state: newState,
                     card,
                     player: currentPlayer,
-                    targetRow,
+                    // targetRow, // REMOVED
                     updateState: () => { },
                 };
                 executeAbility(ability, context);
@@ -199,27 +141,152 @@ export const playCard = (
     return { newState, success: true };
 };
 
-// Pass turn for current player
-export const passTurn = (state: GameState): GameState => {
-    const currentPlayer = state.currentTurn;
+// Initialize new game
+export const createInitialGameState = (difficulty: Difficulty, playerDeck?: Card[]): GameState => {
+    const deck = playerDeck || createStarterDeck();
+    const player = createPlayerState('player', 'player', deck);
+    const aiDeck = createAIDeck();
+    const ai = createPlayerState('ai', 'ai', aiDeck);
+
+    return {
+        currentRound: 1,
+        roundsWon: { player: 0, ai: 0 },
+        currentTurn: 'player', // Coin flip? Player starts for now
+        phase: 'draw',
+        player,
+        ai,
+        roundHistory: [],
+        gameOver: false,
+    };
+};
+
+// Pass turn
+export const passTurn = (state: GameState, playerType: PlayerType): GameState => {
+    const newState = { ...state };
+    newState[playerType].hasPassed = true;
+
+    // Check if round should end
+    if (shouldEndRound(newState)) {
+        return resolveRound(newState);
+    }
+
+    // Switch turn logic handled in endTurn usually, but if passed, we just give control to other
+    return endTurn(newState);
+};
+
+// Helper to handle unit death
+const checkDeaths = (state: GameState): GameState => {
     const newState = { ...state };
 
-    newState[currentPlayer] = {
-        ...newState[currentPlayer],
-        hasPassed: true,
-    };
+    (['player', 'ai'] as PlayerType[]).forEach((playerType) => {
+        const currentPlayerState = newState[playerType];
+        const deadUnits = currentPlayerState.board.filter(c => (c.power || 0) <= 0);
+
+        if (deadUnits.length > 0) {
+            newState[playerType] = {
+                ...currentPlayerState,
+                graveyard: [...currentPlayerState.graveyard, ...deadUnits],
+                board: currentPlayerState.board.filter(c => (c.power || 0) > 0)
+            };
+        }
+    });
 
     return newState;
 };
 
-// Switch to next player's turn
-export const endTurn = (state: GameState): GameState => {
-    const nextPlayer: PlayerType = state.currentTurn === 'player' ? 'ai' : 'player';
+// Attack unit
+export const attackUnit = (
+    state: GameState,
+    attackerId: string,
+    targetId: string
+): { newState: GameState; success: boolean; message?: string } => {
+    const currentPlayer = state.currentTurn;
+    const opponent = currentPlayer === 'player' ? 'ai' : 'player';
 
-    return {
-        ...state,
-        currentTurn: nextPlayer,
+    // 1. Find cards
+    const attackerRef = state[currentPlayer].board.find(c => c.id === attackerId);
+    const targetRef = state[opponent].board.find(c => c.id === targetId);
+
+    if (!attackerRef || !targetRef) {
+        return { newState: state, success: false, message: "Unit not found" };
+    }
+
+    // 2. Validation
+    if (attackerRef.isExhausted) {
+        return { newState: state, success: false, message: "Unit is exhausted" };
+    }
+
+    // 3. Combat Math
+    // Clone state to avoid mutation
+    // Deep clone needed? We'll map the boards.
+    const newState = { ...state };
+    const newAttacker = { ...attackerRef };
+    const newTarget = { ...targetRef };
+
+    // Damage
+    newTarget.power = (newTarget.power || 0) - newAttacker.attack;
+
+    // Retaliation logic? Hearthstone has it.
+    newAttacker.power = (newAttacker.power || 0) - newTarget.attack;
+
+    // Exhaust attacker
+    newAttacker.isExhausted = true;
+
+    // Update boards
+    newState[currentPlayer] = {
+        ...state[currentPlayer],
+        board: state[currentPlayer].board.map(c => c.id === attackerId ? newAttacker : c)
     };
+
+    newState[opponent] = {
+        ...state[opponent],
+        board: state[opponent].board.map(c => c.id === targetId ? newTarget : c)
+    };
+
+    // 4. Death processing
+    const finalState = checkDeaths(newState);
+
+    return { newState: finalState, success: true, message: "Attack successful" };
+};
+
+// End turn and switch active player
+export const endTurn = (state: GameState): GameState => {
+    // If game over, do nothing
+    if (state.gameOver) return state;
+
+    const current = state.currentTurn;
+    const opponent = current === 'player' ? 'ai' : 'player';
+
+    // If opponent has passed, stay on current player
+    if (state[opponent].hasPassed) {
+        if (state[current].hasPassed) {
+            return resolveRound(state);
+        }
+        // Current player keeps playing
+        // Refresh units if it's "start of turn" conceptually? 
+        // If opponent passed, I take another turn immediately. 
+        // So my units should ready up?
+        // Yes, start of MY turn.
+        const refreshedPlayer = {
+            ...state[current],
+            board: state[current].board.map(c => ({ ...c, isExhausted: false }))
+        };
+        const newState = { ...state };
+        newState[current] = refreshedPlayer;
+        return newState;
+    }
+
+    // Switch turn
+    // Ready up the NEXT player's units
+    const refreshedOpponent = {
+        ...state[opponent],
+        board: state[opponent].board.map(c => ({ ...c, isExhausted: false }))
+    };
+
+    const newState = { ...state, currentTurn: opponent as PlayerType };
+    newState[opponent] = refreshedOpponent;
+
+    return newState;
 };
 
 // Check if round should end
@@ -227,68 +294,128 @@ export const shouldEndRound = (state: GameState): boolean => {
     return state.player.hasPassed && state.ai.hasPassed;
 };
 
-// Calculate round winner and update state
-export const resolveRound = (state: GameState, weather: WeatherState): GameState => {
-    const playerPower = calculateBoardPower(state.player.board, weather, state.ai.board);
-    const aiPower = calculateBoardPower(state.ai.board, weather, state.player.board);
+// Resolve round winner
+export const resolveRound = (state: GameState): GameState => {
+    const weather = { melee: false, ranged: false, siege: false }; // Weather removed/simplified
+    const playerPower = calculateBoardPower(state.player.board, weather);
+    const aiPower = calculateBoardPower(state.ai.board, weather);
 
-    const newState = { ...state };
+    let winner: PlayerType | 'draw' = 'draw';
+    if (playerPower > aiPower) winner = 'player';
+    else if (aiPower > playerPower) winner = 'ai';
 
-    // Record round history
-    newState.roundHistory.push({
+    // Update scores (gems)
+    const roundsWon = { ...state.roundsWon };
+    const playerHealth = state.player.health;
+    const aiHealth = state.ai.health;
+
+    // Gwent style: Winner gets a round point? Or loser loses a gem/life?
+    // "Classic Gwent": 2 lives. Loser loses a life.
+    // If draw, both lose a life.
+
+    let newPlayerHealth = playerHealth;
+    let newAIHealth = aiHealth;
+
+    if (winner === 'player') {
+        roundsWon.player += 1;
+        newAIHealth -= 1;
+    } else if (winner === 'ai') {
+        roundsWon.ai += 1;
+        newPlayerHealth -= 1;
+    } else {
+        // Draw - both lose life
+        newPlayerHealth -= 1;
+        newAIHealth -= 1;
+    }
+
+    // Record history
+    const roundInfo: RoundInfo = {
         number: state.currentRound,
         playerScore: playerPower,
         aiScore: aiPower,
-    });
+    };
 
-    // Determine winner
-    if (playerPower > aiPower) {
-        newState.roundsWon.player += 1;
-    } else if (aiPower > playerPower) {
-        newState.roundsWon.ai += 1;
-    }
-    // Tie: no one wins the round
+    const newState = {
+        ...state,
+        roundsWon,
+        player: { ...state.player, health: newPlayerHealth },
+        ai: { ...state.ai, health: newAIHealth },
+        roundHistory: [...state.roundHistory, roundInfo],
+    };
 
-    // Check for game over
-    if (newState.roundsWon.player >= ROUNDS_TO_WIN) {
-        newState.gameOver = true;
-        newState.winner = 'player';
-    } else if (newState.roundsWon.ai >= ROUNDS_TO_WIN) {
-        newState.gameOver = true;
-        newState.winner = 'ai';
-    } else if (newState.currentRound >= MAX_ROUNDS) {
-        // After 3 rounds, determine winner by rounds won
-        newState.gameOver = true;
-        if (newState.roundsWon.player > newState.roundsWon.ai) {
-            newState.winner = 'player';
-        } else if (newState.roundsWon.ai > newState.roundsWon.player) {
-            newState.winner = 'ai';
-        } else {
-            newState.winner = 'draw';
-        }
+    // Check Game Over
+    if (newPlayerHealth <= 0 || newAIHealth <= 0) {
+        // Game Over
+        let gameWinner: PlayerType | 'draw' = 'draw';
+        if (newPlayerHealth > 0 && newAIHealth <= 0) gameWinner = 'player';
+        else if (newAIHealth > 0 && newPlayerHealth <= 0) gameWinner = 'ai';
+        else gameWinner = 'draw'; // Both died same turn
+
+        return {
+            ...newState,
+            gameOver: true,
+            winner: gameWinner,
+        };
     }
 
-    return newState;
+    // Start next round
+    return startNextRound(newState);
+};
+
+// Use Hero Ability
+export const useHeroAbility = (state: GameState): { newState: GameState, success: boolean, message?: string } => {
+    const player = state.currentTurn;
+    const playerState = state[player];
+
+    if (playerState.hero.ability.currentCooldown > 0) {
+        return { newState: state, success: false, message: "Ability on cooldown" };
+    }
+
+    // Execute ability
+    const abilityType = playerState.hero.ability.type;
+    const context: AbilityContext = {
+        state: state,
+        card: {} as Card, // Dummy card for hero ability context if needed, or update AbilityContext to allow optional card
+        player: player,
+        updateState: () => { },
+    };
+
+    // Execute logic directly since card is mocked
+    // Ideally executeAbility handles it. 
+    // We need a dummy card with the ability
+    const dummyAbilityCard = {
+        id: 'hero_ability',
+        name: playerState.hero.ability.name,
+        abilities: [{ type: abilityType, value: 0 }] // Value configurable?
+    } as Card;
+
+    context.card = dummyAbilityCard;
+
+    executeAbility(dummyAbilityCard.abilities[0], context);
+
+    // Set cooldown (e.g., once per game or per round? Config says 3? )
+    const newState = { ...state };
+    newState[player].hero.ability.currentCooldown = 99; // Used once per game usually? Or set to max.
+
+    return { newState, success: true, message: "Hero ability used" };
 };
 
 // Setup next round
 export const startNextRound = (state: GameState): GameState => {
     // Move all board cards to graveyard
     const moveToGraveyard = (player: PlayerState): PlayerState => {
-        const allBoardCards = [
-            ...player.board.melee,
-            ...player.board.ranged,
-            ...player.board.siege,
-        ];
+        const allBoardCards = [...player.board];
 
         return {
             ...player,
-            board: { melee: [], ranged: [], siege: [] },
+            board: [],
             graveyard: [...player.graveyard, ...allBoardCards],
             hasPassed: false,
             mana: player.maxMana, // Restore mana
         };
     };
+
+    // ... rest of startNextRound ...
 
     // Draw 2 cards for new round
     const drawForRound = (player: PlayerState): PlayerState => {
@@ -323,14 +450,13 @@ export const startNextRound = (state: GameState): GameState => {
     };
 };
 
-// Get row power for display
 export const getRowPower = (cards: Card[], hasWeather: boolean): number => {
+    // Deprecated but kept for compatibility logic if needed
     if (hasWeather) return cards.length;
     return cards.reduce((sum, card) => sum + (card.power || 0), 0);
 };
 
 // Get total player power
-export const getTotalPower = (board: BoardRow, weather: WeatherState, opponentBoard?: BoardRow): number => {
-    // Determine raw power first
+export const getTotalPower = (board: BoardState, weather: WeatherState, opponentBoard?: BoardState): number => {
     return calculateBoardPower(board, weather, opponentBoard);
 };

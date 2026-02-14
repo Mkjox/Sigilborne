@@ -40,3 +40,4 @@ yarn-error.*
 /ios
 /android
 .vscode/settings.json
+build_release_log.txt

@@ -252,7 +252,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                             <MenuButton
                                 title="PLAY"
                                 subtitle="Start a new game"
-                                onPress={() => navigation.navigate('DeckBuilder')}
+                                onPress={() => navigation.navigate('GameBoard', { difficulty: 'medium' })}
                                 variant="primary"
                                 delay={100}
                             />
@@ -418,11 +418,8 @@ const styles = StyleSheet.create({
     menuContainer: {
         width: '100%',
         gap: spacing.md,
-        padding: spacing.lg,
-        backgroundColor: 'rgba(45,37,32,0.6)', // Semi-transparent warm dark
-        borderRadius: 24,
-        borderWidth: 2,
-        borderColor: 'rgba(139,69,19,0.3)',
+        padding: spacing.sm,
+        // Background/border handled by OrnateFrame now
     },
     menuButton: {
         paddingHorizontal: spacing.lg,

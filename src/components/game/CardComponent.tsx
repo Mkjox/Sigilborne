@@ -29,6 +29,7 @@ interface CardComponentProps {
     width?: number;
     height?: number;
     hideStats?: boolean;
+    isTargeted?: boolean;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -48,18 +49,19 @@ const rarityGlow: Record<CardRarity, string> = {
     legendary: 'rgba(245, 158, 11, 0.6)',
 };
 
-/* UnitPowerDisplay declaration removed (defined at bottom) */
+/* ... existing code ... */
 
 export const CardComponent: React.FC<CardComponentProps> = ({
     card,
     onPress,
     isSelected = false,
+    isTargeted = false,
     isPlayable = true,
     isSmall = false,
     faceDown = false,
     width,
     height,
-    hideStats = false,
+    hideStats,
 }) => {
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const scale = useSharedValue(1);
@@ -78,9 +80,9 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     }
 
     // Dynamic Scaling Calculations
-    const badgeSize = cardHeight * 0.18; // 18% of card height
-    const badgeFontSize = badgeSize * 0.55;
-    const padding = cardHeight * 0.03;
+    const badgeSize = cardHeight * 0.22; // Increased from 0.18 for better visibility
+    const badgeFontSize = badgeSize * 0.6;
+    const padding = cardHeight * 0.04;
     const typeSize = cardHeight * 0.16;
 
     const handlePressIn = () => {
@@ -117,18 +119,29 @@ export const CardComponent: React.FC<CardComponentProps> = ({
         );
     }
 
-    const gradientColors = rarityColors[card.rarity];
+    // Dynamic border color for selection/targeting
+    const getBorderColors = () => {
+        if (isTargeted) return [colors.error, '#FF0000']; // Red glow for targets
+        if (isSelected) return [colors.secondary[400], colors.secondary[600]]; // Gold for selection
+        return rarityColors[card.rarity];
+    };
+
+    const gradientColors = getBorderColors();
 
     return (
         <AnimatedPressable
-            onPress={isPlayable ? onPress : undefined}
-            onPressIn={isPlayable ? handlePressIn : undefined}
-            onPressOut={isPlayable ? handlePressOut : undefined}
-            style={[animatedStyle, styles.cardContainer, { width: cardWidth, height: cardHeight }]}
+            onPress={onPress}
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            style={[styles.cardContainer, { width: cardWidth, height: cardHeight }, animatedStyle]}
+            disabled={!onPress}
         >
-            {/* Glow effect for rare+ cards */}
-            {card.rarity !== 'common' && (
-                <View style={[styles.glowEffect]} />
+            {/* Glow effect for rare+ or targeted cards */}
+            {(card.rarity !== 'common' || isTargeted || isSelected) && (
+                <View style={[
+                    styles.glowEffect,
+                    (isTargeted || isSelected) && { opacity: 0.8, backgroundColor: isTargeted ? colors.error : colors.secondary[400] }
+                ]} />
             )}
 
             {/* Card border gradient */}
@@ -140,14 +153,13 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                 <View style={[styles.cardInner, { width: cardWidth - 4, height: cardHeight - 4 }]}>
 
                     {/* Card type indicator (Top Left) */}
-
                     {!hideStats && (
                         <View style={[
                             styles.badgeBase,
                             {
                                 top: padding, left: padding,
                                 width: typeSize, height: typeSize, borderRadius: typeSize / 2, // Circular
-                                backgroundColor: gradientColors[0],
+                                backgroundColor: isTargeted ? colors.error : rarityColors[card.rarity][0], // Red if target
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 borderWidth: 1,
@@ -159,9 +171,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                             }
                         ]}>
                             <Text style={[styles.badgeText, { fontSize: typeSize * 0.65, lineHeight: typeSize * 0.75, textAlign: 'center', textAlignVertical: 'center' }]}>
-                                {card.type === 'unit'
-                                    ? (card.row === 'melee' ? '⚔️' : (card.row === 'ranged' ? '🏹' : '🏰'))
-                                    : (card.type === 'spell' ? '✨' : '🌧️')}
+                                {card.type === 'unit' ? '⚔️' : (card.type === 'spell' ? '✨' : '🌧️')}
                             </Text>
                         </View>
                     )}
@@ -208,35 +218,46 @@ export const CardComponent: React.FC<CardComponentProps> = ({
 
                     {/* Card name */}
                     <View style={styles.nameContainer}>
-                        <Text style={[styles.cardName, { fontSize: Math.max(8, cardHeight * 0.08) }]} numberOfLines={1}>
+                        <Text style={[styles.cardName, { fontSize: Math.max(10, cardHeight * 0.1) }]} numberOfLines={1}>
                             {card.name}
                         </Text>
                     </View>
 
-                    {/* Power (Bottom Right) */}
-                    {card.type === 'unit' && card.power !== undefined && (
-                        <UnitPowerDisplay
-                            power={card.power}
-                            isHero={false}
-                            size={badgeSize}
-                            fontSize={badgeFontSize}
-                            style={{ bottom: padding + 16, right: padding }}
+                    {/* Attack (Bottom Left) */}
+                    {card.type === 'unit' && card.attack !== undefined && !hideStats && (
+                        <StatBadge
+                            value={card.attack}
+                            type="attack"
+                            size={badgeSize * 1.2} // 20% bigger
+                            fontSize={badgeFontSize * 1.3}
+                            style={{ bottom: padding, left: padding }}
                         />
                     )}
 
-                    {/* Ability indicator (Bottom Left) */}
+                    {/* Health (Bottom Right) */}
+                    {card.type === 'unit' && card.power !== undefined && !hideStats && (
+                        <StatBadge
+                            value={card.power}
+                            type="health"
+                            size={badgeSize * 1.2}
+                            fontSize={badgeFontSize * 1.3}
+                            style={{ bottom: padding, right: padding }}
+                        />
+                    )}
+
+                    {/* Ability indicator (Bottom Center - Small Star) */}
                     {card.abilities.length > 0 && !hideStats && (
                         <View style={[
                             styles.badgeBase,
                             {
-                                bottom: padding + 16, left: padding,
-                                width: badgeSize, height: badgeSize, borderRadius: badgeSize / 2, // Circular
+                                bottom: padding + 5, alignSelf: 'center',
+                                width: badgeSize * 0.6, height: badgeSize * 0.6, borderRadius: badgeSize * 0.3,
                                 backgroundColor: colors.primary[500],
                                 borderWidth: 1,
                                 borderColor: '#fff'
                             }
                         ]}>
-                            <Text style={[styles.badgeText, { fontSize: badgeFontSize }]}>★</Text>
+                            {/* <Text style={[styles.badgeText, { fontSize: badgeFontSize * 0.6 }]}>★</Text> */}
                         </View>
                     )}
                 </View>
@@ -255,33 +276,61 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     );
 };
 
-// Modified UnitPowerDisplay to accept size props
-const UnitPowerDisplay: React.FC<{
-    power: number;
-    isHero?: boolean;
+// Generic Stat Badge Component
+const StatBadge: React.FC<{
+    value: number;
+    type: 'attack' | 'health' | 'mana';
     size: number;
     fontSize: number;
     style?: any;
-}> = ({ power, isHero, size, fontSize, style }) => {
-    const prevPower = React.useRef(power);
+    showChangeAnim?: boolean;
+}> = ({ value, type, size, fontSize, style, showChangeAnim = true }) => {
+    const prevValue = React.useRef(value);
     const colorAnim = useSharedValue(0);
 
+    // Contextual Colors
+    const getBgColor = () => {
+        switch (type) {
+            case 'attack': return '#E8C547'; // Yellow
+            case 'health': return '#D32F2F'; // Red
+            case 'mana': return '#1976D2'; // Blue
+            default: return '#555';
+        }
+    };
+
+    // Border Colors
+    const getBorderColor = () => {
+        switch (type) {
+            case 'attack': return '#B8941F';
+            case 'health': return '#8E0000';
+            case 'mana': return '#0D47A1';
+            default: return '#333';
+        }
+    };
+
+    // Pre-calculate colors outside of worklet
+    const bgColor = getBgColor();
+    const borderColor = getBorderColor();
+
     React.useEffect(() => {
-        if (power > prevPower.current) {
+        if (!showChangeAnim) return;
+        if (value > prevValue.current) {
             colorAnim.value = withSequence(withTiming(1, { duration: 200 }), withDelay(500, withTiming(0, { duration: 500 })));
-        } else if (power < prevPower.current) {
+        } else if (value < prevValue.current) {
             colorAnim.value = withSequence(withTiming(-1, { duration: 200 }), withDelay(500, withTiming(0, { duration: 500 })));
         }
-        prevPower.current = power;
-    }, [power]);
+        prevValue.current = value;
+    }, [value]);
 
     const animatedStyle = useAnimatedStyle(() => {
+        if (!showChangeAnim) return {};
         const backgroundColor = interpolateColor(
             colorAnim.value,
             [-1, 0, 1],
-            [colors.error, colors.secondary[500], colors.success]
+            [colors.error, bgColor, colors.success]
         );
-        return { backgroundColor };
+        // Only override background if animating
+        return colorAnim.value !== 0 ? { backgroundColor } : {};
     });
 
     return (
@@ -289,9 +338,19 @@ const UnitPowerDisplay: React.FC<{
             styles.badgeBase,
             style,
             animatedStyle,
-            { width: size, height: size, borderRadius: size / 2, borderWidth: 1, borderColor: 'rgba(255,255,255,0.4)' } // Circular
+            {
+                width: size, height: size, borderRadius: size / 2,
+                backgroundColor: bgColor,
+                borderWidth: 2, borderColor: borderColor,
+                shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.6, shadowRadius: 2
+            }
         ]}>
-            <Text style={[styles.badgeText, { fontSize }]}>{power}</Text>
+            {type === 'attack' && (
+                <View style={{ position: 'absolute', bottom: -4, zIndex: -1 }}>
+                    {/* Optional sword icon or flair here */}
+                </View>
+            )}
+            <Text style={[styles.badgeText, { fontSize, textShadowColor: '#000', textShadowRadius: 2 }]}>{value}</Text>
         </Animated.View>
     );
 };
@@ -349,17 +408,22 @@ const styles = StyleSheet.create({
     },
     nameContainer: {
         position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        paddingVertical: 2,
+        top: '60%', // Move Name to middle-bottom to not overlap with bottom stats
+        left: 2,
+        right: 2,
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        paddingVertical: 4,
         paddingHorizontal: 4,
         zIndex: 4,
+        borderRadius: 4,
     },
     cardName: {
         textAlign: 'center',
-        color: colors.text.primary,
+        color: '#FFF',
+        fontWeight: 'bold',
+        textShadowColor: '#000',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2,
     },
     selectedOverlay: {
         position: 'absolute',

@@ -5,12 +5,8 @@ import { Hero } from './hero.types';
 export type GamePhase = 'draw' | 'main' | 'combat' | 'end';
 export type PlayerType = 'player' | 'ai';
 
-// Board structure (3 rows)
-export interface BoardRow {
-    melee: Card[];
-    ranged: Card[];
-    siege: Card[];
-}
+// Board structure (Single Zone)
+export type BoardState = Card[];
 
 // Player state
 export interface PlayerState {
@@ -21,7 +17,7 @@ export interface PlayerState {
     maxMana: number;
     deck: Card[];
     hand: Card[];
-    board: BoardRow;
+    board: BoardState;
     graveyard: Card[];
     hero: Hero;
     hasPassed: boolean;
@@ -48,6 +44,7 @@ export interface GameState {
     roundHistory: RoundInfo[];
     gameOver: boolean;
     winner?: PlayerType | 'draw';
+    attackingCardId?: string | null;
 }
 
 // Difficulty levels
