@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Dragon Forge",
-    "slug": "DragonForge",
+    "name": "Sigilborne",
+    "slug": "sigilborne",
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/icon.png",
@@ -22,7 +22,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.mkjox.dragonforge"
+      "package": "com.mkjox.sigilborne"
     },
     "web": {
       "favicon": "./assets/favicon.png"
