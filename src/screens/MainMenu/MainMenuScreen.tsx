@@ -15,6 +15,10 @@ import Animated, {
     withSpring,
     withSequence,
     withDelay,
+    withRepeat,
+    withTiming,
+    interpolateColor,
+    Easing,
     FadeIn,
     SlideInLeft,
     SlideInRight,
@@ -68,24 +72,24 @@ const MenuButton: React.FC<MenuButtonProps> = ({
     const getGradientColors = (): readonly [string, string, ...string[]] => {
         switch (variant) {
             case 'primary':
-                return [colors.primary[400], colors.primary[600]];
+                return [colors.primary[500], colors.primary[700]];
             case 'accent':
-                return [colors.accent[400], colors.accent[600]];
+                return [colors.accent[500], colors.accent[700]];
             case 'secondary':
             default:
-                return ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.05)'];
+                return ['rgba(139,69,19,0.5)', 'rgba(62,31,14,0.6)']; // Warm brown
         }
     };
 
     const getBorderColor = () => {
         switch (variant) {
             case 'primary':
-                return colors.primary[400];
+                return colors.primary[300]; // Bright gold
             case 'accent':
                 return colors.accent[400];
             case 'secondary':
             default:
-                return 'rgba(255,255,255,0.2)';
+                return colors.secondary[600]; // Brown border
         }
     };
 
@@ -130,6 +134,50 @@ const MenuButton: React.FC<MenuButtonProps> = ({
     );
 };
 
+const AnimatedLinearGradient = Animated.createAnimatedComponent(LinearGradient);
+
+const AnimatedBackground: React.FC = () => {
+    const progress = useSharedValue(0);
+
+    React.useEffect(() => {
+        // Animate through color states continuously
+        progress.value = withRepeat(
+            withTiming(1, {
+                duration: 10000, // 10 seconds for full cycle
+                easing: Easing.inOut(Easing.ease),
+            }),
+            -1, // Infinite repeat
+            true // Reverse (ping-pong effect)
+        );
+    }, []);
+
+    const animatedStyle = useAnimatedStyle(() => {
+        // Interpolate between warm brown color states
+        const backgroundColor = interpolateColor(
+            progress.value,
+            [0, 0.5, 1],
+            [
+                '#1A1410', // Very dark brown
+                '#2D2520', // Dark brown with warm tone
+                '#1A1410', // Back to very dark brown
+            ]
+        );
+
+        return { backgroundColor };
+    });
+
+    return (
+        <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
+            <LinearGradient
+                colors={['rgba(212,175,55,0.05)', 'transparent', 'rgba(205,127,50,0.08)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+            />
+        </Animated.View>
+    );
+};
+
 export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
     const { width, height } = useWindowDimensions();
     const insets = useSafeAreaInsets();
@@ -140,24 +188,31 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            {/* Background gradient */}
-            <LinearGradient
-                colors={[colors.background.primary, '#0a0015', colors.background.primary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-            />
+            {/* Animated background gradient */}
+            <AnimatedBackground />
 
-            {/* Decorative elements */}
+            {/* Decorative elements - Board game inspired */}
             <View style={styles.decorativeContainer}>
+                {/* Corner ornaments */}
                 <Animated.View
                     entering={FadeIn.delay(200).duration(1000)}
-                    style={[styles.glowOrb, styles.glowOrbPrimary]}
+                    style={[styles.cornerOrnament, styles.cornerTopLeft]}
+                />
+                <Animated.View
+                    entering={FadeIn.delay(300).duration(1000)}
+                    style={[styles.cornerOrnament, styles.cornerTopRight]}
                 />
                 <Animated.View
                     entering={FadeIn.delay(400).duration(1000)}
-                    style={[styles.glowOrb, styles.glowOrbAccent]}
+                    style={[styles.cornerOrnament, styles.cornerBottomLeft]}
                 />
+                <Animated.View
+                    entering={FadeIn.delay(500).duration(1000)}
+                    style={[styles.cornerOrnament, styles.cornerBottomRight]}
+                />
+
+                {/* Subtle geometric pattern overlay */}
+                <View style={styles.patternOverlay} />
             </View>
 
             {/* Main content - responsive layout */}
@@ -176,67 +231,58 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                     entering={isLandscape ? SlideInLeft.springify() : FadeIn.duration(800)}
                     style={styles.brandSection}
                 >
-                    <View style={styles.logoContainer}>
-                        <LinearGradient
-                            colors={[colors.primary[500], colors.accent[500]]}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                            style={styles.logoGradient}
-                        >
-                            <Text variant="h1" style={styles.logoText}>⚔</Text>
-                        </LinearGradient>
+
+
+                    {/* HEADER */}
+                    <View style={styles.header}>
+                        <View style={styles.titleContainer}>
+                            <Text variant="h1" style={styles.title} color={colors.primary[400]}>
+                                LEGENDS
+                            </Text>
+                            <Text variant="h3" style={styles.subtitle} color={colors.accent[400]}>
+                                OF THE TAVERN
+                            </Text>
+                            <View style={styles.titleUnderline} />
+                        </View>
                     </View>
 
-                    <View style={styles.titleContainer}>
-                        <Text variant="h2" style={styles.title}>
-                            CARD
-                        </Text>
-                        <Text variant="h2" style={styles.titleAccent}>
-                            LEGENDS
-                        </Text>
-                    </View>
+                    {/* MENU ITEMS Container */}
+                    <View style={styles.menuContainerOutside}>
+                        <View style={styles.menuContainer}>
+                            <MenuButton
+                                title="PLAY"
+                                subtitle="Start a new game"
+                                onPress={() => navigation.navigate('DeckBuilder')}
+                                variant="primary"
+                                delay={100}
+                            />
 
-                    <Text variant="caption" color={colors.text.disabled} style={styles.tagline}>
-                        Strategic Card Battle
-                    </Text>
+                            <MenuButton
+                                title="COLLECTION"
+                                subtitle="View your cards"
+                                onPress={() => navigation.navigate('Collection')}
+                                variant="secondary"
+                                delay={200}
+                            />
+
+                            <MenuButton
+                                title="DECK BUILDER"
+                                subtitle="Create custom decks"
+                                onPress={() => navigation.navigate('DeckBuilder')}
+                                variant="secondary"
+                                delay={300}
+                            />
+
+                            <MenuButton
+                                title="SETTINGS"
+                                subtitle="Game preferences"
+                                onPress={() => navigation.navigate('Settings')}
+                                variant="secondary"
+                                delay={400}
+                            />
+                        </View>
+                    </View>
                 </Animated.View>
-
-                {/* Divider - responsive */}
-                <View style={isLandscape ? styles.dividerVertical : styles.dividerHorizontal} />
-
-                {/* Right side - Menu buttons */}
-                <View style={styles.menuSection}>
-                    <MenuButton
-                        title="PLAY"
-                        subtitle="Battle the AI"
-                        variant="primary"
-                        delay={100}
-                        onPress={() => navigation.navigate('GameBoard', { difficulty: 'medium' })}
-                    />
-
-                    <MenuButton
-                        title="COLLECTION"
-                        subtitle="View your cards"
-                        variant="secondary"
-                        delay={200}
-                        onPress={() => navigation.navigate('Collection')}
-                    />
-
-                    <MenuButton
-                        title="DECK BUILDER"
-                        subtitle="Customize decks"
-                        variant="secondary"
-                        delay={300}
-                        onPress={() => navigation.navigate('DeckBuilder')}
-                    />
-
-                    <MenuButton
-                        title="SETTINGS"
-                        variant="secondary"
-                        delay={400}
-                        onPress={() => navigation.navigate('Settings')}
-                    />
-                </View>
             </View>
 
             {/* Version info */}
@@ -261,30 +307,50 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         overflow: 'hidden',
     },
-    glowOrb: {
+    cornerOrnament: {
         position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: 150,
-        opacity: 0.3,
-    },
-    glowOrbPrimary: {
-        backgroundColor: colors.primary[500],
-        top: -100,
-        left: -100,
-        shadowColor: colors.primary[500],
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 1,
-        shadowRadius: 100,
-    },
-    glowOrbAccent: {
-        backgroundColor: colors.accent[500],
-        bottom: -100,
-        right: -100,
+        width: 100,
+        height: 100,
+        borderColor: colors.accent[500], // Bronze
+        borderWidth: 2.5,
+        opacity: 0.35,
         shadowColor: colors.accent[500],
         shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 1,
-        shadowRadius: 100,
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+    },
+    cornerTopLeft: {
+        top: spacing.xl,
+        left: spacing.xl,
+        borderBottomWidth: 0,
+        borderRightWidth: 0,
+        borderTopLeftRadius: 8,
+    },
+    cornerTopRight: {
+        top: spacing.xl,
+        right: spacing.xl,
+        borderBottomWidth: 0,
+        borderLeftWidth: 0,
+        borderTopRightRadius: 8,
+    },
+    cornerBottomLeft: {
+        bottom: spacing.xl,
+        left: spacing.xl,
+        borderTopWidth: 0,
+        borderRightWidth: 0,
+        borderBottomLeftRadius: 8,
+    },
+    cornerBottomRight: {
+        bottom: spacing.xl,
+        right: spacing.xl,
+        borderTopWidth: 0,
+        borderLeftWidth: 0,
+        borderBottomRightRadius: 8,
+    },
+    patternOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        opacity: 0.02, // Even more subtle
+        backgroundColor: 'transparent',
     },
     content: {
         flex: 1,
@@ -304,66 +370,87 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         maxWidth: 280,
     },
-    logoContainer: {
-        marginBottom: spacing.md,
-    },
-    logoGradient: {
-        width: 80,
-        height: 80,
-        borderRadius: 20,
+
+    header: {
         alignItems: 'center',
         justifyContent: 'center',
-        ...shadows.lg,
-    },
-    logoText: {
-        fontSize: 40,
+        marginBottom: spacing['2xl'],
+        zIndex: 10,
     },
     titleContainer: {
         alignItems: 'center',
+        paddingVertical: 10,
     },
     title: {
-        color: colors.text.primary,
-        letterSpacing: 4,
-        marginBottom: -8,
-    },
-    titleAccent: {
+        fontSize: 64,
+        fontWeight: '900',
         color: colors.primary[400],
-        letterSpacing: 6,
+        textAlign: 'center',
+        letterSpacing: 8,
+        textShadowColor: 'rgba(0, 0, 0, 0.7)',
+        textShadowOffset: { width: 0, height: 4 },
+        textShadowRadius: 10,
     },
-    tagline: {
-        marginTop: spacing.sm,
-        letterSpacing: 2,
-        textTransform: 'uppercase',
+    subtitle: {
+        fontSize: 24,
+        letterSpacing: 4,
+        fontWeight: '300',
+        marginTop: -10,
+        textShadowColor: 'rgba(0, 0, 0, 0.7)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
-    dividerVertical: {
-        width: 1,
-        height: '60%',
-        backgroundColor: 'rgba(255,255,255,0.1)',
+    titleUnderline: {
+        width: 150,
+        height: 3,
+        backgroundColor: colors.primary[500],
+        marginTop: 10,
+        borderRadius: 2,
+        shadowColor: colors.primary[500],
+        shadowRadius: 10,
+        shadowOpacity: 0.8,
     },
-    dividerHorizontal: {
-        width: '60%',
-        height: 1,
-        backgroundColor: 'rgba(255,255,255,0.1)',
+    menuContainerOutside: {
+        width: '100%',
+        maxWidth: 320,
+        alignItems: 'center',
     },
-    menuSection: {
-        flex: 1,
-        justifyContent: 'center',
-        gap: spacing.sm,
-        maxWidth: 280,
+    menuContainer: {
+        width: '100%',
+        gap: spacing.md,
+        padding: spacing.lg,
+        backgroundColor: 'rgba(45,37,32,0.6)', // Semi-transparent warm dark
+        borderRadius: 24,
+        borderWidth: 2,
+        borderColor: 'rgba(139,69,19,0.3)',
     },
     menuButton: {
-        paddingVertical: spacing.sm,
         paddingHorizontal: spacing.lg,
-        borderRadius: borderRadius.lg,
-        borderWidth: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+        paddingVertical: spacing.md + 4,
+        borderRadius: 24, // Pill shape
+        borderWidth: 2,
+        marginBottom: spacing.xs,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
     },
     menuButtonPrimary: {
-        ...shadows.glow,
+        borderColor: colors.primary[400],
+        shadowColor: colors.primary[500],
+        shadowOpacity: 0.5,
+        shadowRadius: 12,
+        borderWidth: 2,
     },
     menuButtonText: {
+        fontSize: 18,
+        fontWeight: 'bold',
         letterSpacing: 2,
+        textAlign: 'center',
+        textShadowColor: 'rgba(0,0,0,0.5)',
+        textShadowRadius: 2,
+        textShadowOffset: { width: 1, height: 1 },
     },
     versionContainer: {
         position: 'absolute',

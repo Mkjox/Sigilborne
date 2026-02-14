@@ -28,39 +28,15 @@ interface Props {
     route: GameBoardScreenRouteProp;
 }
 
-// Animated Background Component
-const AnimatedBackground: React.FC = () => {
-    const orb1 = useSharedValue(0);
-    const orb2 = useSharedValue(0);
-
-    useEffect(() => {
-        orb1.value = withRepeat(withTiming(1, { duration: 15000 }), -1, true);
-        orb2.value = withRepeat(withTiming(1, { duration: 10000 }), -1, true);
-    }, []);
-
-    const orb1Style = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: interpolate(orb1.value, [0, 1], [-50, 50]) },
-            { translateY: interpolate(orb1.value, [0, 1], [20, -20]) },
-        ],
-    }));
-
-    const orb2Style = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: interpolate(orb2.value, [0, 1], [30, -30]) },
-            { translateY: interpolate(orb2.value, [0, 1], [-15, 15]) },
-        ],
-    }));
-
+// Simple Background - Warm tones
+const SimpleBackground: React.FC = () => {
     return (
-        <View style={StyleSheet.absoluteFill}>
-            <LinearGradient
-                colors={[colors.background.primary, '#0a0015', '#050008']}
-                style={StyleSheet.absoluteFill}
-            />
-            <Animated.View style={[styles.bgOrb, styles.bgOrb1, orb1Style]} />
-            <Animated.View style={[styles.bgOrb, styles.bgOrb2, orb2Style]} />
-        </View>
+        <LinearGradient
+            colors={['#1A1410', '#2D2520', '#1A1410']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={StyleSheet.absoluteFill}
+        />
     );
 };
 
@@ -197,23 +173,31 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
     return (
         <View style={styles.container}>
             <StatusBar hidden />
-            <AnimatedBackground />
+            <SimpleBackground />
 
             {/* TOP HUD BAR */}
             <View style={[styles.topBar, { paddingTop: insets.top + 4 }]}>
                 {/* Left: Opponent Name/Avatar */}
                 <View style={styles.topBarLeft}>
                     <View style={styles.avatarMini}>
-                        <Text style={{ fontSize: 14 }}>🤖</Text>
+                        {/* Placeholder for AI avatar or class icon */}
+                        <Text style={{ fontSize: 18 }}>🤖</Text>
                     </View>
-                    <Text variant="caption" color={colors.text.secondary} style={{ fontWeight: 'bold' }}>OPPONENT</Text>
+                    <View>
+                        <Text variant="caption" color={colors.text.secondary} style={{ fontWeight: 'bold' }}>OPPONENT</Text>
+                        <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 10 }}>The Innkeeper</Text>
+                    </View>
                 </View>
 
-                {/* Center: Score */}
+                {/* Center: Score with ornate styling */}
                 <View style={styles.topBarCenter}>
-                    <Text variant="h4" color={colors.error}>{roundsWon.ai}</Text>
-                    <Text variant="caption" color={colors.text.tertiary} style={{ marginHorizontal: 8 }}>vs</Text>
-                    <Text variant="h4" color={colors.primary[400]}>{roundsWon.player}</Text>
+                    <View style={styles.scoreContainer}>
+                        <Text variant="h4" color={colors.error} style={styles.scoreText}>{roundsWon.ai}</Text>
+                    </View>
+                    <Text variant="caption" color={colors.text.tertiary} style={{ marginHorizontal: 8, fontSize: 12 }}>VS</Text>
+                    <View style={[styles.scoreContainer, { borderColor: colors.primary[500] }]}>
+                        <Text variant="h4" color={colors.primary[400]} style={styles.scoreText}>{roundsWon.player}</Text>
+                    </View>
                 </View>
 
                 {/* Right: Menu */}
@@ -262,19 +246,21 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
 
                 {/* LEFT COLUMN: Opponent Stats */}
                 <View style={[styles.sideColumnLeft, { width: sideColWidth }]}>
-                    <View style={styles.statBubble}>
-                        <Text style={{ fontSize: 16 }}>🃏</Text>
-                        <Text variant="caption" color={colors.text.primary} style={{ fontWeight: 'bold' }}>{ai.hand.length}</Text>
+                    <View style={styles.statDisplay}>
+                        <Text variant="caption" color={colors.text.disabled} style={styles.statLabel}>HAND</Text>
+                        <Text variant="h4" color={colors.text.primary}>{ai.hand.length}</Text>
                     </View>
 
-                    <View style={styles.statBubble}>
-                        <Text style={{ fontSize: 16 }}>📚</Text>
-                        <Text variant="caption" color={colors.text.primary} style={{ fontWeight: 'bold' }}>{ai.deck.length}</Text>
+                    <View style={styles.statDisplay}>
+                        <Text variant="caption" color={colors.text.disabled} style={styles.statLabel}>DECK</Text>
+                        <Text variant="h4" color={colors.text.primary}>{ai.deck.length}</Text>
                     </View>
 
-                    <View style={[styles.statBubble, { marginTop: 'auto', borderColor: colors.error }]}>
-                        <Text variant="caption" color={colors.error} style={{ fontSize: 8, lineHeight: 10, marginBottom: -2 }}>PWR</Text>
-                        <Text variant="h4" color={colors.error} style={{ fontSize: hudFontSize, lineHeight: hudFontSize }}>{aiPower}</Text>
+                    <View style={[styles.statDisplay, { marginTop: 'auto' }]}>
+                        <View style={[styles.powerBadge, { borderColor: colors.error }]}>
+                            <Text variant="h3" color="#fff" style={styles.powerText}>{aiPower}</Text>
+                        </View>
+                        <Text variant="caption" color={colors.error} style={styles.statLabel}>POWER</Text>
                     </View>
                 </View>
 
@@ -307,32 +293,42 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                 {/* RIGHT COLUMN: Player Actions */}
                 <View style={[styles.sideColumnRight, { width: sideColWidth }]}>
 
-                    {/* Power Stat - mirrored to opponent's bottom left */}
-                    <View style={[styles.statBubble, { marginBottom: 'auto', borderColor: colors.primary[400] }]}>
-                        <Text variant="caption" color={colors.primary[400]} style={{ fontSize: 8, lineHeight: 10, marginBottom: -2 }}>PWR</Text>
-                        <Text variant="h4" color={colors.primary[400]} style={{ fontSize: hudFontSize, lineHeight: hudFontSize }}>{playerPower}</Text>
+                    {/* Power Stat */}
+                    <View style={[styles.statDisplay, { marginBottom: 'auto' }]}>
+                        <View style={[styles.powerBadge, { borderColor: colors.primary[500], backgroundColor: 'rgba(212,175,55,0.2)' }]}>
+                            <Text variant="h3" color={colors.primary[200]} style={styles.powerText}>{playerPower}</Text>
+                        </View>
+                        <Text variant="caption" color={colors.primary[400]} style={styles.statLabel}>POWER</Text>
                     </View>
 
-                    {/* Energy */}
-                    <View style={styles.statBubble}>
-                        <Text style={{ fontSize: 16 }}>⚡</Text>
-                        <Text variant="h4" color={colors.accent[400]}>{player.mana}</Text>
+                    {/* Energy - Text only, no icon */}
+                    <View style={styles.statDisplay}>
+                        <View style={[styles.manaBadge]}>
+                            <Text variant="h4" color="#fff" style={{ fontWeight: 'bold' }}>{player.mana}</Text>
+                        </View>
+                        <Text variant="caption" color={colors.accent[400]} style={styles.statLabel}>MANA</Text>
                     </View>
 
-                    {/* Pass Button */}
+                    {/* Pass Button - Ornate Pill shaped */}
                     <Pressable
                         onPress={passTurn}
                         disabled={!isPlayerTurn || player.hasPassed}
-                        style={[
+                        style={({ pressed }) => [
                             styles.passButton,
-                            { width: passBtnSize, height: passBtnSize, borderRadius: passBtnSize / 2 },
+                            pressed && { transform: [{ scale: 0.95 }] },
                             shouldHighlightPass && styles.passButtonHighlight,
                             player.hasPassed && styles.passButtonDisabled
                         ]}
                     >
-                        <Text variant="caption" color={player.hasPassed ? colors.text.disabled : colors.text.inverse} style={{ fontWeight: 'bold', fontSize: passBtnSize * 0.15 }}>
-                            {player.hasPassed ? "PASSED" : "PASS"}
-                        </Text>
+                        <LinearGradient
+                            colors={player.hasPassed ? ['#4A2511', '#3E1F0E'] : ['#E8C547', '#B8941F']}
+                            style={StyleSheet.absoluteFill}
+                        />
+                        <View style={styles.passButtonInner}>
+                            <Text variant="button" color={player.hasPassed ? colors.text.disabled : '#3E1F0E'} style={{ fontWeight: '900', fontSize: 12, letterSpacing: 1 }}>
+                                {player.hasPassed ? "PASSED" : "END TURN"}
+                            </Text>
+                        </View>
                     </Pressable>
                 </View>
 
@@ -406,15 +402,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#1a1a1a', // Fallback
     },
-    bgOrb: {
-        position: 'absolute',
-        width: 500,
-        height: 500,
-        borderRadius: 250,
-        opacity: 0.1,
-    },
-    bgOrb1: { backgroundColor: colors.primary[500], top: -150, right: -150 },
-    bgOrb2: { backgroundColor: colors.secondary[500], bottom: -150, left: -150 },
+
 
     // Top Bar
     topBar: {
@@ -432,11 +420,7 @@ const styles = StyleSheet.create({
     },
     topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
     topBarCenter: { flexDirection: 'row', alignItems: 'center' },
-    avatarMini: {
-        width: 32, height: 32, borderRadius: 16,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        alignItems: 'center', justifyContent: 'center'
-    },
+
     menuBtn: { padding: 8, backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: 20, paddingHorizontal: 16 },
 
     // Main Row
@@ -461,31 +445,114 @@ const styles = StyleSheet.create({
         gap: 20,
         justifyContent: 'flex-end', // Items closer to bottom for player usage?
     },
-
-    statBubble: {
-        width: 50, height: 50, borderRadius: 25,
-        backgroundColor: 'rgba(20,20,30,0.6)',
-        borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
-        alignItems: 'center', justifyContent: 'center',
+    avatarMini: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: colors.secondary[700],
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 8,
+        borderWidth: 2,
+        borderColor: colors.accent[500], // Bronze border
+    },
+    scoreContainer: {
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        borderWidth: 1,
+        borderColor: colors.error,
+    },
+    scoreText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        lineHeight: 18,
+    },
+    statDisplay: {
+        alignItems: 'center',
+        gap: 2,
+        paddingVertical: 8,
+    },
+    powerBadge: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderWidth: 2,
+        marginBottom: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.5,
+        shadowRadius: 4,
+    },
+    manaBadge: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: colors.accent[600], // Bronze/Copper
+        borderWidth: 2,
+        borderColor: colors.accent[300],
+        marginBottom: 4,
+        shadowColor: colors.accent[500],
+        shadowRadius: 6,
+        shadowOpacity: 0.5,
+    },
+    powerText: {
+        fontWeight: '900',
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2,
+    },
+    statLabel: {
+        fontSize: 9,
+        letterSpacing: 1,
+        opacity: 0.8,
+        fontWeight: 'bold',
+        textShadowColor: '#000',
+        textShadowRadius: 2,
     },
     passButton: {
-        // Dimensions overridden inline
-        backgroundColor: colors.background.card,
-        borderWidth: 2, borderColor: colors.text.disabled,
-        alignItems: 'center', justifyContent: 'center',
+        width: 80,
+        height: 50,
+        borderRadius: 25,
+        alignItems: 'center',
+        justifyContent: 'center',
         marginTop: 'auto',
         marginBottom: 20,
+        overflow: 'hidden',
+        borderWidth: 3,
+        borderColor: '#8B4513', // Brown border
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.4,
+        shadowRadius: 6,
+        elevation: 5,
+    },
+    passButtonInner: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.2)', // Inner highlight
+        borderRadius: 22,
     },
     passButtonHighlight: {
-        backgroundColor: colors.warning,
-        borderColor: '#fff',
-        shadowColor: colors.warning,
+        borderColor: colors.primary[400], // Gold border
+        shadowColor: colors.primary[500],
         shadowRadius: 10,
         shadowOpacity: 0.8,
     },
     passButtonDisabled: {
-        opacity: 0.5,
-        backgroundColor: '#000',
+        opacity: 0.8,
+        borderColor: '#3E1F0E',
     },
 
     // Center Board
@@ -514,28 +581,38 @@ const styles = StyleSheet.create({
         transform: [{ translateY: -50 }], // Adjust based on font size
     },
 
-    // Rows
+    // Rows - Organic, rounded style
     rowContainer: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: 2,
-        // backgroundColor: 'rgba(255,255,255,0.02)', // Minimal debug bg
-        borderRadius: 4,
+        marginVertical: 6,
+        borderRadius: 20, // More rounded for organic feel
+        paddingVertical: 6,
+        backgroundColor: 'rgba(74,63,53,0.15)', // Warm brown tint
     },
     enemyRow: {
         // backgroundColor: 'rgba(255,0,0,0.02)',
     },
     activeRow: {
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: 'rgba(212,175,55,0.12)', // Gold tint
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(212,175,55,0.3)',
+        shadowColor: colors.primary[500],
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
     },
     rowPowerBadge: {
         position: 'absolute',
-        left: 4,
+        left: 10,
         zIndex: 10,
-        opacity: 0.5,
+        backgroundColor: 'rgba(26,20,16,0.7)', // Warm dark background
+        paddingHorizontal: 8,
+        paddingVertical: 3,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(212,175,55,0.3)',
     },
     rowPowerText: {
         fontSize: 10,

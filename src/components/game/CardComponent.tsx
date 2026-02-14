@@ -106,7 +106,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
         return (
             <Animated.View style={[styles.cardContainer, { width: cardWidth, height: cardHeight }]}>
                 <LinearGradient
-                    colors={['#1e1e2e', '#2d2d42']}
+                    colors={['#3E1F0E', '#5A2E0C']} // Warm dark wood/leather for card back
                     style={[styles.card, { width: cardWidth, height: cardHeight }]}
                 >
                     <View style={styles.cardBack}>
@@ -146,9 +146,16 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                             styles.badgeBase,
                             {
                                 top: padding, left: padding,
-                                width: typeSize, height: typeSize, borderRadius: typeSize / 4,
+                                width: typeSize, height: typeSize, borderRadius: typeSize / 2, // Circular
                                 backgroundColor: gradientColors[0],
-                                alignItems: 'center', justifyContent: 'center'
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderWidth: 1,
+                                borderColor: 'rgba(255,255,255,0.3)',
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 1 },
+                                shadowOpacity: 0.5,
+                                shadowRadius: 2,
                             }
                         ]}>
                             <Text style={[styles.badgeText, { fontSize: typeSize * 0.65, lineHeight: typeSize * 0.75, textAlign: 'center', textAlignVertical: 'center' }]}>
@@ -165,8 +172,14 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                             styles.badgeBase,
                             {
                                 top: padding, right: padding,
-                                width: badgeSize, height: badgeSize, borderRadius: badgeSize / 4,
-                                backgroundColor: colors.accent[500]
+                                width: badgeSize, height: badgeSize, borderRadius: badgeSize / 2, // Circular
+                                backgroundColor: colors.accent[500],
+                                borderWidth: 1,
+                                borderColor: colors.primary[400], // Gold border
+                                shadowColor: '#000',
+                                shadowOffset: { width: 0, height: 1 },
+                                shadowOpacity: 0.5,
+                                shadowRadius: 2,
                             }
                         ]}>
                             <Text style={[styles.badgeText, { fontSize: badgeFontSize }]}>{card.manaCost}</Text>
@@ -183,7 +196,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                             />
                         ) : (
                             <LinearGradient
-                                colors={['#1a1a2e', '#16213e']}
+                                colors={['#2D2520', '#3E342B']} // Warm dark placeholder
                                 style={styles.artPlaceholder}
                             >
                                 <Text style={{ fontSize: cardHeight * 0.25 }}>
@@ -217,8 +230,10 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                             styles.badgeBase,
                             {
                                 bottom: padding + 16, left: padding,
-                                width: badgeSize, height: badgeSize, borderRadius: badgeSize / 4,
-                                backgroundColor: colors.primary[500]
+                                width: badgeSize, height: badgeSize, borderRadius: badgeSize / 2, // Circular
+                                backgroundColor: colors.primary[500],
+                                borderWidth: 1,
+                                borderColor: '#fff'
                             }
                         ]}>
                             <Text style={[styles.badgeText, { fontSize: badgeFontSize }]}>★</Text>
@@ -274,7 +289,7 @@ const UnitPowerDisplay: React.FC<{
             styles.badgeBase,
             style,
             animatedStyle,
-            { width: size, height: size, borderRadius: size / 4 }
+            { width: size, height: size, borderRadius: size / 2, borderWidth: 1, borderColor: 'rgba(255,255,255,0.4)' } // Circular
         ]}>
             <Text style={[styles.badgeText, { fontSize }]}>{power}</Text>
         </Animated.View>
@@ -299,7 +314,7 @@ const styles = StyleSheet.create({
     },
     cardInner: {
         backgroundColor: colors.background.card,
-        borderRadius: borderRadius.md - 2,
+        borderRadius: borderRadius.md, // Ensure inner follows outer
         overflow: 'hidden',
     },
     badgeBase: {
