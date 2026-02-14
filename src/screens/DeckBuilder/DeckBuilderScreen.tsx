@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, Pressable, useWindowDimensions, FlatList, Animated as RNAnimated } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, StyleSheet, ScrollView, Pressable, useWindowDimensions, FlatList } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, SlideInLeft, SlideInRight, SlideInDown, FadeOut } from 'react-native-reanimated';
-import { RootStackParamList, Card, CardRarity, CardType } from '../../types';
+import Animated, { FadeIn, FadeOut, SlideInLeft, SlideInRight } from 'react-native-reanimated';
+import { RootStackParamList, Card, CardType } from '../../types';
 import { Text, BoardSurface } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing, borderRadius, getLayoutDimensions, getCardDimensions } from '../../theme';
-
 import { useDeckStore } from '../../store/deckStore';
 import { getAllCards } from '../../data/cardData';
 
@@ -20,380 +19,161 @@ interface Props {
 
 const ALL_CARDS = getAllCards();
 
-const DeckSlot: React.FC<{
-    index: number;
-    deck: any | null;
-    isActive: boolean;
-    onPress: () => void;
-    onCreate?: () => void;
-    width: number
-}> = ({
-    index,
-    deck,
-    isActive,
-    onPress,
-    onCreate,
-    width
-}) => (
-        <Animated.View entering={SlideInLeft.delay(200 + index * 100).springify()}>
-            <Pressable onPress={deck ? onPress : onCreate}>
-                <LinearGradient
-                    colors={isActive
-                        ? [colors.primary[400], colors.primary[600]]
-                        : ['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']
-                    }
-                    style={[
-                        styles.deckSlot,
-                        isActive && styles.deckSlotActive,
-                        { minHeight: 60 }
-                    ]}
-                >
-                    <View style={styles.deckSlotContent}>
-                        <Text variant="h4" color={isActive ? colors.text.primary : colors.text.disabled}>
-                            {index + 1}
-                        </Text>
-                        <View style={styles.deckSlotInfo}>
-                            <Text
-                                variant="bodySmall"
-                                color={isActive ? colors.text.primary : colors.text.disabled}
-                            >
-                                {deck ? deck.name : 'Empty Slot'}
-                            </Text>
-                            <Text variant="caption" color={isActive ? 'rgba(255,255,255,0.7)' : colors.text.disabled}>
-                                {deck ? `${deck.cards.length}/25 Cards` : 'Tap to Create'}
-                            </Text>
-                        </View>
-                    </View>
-                </LinearGradient>
-            </Pressable>
-        </Animated.View>
-    );
-
-const CategoryButton: React.FC<{
-    label: string;
-    isActive: boolean;
-    onPress: () => void;
-}> = ({ label, isActive, onPress }) => (
-    <Pressable onPress={onPress}>
-        <View style={[styles.categoryButton, isActive && styles.categoryButtonActive]}>
-            <Text
-                variant="bodySmall"
-                color={isActive ? colors.primary[400] : colors.text.secondary}
-            >
-                {label}
-            </Text>
+const AnimatedBackground: React.FC = () => {
+    return (
+        <View style={StyleSheet.absoluteFill}>
+            <LinearGradient
+                colors={[colors.arcane.obsidian, colors.arcane.void, colors.arcane.obsidian]}
+                style={StyleSheet.absoluteFill}
+            />
+            <View style={styles.voidMist} />
         </View>
-    </Pressable>
-);
+    );
+};
 
 export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
-    const [viewingDeckId, setViewingDeckId] = useState<string | null>(null);
-
-    // Store
     const {
         decks,
         activeDeckId,
-        createDeck,
-        setActiveDeck,
         addCardToDeck,
-        removeCardFromDeck
+        removeCardFromDeck,
+        createDeck,
+        setActiveDeck
     } = useDeckStore();
 
-    // Get responsive dimensions
+    const [selectedCategory, setSelectedCategory] = useState<'all' | CardType>('all');
+
+    const activeDeck = useMemo(() => decks.find(d => d.id === activeDeckId), [decks, activeDeckId]);
     const layout = getLayoutDimensions(screenWidth, screenHeight);
     const cardDims = getCardDimensions(screenWidth, screenHeight);
 
-    // Slightly smaller cards for the collection grid to fit more
-    const gridCardWidth = cardDims.width * 0.9;
-    const gridCardHeight = cardDims.height * 0.9;
+    const filteredCards = useMemo(() => {
+        if (selectedCategory === 'all') return ALL_CARDS;
+        return ALL_CARDS.filter(card => card.type === selectedCategory);
+    }, [selectedCategory]);
 
-    const filteredCards = ALL_CARDS.filter(card =>
-        selectedCategory === 'all' ||
-        (selectedCategory === 'units' && card.type === 'unit') ||
-        (selectedCategory === 'spells' && card.type === 'spell') ||
-        (selectedCategory === 'weather' && card.type === 'weather')
-    );
-
-    const categories = [
-        { id: 'all', label: 'All Cards' },
-        { id: 'units', label: 'Units' },
-        { id: 'spells', label: 'Spells' },
-        { id: 'weather', label: 'Weather' },
-    ];
-
-    const currentDeck = decks.find(d => d.id === activeDeckId);
+    const isCardInDeckCount = (cardId: string) => {
+        if (!activeDeck) return 0;
+        return activeDeck.cards.filter(card => card.name === ALL_CARDS.find(c => c.id === cardId)?.name).length;
+    };
 
     const handleCreateDeck = () => {
-        const newId = createDeck(`My Deck ${decks.length + 1}`);
-        setActiveDeck(newId);
-    };
-
-
-    const [lastTapInfo, setLastTapInfo] = useState({ id: '', time: 0 });
-
-    const handleCardPress = (card: Card, evt: any) => {
-        const now = Date.now();
-        const DOUBLE_PRESS_DELAY = 300;
-
-        if (lastTapInfo.id === card.id && now - lastTapInfo.time < DOUBLE_PRESS_DELAY) {
-            // Double tap detected!
-            const { pageX, pageY } = evt.nativeEvent;
-            triggerFlyAnimation(card, pageX, pageY);
-            setLastTapInfo({ id: '', time: 0 }); // Reset
-        } else {
-            setLastTapInfo({ id: card.id, time: now });
-        }
-    };
-
-    // Animation State
-    const [flyingCards, setFlyingCards] = useState<{ id: string; card: Card; x: number; y: number }[]>([]);
-
-    const triggerFlyAnimation = (card: Card, startX: number, startY: number) => {
-        if (!activeDeckId) {
-            // If no deck selected, select first one
-            if (decks.length > 0) setActiveDeck(decks[0].id);
-            else {
-                // Or create one if none exist?
-                const newId = createDeck(`My Deck 1`);
-                setActiveDeck(newId);
-            }
-        }
-
-        const flyId = Math.random().toString();
-        setFlyingCards(prev => [...prev, { id: flyId, card, x: startX, y: startY }]);
-    };
-
-    const handleAnimationComplete = (flyId: string, card: Card) => {
-        setFlyingCards(prev => prev.filter(fc => fc.id !== flyId));
-        const currentActiveId = useDeckStore.getState().activeDeckId;
-        if (currentActiveId) {
-            addCardToDeck(currentActiveId, card);
-        } else if (decks.length > 0) {
-            addCardToDeck(decks[0].id, card);
-        }
-    };
-
-    // Active Deck List Component
-    const ActiveDeckList = ({ deck }: { deck: any }) => (
-        <Animated.View entering={FadeIn} style={styles.activeDeckContainer}>
-            <View style={styles.activeDeckHeader}>
-                <Pressable onPress={() => setViewingDeckId(null)} style={styles.tinyBackBtn}>
-                    <Text variant="caption" color={colors.primary[400]}>← ALL DECKS</Text>
-                </Pressable>
-                <Text variant="bodySmall" color={colors.text.primary} style={styles.activeDeckTitle}>
-                    {deck.name.toUpperCase()}
-                </Text>
-                <Text variant="caption" color={colors.text.disabled}>
-                    {deck.cards.length}/25
-                </Text>
-            </View>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {deck.cards.map((card: Card, idx: number) => (
-                    <Pressable
-                        key={`${card.id}-${idx}`}
-                        onPress={() => removeCardFromDeck(deck.id, card.id)}
-                        style={styles.activeDeckCard}
-                    >
-                        <Text variant="bodySmall" color={colors.text.primary}>{card.name}</Text>
-                        <Text variant="caption" color={colors.text.disabled}>{card.manaCost}💧</Text>
-                    </Pressable>
-                ))}
-                {deck.cards.length === 0 && (
-                    <View style={styles.emptyDeckPlaceholder}>
-                        <Text variant="caption" color={colors.text.disabled}>No cards yet.</Text>
-                        <Text variant="caption" color={colors.text.disabled}>Double-tap cards to add!</Text>
-                    </View>
-                )}
-            </ScrollView>
-        </Animated.View>
-    );
-
-    // Flying Card Component
-    const FlyingCard = ({ item }: { item: { id: string; card: Card; x: number; y: number } }) => {
-        const translateX = React.useRef(new RNAnimated.Value(item.x)).current;
-        const translateY = React.useRef(new RNAnimated.Value(item.y)).current;
-        const scale = React.useRef(new RNAnimated.Value(1)).current;
-        const opacity = React.useRef(new RNAnimated.Value(1)).current;
-
-        React.useEffect(() => {
-            // Target position: Left panel (approx x=50, y=100)
-            const targetX = 50;
-            const targetY = 150;
-
-            RNAnimated.parallel([
-                RNAnimated.timing(translateX, {
-                    toValue: targetX,
-                    duration: 600,
-                    useNativeDriver: true,
-                }),
-                RNAnimated.timing(translateY, {
-                    toValue: targetY,
-                    duration: 600,
-                    useNativeDriver: true,
-                }),
-                RNAnimated.timing(scale, {
-                    toValue: 0.2,
-                    duration: 600,
-                    useNativeDriver: true,
-                }),
-                RNAnimated.sequence([
-                    RNAnimated.delay(400),
-                    RNAnimated.timing(opacity, {
-                        toValue: 0,
-                        duration: 200,
-                        useNativeDriver: true,
-                    })
-                ])
-            ]).start(() => {
-                handleAnimationComplete(item.id, item.card);
-            });
-        }, []);
-
-        return (
-            <RNAnimated.View
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: gridCardWidth,
-                    height: gridCardHeight,
-                    zIndex: 1000,
-                    transform: [
-                        { translateX },
-                        { translateY },
-                        { scale }
-                    ],
-                    opacity
-                }}
-            >
-                <CardComponent
-                    card={item.card}
-                    width={gridCardWidth}
-                    height={gridCardHeight}
-                    isPlayable={false}
-                />
-            </RNAnimated.View>
-        );
+        const id = createDeck(`New Deck ${decks.length + 1}`);
+        setActiveDeck(id);
     };
 
     return (
         <BoardSurface style={styles.container}>
+            <AnimatedBackground />
 
-            {/* Flying Cards Layer */}
-            {flyingCards.map(fc => (
-                <FlyingCard key={fc.id} item={fc} />
-            ))}
-
-            <View style={[
-                styles.content,
-                {
-                    paddingTop: insets.top,
-                    paddingBottom: insets.bottom,
-                    paddingLeft: insets.left,
-                    paddingRight: insets.right,
-                }
-            ]}>
+            <View style={[styles.content, {
+                paddingTop: insets.top,
+                paddingBottom: insets.bottom,
+                paddingLeft: insets.left,
+                paddingRight: insets.right
+            }]}>
                 {/* Header */}
                 <View style={[styles.header, { paddingHorizontal: layout.contentPadding }]}>
                     <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
-                        <Text variant="body" color={colors.primary[400]}>← Back</Text>
+                        <Text variant="body" color={colors.arcane.emerald} style={{ fontWeight: '900', letterSpacing: 1 }}>← VOID</Text>
                     </Pressable>
-                    <Text variant="h3" style={styles.title}>Deck Builder</Text>
-                    <Pressable
-                        onPress={() => navigation.navigate('GameBoard', { difficulty: 'medium' })}
-                        style={({ pressed }) => [
-                            styles.playButton,
-                            pressed && { opacity: 0.8 }
-                        ]}
-                    >
-                        <Text variant="bodySmall" style={{ fontWeight: 'bold', color: '#1A1410' }}>PLAY</Text>
-                    </Pressable>
+                    <Text variant="h2" style={styles.title}>FORGE</Text>
+                    <View style={{ width: 80 }} />
                 </View>
 
                 <View style={styles.mainContent}>
-                    {/* Left Panel: Decks or Active Deck */}
-                    <View style={[styles.leftPanel, { width: layout.leftPanelWidth, padding: layout.contentPadding }]}>
-                        {viewingDeckId && decks.find(d => d.id === viewingDeckId) ? (
-                            <ActiveDeckList deck={decks.find(d => d.id === viewingDeckId)!} />
+                    {/* LEFT PANEL: ACTIVE DECK */}
+                    <View style={styles.leftPanel}>
+                        <LinearGradient
+                            colors={['rgba(11, 15, 20, 0.95)', 'rgba(31, 41, 55, 0.4)']}
+                            style={[styles.panelBackground, { borderRightWidth: 1, borderColor: 'rgba(16, 185, 129, 0.1)' }]}
+                        />
+
+                        <View style={styles.panelHeader}>
+                            <Text variant="caption" color={colors.arcane.emerald} style={styles.panelTitle}>CONSTRUCT</Text>
+                            {activeDeck && (
+                                <Text variant="caption" color={colors.text.disabled}>{activeDeck.cards.length}/25</Text>
+                            )}
+                        </View>
+
+                        {!activeDeck ? (
+                            <View style={styles.emptyDeck}>
+                                <Text variant="body" color={colors.text.disabled} style={{ textAlign: 'center', marginBottom: 20 }}>NO ACTIVE DECK</Text>
+                                <Pressable onPress={handleCreateDeck} style={styles.createBtn}>
+                                    <Text variant="button" color={colors.arcane.white}>CREATE DECK</Text>
+                                </Pressable>
+                            </View>
                         ) : (
-                            <>
-                                <Text variant="bodySmall" color={colors.text.secondary} style={styles.sectionTitle}>
-                                    YOUR DECKS
-                                </Text>
-                                <ScrollView showsVerticalScrollIndicator={false}>
-                                    {[0, 1, 2, 3].map((index) => {
-                                        const deck = decks[index];
+                            <View style={{ flex: 1 }}>
+                                <View style={styles.deckNameBar}>
+                                    <Text variant="h4" color={colors.arcane.white}>{activeDeck.name.toUpperCase()}</Text>
+                                </View>
+                                <FlatList
+                                    data={activeDeck.cards}
+                                    keyExtractor={(item, index) => `${item.id}-${index}`}
+                                    renderItem={({ item, index }) => {
                                         return (
-                                            <DeckSlot
-                                                key={index}
-                                                index={index}
-                                                deck={deck}
-                                                isActive={deck && activeDeckId === deck.id}
-                                                onPress={() => {
-                                                    setActiveDeck(deck.id);
-                                                    setViewingDeckId(deck.id);
-                                                }}
-                                                onCreate={handleCreateDeck}
-                                                width={layout.leftPanelWidth - (layout.contentPadding * 2)}
-                                            />
+                                            <Animated.View entering={FadeIn.delay(index * 20)}>
+                                                <Pressable
+                                                    onPress={() => removeCardFromDeck(activeDeckId!, item.id)}
+                                                    style={styles.deckItem}
+                                                >
+                                                    <View style={styles.deckItemCost}>
+                                                        <Text variant="caption" color={colors.arcane.cyan}>{item.manaCost}</Text>
+                                                    </View>
+                                                    <Text variant="body" color={colors.arcane.white} style={{ flex: 1, fontSize: 12 }}>{item.name.toUpperCase()}</Text>
+                                                    <Text variant="caption" color={colors.error}>×</Text>
+                                                </Pressable>
+                                            </Animated.View>
                                         );
-                                    })}
-                                </ScrollView>
-                            </>
+                                    }}
+                                    contentContainerStyle={{ padding: 12 }}
+                                />
+                            </View>
                         )}
                     </View>
 
-                    {/* Divider */}
-                    <View style={styles.divider} />
-
-                    {/* Right Panel: Card Collection */}
-                    <View style={[styles.rightPanel, { width: layout.rightPanelWidth }]}>
-                        {/* Categories Filter */}
-                        <View style={[styles.filterBar, { paddingHorizontal: layout.contentPadding }]}>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                                {categories.map((cat) => (
-                                    <CategoryButton
-                                        key={cat.id}
-                                        label={cat.label}
-                                        isActive={selectedCategory === cat.id}
-                                        onPress={() => setSelectedCategory(cat.id)}
-                                    />
+                    {/* RIGHT PANEL: CARD LIBRARY */}
+                    <View style={styles.rightPanel}>
+                        <View style={styles.panelHeader}>
+                            <Text variant="caption" color={colors.arcane.emerald} style={styles.panelTitle}>LIBRARY</Text>
+                            <View style={styles.filterRow}>
+                                {['all', 'unit', 'spell'].map((cat) => (
+                                    <Pressable
+                                        key={cat}
+                                        onPress={() => setSelectedCategory(cat as any)}
+                                        style={[styles.filterChip, selectedCategory === cat && { borderColor: colors.arcane.emerald, backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}
+                                    >
+                                        <Text variant="caption" color={selectedCategory === cat ? colors.arcane.emerald : colors.text.disabled}>{cat.toUpperCase()}</Text>
+                                    </Pressable>
                                 ))}
-                            </ScrollView>
+                            </View>
                         </View>
 
-                        {/* Card Grid */}
                         <FlatList
                             data={filteredCards}
                             keyExtractor={(item) => item.id}
-                            numColumns={Math.floor((layout.rightPanelWidth - layout.contentPadding * 2) / (gridCardWidth + 10))}
-                            contentContainerStyle={[styles.gridContent, { padding: layout.contentPadding }]}
-                            columnWrapperStyle={{ gap: 10 }}
-                            renderItem={({ item }) => {
-                                const countInDeck = currentDeck?.cards.filter(c => c.name === item.name).length || 0;
-
-                                return (
-                                    <View style={{ marginBottom: 10 }}>
-                                        <CardComponent
-                                            card={item}
-                                            width={gridCardWidth}
-                                            height={gridCardHeight}
-                                            isPlayable={true}
-                                            onPress={(evt) => handleCardPress(item, evt)}
-                                        />
-                                        {countInDeck > 0 && (
-                                            <View style={styles.countBadge}>
-                                                <Text variant="caption" color="#fff" style={{ fontWeight: 'bold' }}>
-                                                    {countInDeck}/2
-                                                </Text>
-                                            </View>
-                                        )}
-                                    </View>
-                                );
-                            }}
+                            numColumns={3}
+                            renderItem={({ item, index }) => (
+                                <Animated.View entering={FadeIn.delay(index * 10)} style={styles.libraryCardWrapper}>
+                                    <CardComponent
+                                        card={item}
+                                        width={cardDims.width * 0.8}
+                                        height={cardDims.height * 0.8}
+                                        onPress={() => activeDeckId && activeDeck!.cards.length < 25 && addCardToDeck(activeDeckId, item)}
+                                        isPlayable={activeDeckId ? activeDeck!.cards.length < 25 : false}
+                                    />
+                                    {isCardInDeckCount(item.id) > 0 && (
+                                        <View style={styles.cardCountBadge}>
+                                            <Text variant="caption" color={colors.arcane.white} style={{ fontSize: 10 }}>{isCardInDeckCount(item.id)}</Text>
+                                        </View>
+                                    )}
+                                </Animated.View>
+                            )}
+                            contentContainerStyle={{ padding: 12 }}
+                            columnWrapperStyle={{ gap: 12, marginBottom: 12 }}
                         />
                     </View>
                 </View>
@@ -405,138 +185,122 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background.primary,
+        backgroundColor: colors.arcane.obsidian,
+    },
+    voidMist: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(16, 185, 129, 0.02)',
     },
     content: {
         flex: 1,
     },
     header: {
-        height: 50,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.1)',
-        backgroundColor: 'rgba(0,0,0,0.2)',
+        paddingVertical: 12,
     },
     backButton: {
-        width: 60,
+        minWidth: 80,
     },
     title: {
-        color: colors.text.primary,
-    },
-    playButton: {
-        backgroundColor: colors.primary[400],
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: colors.accent[500],
+        color: colors.arcane.white,
+        letterSpacing: 8,
+        fontFamily: 'serif',
     },
     mainContent: {
         flex: 1,
         flexDirection: 'row',
     },
     leftPanel: {
-        backgroundColor: 'rgba(0,0,0,0.1)',
-    },
-    sectionTitle: {
-        marginBottom: spacing.sm,
-        letterSpacing: 1,
-        opacity: 0.7,
-    },
-    divider: {
-        width: 1,
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        flex: 1.2,
+        backgroundColor: 'rgba(0,0,0,0.2)',
     },
     rightPanel: {
-        flex: 1,
+        flex: 2.8,
     },
-    filterBar: {
-        height: 50,
-        justifyContent: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.05)',
+    panelBackground: {
+        ...StyleSheet.absoluteFillObject,
+        zIndex: -1,
     },
-    categoryButton: {
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: borderRadius.full,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        marginRight: 8,
-        borderWidth: 1,
-        borderColor: 'transparent',
-    },
-    categoryButtonActive: {
-        backgroundColor: 'rgba(102, 0, 255, 0.15)',
-        borderColor: colors.primary[500],
-    },
-    deckSlot: {
-        padding: spacing.sm,
-        borderRadius: borderRadius.md,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
-        marginBottom: spacing.xs,
-    },
-    deckSlotContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    deckSlotInfo: {
-        marginLeft: spacing.sm,
-    },
-    deckSlotActive: {
-        borderColor: colors.primary[400],
-        backgroundColor: 'rgba(102, 0, 255, 0.1)',
-    },
-    gridContent: {
-        paddingBottom: spacing.xl,
-    },
-    countBadge: {
-        position: 'absolute',
-        top: -6,
-        right: -6,
-        backgroundColor: colors.primary[500],
-        borderRadius: 12,
-        width: 24,
-        height: 24,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 2,
-        borderColor: colors.background.primary,
-        zIndex: 10,
-    },
-    activeDeckContainer: {
-        flex: 1,
-    },
-    activeDeckHeader: {
-        marginBottom: spacing.md,
-        paddingBottom: spacing.xs,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.1)',
-    },
-    tinyBackBtn: {
-        marginBottom: 4,
-    },
-    activeDeckTitle: {
-        fontWeight: 'bold',
-        letterSpacing: 1,
-    },
-    activeDeckCard: {
+    panelHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 8,
-        paddingHorizontal: 10,
-        backgroundColor: 'rgba(255,255,255,0.03)',
-        borderRadius: borderRadius.sm,
-        marginBottom: 4,
+        padding: 12,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        borderBottomWidth: 1,
+        borderColor: 'rgba(16, 185, 129, 0.1)',
+        height: 48,
+    },
+    panelTitle: {
+        fontWeight: '900',
+        letterSpacing: 2,
+    },
+    filterRow: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    filterChip: {
+        paddingVertical: 4,
+        paddingHorizontal: 12,
+        borderRadius: 2,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.05)',
     },
-    emptyDeckPlaceholder: {
-        marginTop: 40,
+    emptyDeck: {
+        flex: 1,
         alignItems: 'center',
-        opacity: 0.5,
-    }
+        justifyContent: 'center',
+        padding: 20,
+    },
+    createBtn: {
+        backgroundColor: colors.arcane.emeraldDark,
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 2,
+    },
+    deckNameBar: {
+        padding: 12,
+        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+        alignItems: 'center',
+    },
+    deckItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(31, 41, 55, 0.4)',
+        marginBottom: 4,
+        padding: 8,
+        borderRadius: 2,
+        borderLeftWidth: 2,
+        borderLeftColor: colors.arcane.emerald,
+    },
+    deckItemCost: {
+        width: 22,
+        height: 22,
+        borderRadius: 11,
+        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 10,
+        borderWidth: 1,
+        borderColor: colors.arcane.cyan,
+    },
+    libraryCardWrapper: {
+        position: 'relative',
+    },
+    cardCountBadge: {
+        position: 'absolute',
+        top: -6,
+        right: -6,
+        width: 18,
+        height: 18,
+        borderRadius: 9,
+        backgroundColor: colors.arcane.emerald,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10,
+        borderWidth: 1,
+        borderColor: colors.arcane.white,
+    },
 });

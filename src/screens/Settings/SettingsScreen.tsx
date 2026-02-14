@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, Switch, ScrollView, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, useWindowDimensions, Switch, ScrollView } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, SlideInRight } from 'react-native-reanimated';
+import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
 import { RootStackParamList } from '../../types';
-import { Text } from '../../components/ui';
+import { Text, BoardSurface } from '../../components/ui';
 import { colors, spacing, borderRadius } from '../../theme';
 import { useSettingsStore } from '../../store';
 
@@ -15,60 +15,22 @@ interface Props {
     navigation: SettingsScreenNavigationProp;
 }
 
-interface SettingRowProps {
-    label: string;
-    value: boolean;
-    onToggle: () => void;
-    delay?: number;
-}
-
-const SettingRow: React.FC<SettingRowProps> = ({ label, value, onToggle, delay = 0 }) => (
-    <Animated.View
-        entering={SlideInRight.delay(delay).springify()}
-        style={styles.settingRow}
-    >
-        <Text variant="body">{label}</Text>
-        <Switch
-            value={value}
-            onValueChange={onToggle}
-            trackColor={{ false: colors.background.tertiary, true: colors.primary[500] }}
-            thumbColor={colors.text.primary}
-        />
-    </Animated.View>
-);
-
-interface SpeedButtonProps {
-    title: string;
-    isActive: boolean;
-    onPress: () => void;
-}
-
-const SpeedButton: React.FC<SpeedButtonProps> = ({ title, isActive, onPress }) => (
-    <Pressable onPress={onPress} style={styles.speedButtonWrapper}>
-        <LinearGradient
-            colors={isActive
-                ? [colors.primary[400], colors.primary[600]]
-                : ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.05)']
-            }
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[
-                styles.speedButton,
-                isActive && styles.speedButtonActive
-            ]}
-        >
-            <Text
-                variant="button"
-                color={isActive ? colors.text.primary : colors.text.secondary}
-            >
-                {title}
-            </Text>
-        </LinearGradient>
-    </Pressable>
-);
+const AnimatedBackground: React.FC = () => {
+    return (
+        <View style={StyleSheet.absoluteFill}>
+            <LinearGradient
+                colors={[colors.arcane.obsidian, colors.arcane.void, colors.arcane.obsidian]}
+                style={StyleSheet.absoluteFill}
+            />
+            {/* Subtle Void Energy Lines */}
+            <View style={styles.voidEnergyLine} />
+        </View>
+    );
+};
 
 export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
+    const { width: screenWidth } = useWindowDimensions();
     const {
         soundEnabled,
         musicEnabled,
@@ -77,201 +39,197 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
         toggleSound,
         toggleMusic,
         toggleHaptics,
-        setAnimationSpeed,
+        setAnimationSpeed
     } = useSettingsStore();
 
+    const handleBack = () => navigation.goBack();
+
+    const SettingRow = ({ label, value, onValueChange, icon }: { label: string, value: boolean, onValueChange: () => void, icon: string }) => (
+        <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+                <Text style={{ fontSize: 18, marginRight: 10 }}>{icon}</Text>
+                <Text variant="bodySmall" color={colors.arcane.white} style={{ fontWeight: '700' }}>{label.toUpperCase()}</Text>
+            </View>
+            <Switch
+                value={value}
+                onValueChange={onValueChange}
+                trackColor={{ false: colors.arcane.graphite, true: colors.arcane.emeraldDark }}
+                thumbColor={value ? colors.arcane.emerald : colors.text.disabled}
+                style={{ transform: [{ scale: 0.85 }] }}
+            />
+        </View>
+    );
+
     return (
-        <View style={styles.container}>
-            {/* Background gradient */}
-            <LinearGradient
-                colors={[colors.background.primary, '#0a0015', colors.background.primary]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-            />
+        <BoardSurface style={styles.container}>
+            <AnimatedBackground />
 
-            {/* Decorative glow */}
-            <Animated.View
-                entering={FadeIn.delay(200).duration(1000)}
-                style={styles.glowOrb}
-            />
+            <View style={[styles.content, {
+                paddingTop: insets.top,
+                paddingBottom: insets.bottom,
+                paddingLeft: insets.left,
+                paddingRight: insets.right,
+                paddingHorizontal: 20
+            }]}>
+                {/* Header */}
+                <View style={styles.header}>
+                    <Pressable onPress={handleBack} style={styles.backButton}>
+                        <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '900', letterSpacing: 1.5 }}>← RETREAT</Text>
+                    </Pressable>
+                    <Text variant="h3" style={styles.title}>CHAMBER OF ECHOES</Text>
+                    <View style={{ width: 80 }} />
+                </View>
 
-            <ScrollView
-                contentContainerStyle={[
-                    styles.scrollContent,
-                    {
-                        paddingTop: insets.top + spacing.md,
-                        paddingBottom: insets.bottom + spacing.md,
-                        paddingLeft: insets.left + spacing.lg,
-                        paddingRight: insets.right + spacing.lg,
-                    }
-                ]}
-                showsVerticalScrollIndicator={false}
-            >
-                <View style={styles.content}>
-                    {/* Header */}
-                    <Animated.View
-                        entering={FadeIn.delay(100)}
-                        style={styles.header}
-                    >
-                        <Pressable
-                            onPress={() => navigation.goBack()}
-                            style={styles.backButton}
-                        >
-                            <Text variant="body" color={colors.primary[400]}>← Back</Text>
-                        </Pressable>
-                        <Text variant="h3" style={styles.title}>Settings</Text>
-                        <View style={styles.backButton} />
+                <ScrollView
+                    style={{ width: '100%' }}
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
+                    <Animated.View entering={FadeIn.delay(200)} style={styles.settingsPanel}>
+                        <LinearGradient
+                            colors={['rgba(11, 15, 20, 0.9)', 'rgba(31, 41, 55, 0.4)']}
+                            style={StyleSheet.absoluteFill}
+                        />
+
+                        <Text variant="caption" color={colors.arcane.emerald} style={styles.sectionHeader}>SENSORY TUNING</Text>
+                        <View style={styles.sectionDivider} />
+
+                        <SettingRow icon="🔊" label="Audio Resonance" value={soundEnabled} onValueChange={toggleSound} />
+                        <SettingRow icon="🎵" label="Void Melodies" value={musicEnabled} onValueChange={toggleMusic} />
+                        <SettingRow icon="📳" label="Tactile Feedback" value={hapticsEnabled} onValueChange={toggleHaptics} />
+
+                        <View style={{ height: 16 }} />
+                        <Text variant="caption" color={colors.arcane.emerald} style={styles.sectionHeader}>TEMPORARY DYNAMICS</Text>
+                        <View style={styles.sectionDivider} />
+
+                        <View style={styles.speedSection}>
+                            <Text variant="caption" color={colors.text.disabled} style={{ marginBottom: 12, fontSize: 10 }}>ANIMATION VELOCITY</Text>
+                            <View style={styles.speedRow}>
+                                {(['slow', 'normal', 'fast'] as const).map((speed) => (
+                                    <Pressable
+                                        key={speed}
+                                        onPress={() => setAnimationSpeed(speed)}
+                                        style={[
+                                            styles.speedBtn,
+                                            animationSpeed === speed && styles.speedBtnActive
+                                        ]}
+                                    >
+                                        <Text
+                                            variant="caption"
+                                            color={animationSpeed === speed ? colors.arcane.obsidian : colors.arcane.emerald}
+                                            style={{ fontWeight: '900', fontSize: 10 }}
+                                        >
+                                            {speed.toUpperCase()}
+                                        </Text>
+                                    </Pressable>
+                                ))}
+                            </View>
+                        </View>
                     </Animated.View>
 
-                    {/* Settings Card */}
-                    <View style={styles.card}>
-                        {/* Audio Section */}
-                        <Animated.View
-                            entering={FadeIn.delay(200)}
-                            style={styles.section}
-                        >
-                            <Text variant="h4" color={colors.accent[400]} style={styles.sectionTitle}>
-                                🔊 Audio
-                            </Text>
-                            <SettingRow
-                                label="Sound Effects"
-                                value={soundEnabled}
-                                onToggle={toggleSound}
-                                delay={100}
-                            />
-                            <SettingRow
-                                label="Music"
-                                value={musicEnabled}
-                                onToggle={toggleMusic}
-                                delay={150}
-                            />
-                        </Animated.View>
-
-                        {/* Feedback Section */}
-                        <Animated.View
-                            entering={FadeIn.delay(300)}
-                            style={styles.section}
-                        >
-                            <Text variant="h4" color={colors.accent[400]} style={styles.sectionTitle}>
-                                📳 Feedback
-                            </Text>
-                            <SettingRow
-                                label="Haptic Feedback"
-                                value={hapticsEnabled}
-                                onToggle={toggleHaptics}
-                                delay={200}
-                            />
-                        </Animated.View>
-
-                        {/* Animation Speed Section */}
-                        <Animated.View
-                            entering={FadeIn.delay(400)}
-                            style={styles.section}
-                        >
-                            <Text variant="h4" color={colors.accent[400]} style={styles.sectionTitle}>
-                                ⚡ Animation Speed
-                            </Text>
-                            <View style={styles.speedButtons}>
-                                <SpeedButton
-                                    title="SLOW"
-                                    isActive={animationSpeed === 'slow'}
-                                    onPress={() => setAnimationSpeed('slow')}
-                                />
-                                <SpeedButton
-                                    title="NORMAL"
-                                    isActive={animationSpeed === 'normal'}
-                                    onPress={() => setAnimationSpeed('normal')}
-                                />
-                                <SpeedButton
-                                    title="FAST"
-                                    isActive={animationSpeed === 'fast'}
-                                    onPress={() => setAnimationSpeed('fast')}
-                                />
-                            </View>
-                        </Animated.View>
-                    </View>
-                </View>
-            </ScrollView>
-        </View>
+                    {/* Footer Info */}
+                    <Animated.View entering={SlideInDown.delay(400)} style={styles.footer}>
+                        <Text variant="caption" color={colors.text.disabled} style={{ opacity: 0.5, fontSize: 9 }}>ARCANE PROTOCOL v1.0.4</Text>
+                        <Text variant="caption" color={colors.arcane.emerald} style={{ opacity: 0.3, marginTop: 2, fontSize: 8 }}>✧ FORGED IN THE VOID ✧</Text>
+                    </Animated.View>
+                </ScrollView>
+            </View>
+        </BoardSurface>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background.primary,
+        backgroundColor: colors.arcane.obsidian,
     },
-    glowOrb: {
+    voidEnergyLine: {
         position: 'absolute',
-        width: 300,
-        height: 300,
-        borderRadius: 150,
-        backgroundColor: colors.primary[500],
-        top: -150,
-        right: -150,
-        opacity: 0.2,
-    },
-    scrollContent: {
-        flexGrow: 1,
+        top: '30%',
+        left: 0,
+        right: 0,
+        height: 1,
+        backgroundColor: colors.arcane.emerald,
+        opacity: 0.05,
     },
     content: {
         flex: 1,
-        maxWidth: 500,
-        alignSelf: 'center',
-        width: '100%',
+        alignItems: 'center',
+    },
+    scrollContent: {
+        alignItems: 'center',
+        paddingBottom: 20,
     },
     header: {
+        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: spacing.lg,
+        marginVertical: spacing.md,
     },
     backButton: {
-        width: 60,
+        paddingVertical: 8,
     },
     title: {
+        color: colors.arcane.white,
+        letterSpacing: 6,
+        fontFamily: 'serif',
         textAlign: 'center',
-        color: colors.text.primary,
     },
-    card: {
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: borderRadius.xl,
+    settingsPanel: {
+        width: '100%',
+        maxWidth: 500,
+        borderRadius: 2,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
-        padding: spacing.lg,
+        borderColor: 'rgba(16, 185, 129, 0.1)',
+        padding: 20,
+        overflow: 'hidden',
     },
-    section: {
-        marginBottom: spacing.lg,
+    sectionHeader: {
+        letterSpacing: 2,
+        fontWeight: '900',
+        marginBottom: 6,
+        fontSize: 10,
     },
-    sectionTitle: {
-        marginBottom: spacing.sm,
+    sectionDivider: {
+        height: 1,
+        backgroundColor: colors.arcane.emerald,
+        opacity: 0.2,
+        marginBottom: 12,
     },
     settingRow: {
         flexDirection: 'row',
+        alignItems: 'center',
         justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: spacing.sm,
-        borderBottomWidth: 1,
-        borderBottomColor: 'rgba(255,255,255,0.05)',
+        paddingVertical: 8,
     },
-    speedButtons: {
+    settingInfo: {
         flexDirection: 'row',
-        gap: spacing.sm,
-        marginTop: spacing.xs,
-    },
-    speedButtonWrapper: {
-        flex: 1,
-    },
-    speedButton: {
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.md,
-        borderRadius: borderRadius.md,
         alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
     },
-    speedButtonActive: {
-        borderColor: colors.primary[400],
+    speedSection: {
+        marginTop: 4,
+    },
+    speedRow: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    speedBtn: {
+        flex: 1,
+        paddingVertical: 8,
+        alignItems: 'center',
+        borderRadius: 1,
+        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+        borderWidth: 1,
+        borderColor: 'rgba(16, 185, 129, 0.2)',
+    },
+    speedBtnActive: {
+        backgroundColor: colors.arcane.emerald,
+        borderColor: colors.arcane.emeraldLight,
+    },
+    footer: {
+        marginTop: 'auto',
+        alignItems: 'center',
+        paddingBottom: 12,
     },
 });

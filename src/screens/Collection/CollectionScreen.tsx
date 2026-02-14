@@ -11,7 +11,6 @@ import Animated, {
     useSharedValue,
     withRepeat,
     withTiming,
-    withDelay,
     interpolate
 } from 'react-native-reanimated';
 import { RootStackParamList, Card, CardType } from '../../types';
@@ -30,38 +29,16 @@ interface Props {
 const ALL_CARDS = getAllCards();
 
 const AnimatedBackground: React.FC = () => {
-    const orb1Pos = useSharedValue(0);
-    const orb2Pos = useSharedValue(0);
-
-    React.useEffect(() => {
-        orb1Pos.value = withRepeat(withTiming(1, { duration: 10000 }), -1, true);
-        orb2Pos.value = withRepeat(withTiming(1, { duration: 8000 }), -1, true);
-    }, []);
-
-    const orb1Style = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: interpolate(orb1Pos.value, [0, 1], [-50, 50]) },
-            { translateY: interpolate(orb1Pos.value, [0, 1], [-20, 20]) },
-        ],
-    }));
-
-    const orb2Style = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: interpolate(orb2Pos.value, [0, 1], [30, -30]) },
-            { translateY: interpolate(orb2Pos.value, [0, 1], [50, -50]) },
-        ],
-    }));
-
     return (
         <View style={StyleSheet.absoluteFill}>
             <LinearGradient
-                colors={[colors.background.primary, '#0a0015', colors.background.primary]}
+                colors={[colors.arcane.obsidian, colors.arcane.void, colors.arcane.obsidian]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
             />
-            <Animated.View style={[styles.glowOrb, styles.orb1, orb1Style]} />
-            <Animated.View style={[styles.glowOrb, styles.orb2, orb2Style]} />
+            {/* Subtle Void Mist */}
+            <View style={styles.voidMist} />
         </View>
     );
 };
@@ -77,7 +54,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     const layout = getLayoutDimensions(screenWidth, screenHeight);
     const cardDims = getCardDimensions(screenWidth, screenHeight);
 
-    const cardWidth = cardDims.width * 1.1; // Slightly larger for collection
+    const cardWidth = cardDims.width * 1.1;
     const cardHeight = cardDims.height * 1.1;
 
     const categories: { id: 'all' | CardType; label: string }[] = [
@@ -96,6 +73,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
 
     return (
         <BoardSurface style={styles.container}>
+            <AnimatedBackground />
 
             <View style={[
                 styles.content,
@@ -115,13 +93,12 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                         onPress={() => navigation.goBack()}
                         style={styles.backButton}
                     >
-                        <Text variant="body" color={colors.primary[400]} style={styles.backText}>← MENU</Text>
+                        <Text variant="body" color={colors.arcane.emerald} style={styles.backText}>← VOID</Text>
                     </Pressable>
                     <View style={styles.titleContainer}>
                         <Text variant="h2" style={styles.title}>COLLECTION</Text>
                         <View style={styles.titleUnderline} />
                     </View>
-                    <View style={styles.backButton} />
                     <View style={styles.backButton} />
                 </Animated.View>
 
@@ -143,8 +120,8 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                                 >
                                     <Text
                                         variant="caption"
-                                        color={selectedCategory === cat.id ? colors.background.primary : colors.text.secondary}
-                                        style={{ fontWeight: 'bold' }}
+                                        color={selectedCategory === cat.id ? colors.arcane.obsidian : colors.arcane.emerald}
+                                        style={{ fontWeight: '900', letterSpacing: 1 }}
                                     >
                                         {cat.label.toUpperCase()}
                                     </Text>
@@ -155,13 +132,13 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
 
                     <Animated.View entering={FadeIn.delay(500)} style={styles.statsGlass}>
                         <View style={styles.statItem}>
-                            <Text variant="h4" color={colors.secondary[400]}>{ALL_CARDS.length}</Text>
-                            <Text variant="caption" color={colors.text.tertiary}>CARDS</Text>
+                            <Text variant="h4" color={colors.arcane.emerald} style={{ fontWeight: '900' }}>{ALL_CARDS.length}</Text>
+                            <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>CARDS</Text>
                         </View>
                         <View style={styles.statDivider} />
                         <View style={styles.statItem}>
-                            <Text variant="h4" color={colors.primary[400]}>{decks.length}</Text>
-                            <Text variant="caption" color={colors.text.tertiary}>DECKS</Text>
+                            <Text variant="h4" color={colors.arcane.cyan} style={{ fontWeight: '900' }}>{decks.length}</Text>
+                            <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>DECKS</Text>
                         </View>
                     </Animated.View>
                 </View>
@@ -172,22 +149,22 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                     if (card) return (
                         <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.cardDetailsPanel}>
                             <View style={styles.cardDetailHeader}>
-                                <Text variant="h4" color={colors.text.primary} style={{ flex: 1 }}>{card.name}</Text>
+                                <Text variant="h4" color={colors.arcane.white} style={{ flex: 1, fontFamily: 'serif', letterSpacing: 2 }}>{card.name.toUpperCase()}</Text>
                                 <View style={{ flexDirection: 'row', gap: 8 }}>
-                                    <View style={[styles.miniBadge, { backgroundColor: colors.accent[500] }]}>
-                                        <Text variant="caption">{card.manaCost}</Text>
+                                    <View style={[styles.miniBadge, { borderColor: colors.arcane.cyan }]}>
+                                        <Text variant="caption" color={colors.arcane.cyan}>{card.manaCost}</Text>
                                     </View>
                                     {card.power !== undefined && (
-                                        <View style={[styles.miniBadge, { backgroundColor: colors.secondary[500] }]}>
-                                            <Text variant="caption">{card.power}</Text>
+                                        <View style={[styles.miniBadge, { borderColor: colors.error }]}>
+                                            <Text variant="caption" color={colors.error}>{card.power}</Text>
                                         </View>
                                     )}
                                 </View>
                             </View>
-                            <Text variant="caption" color={colors.text.secondary} style={{ fontStyle: 'italic', marginBottom: 4 }}>
-                                {card.flavorText || "A mysterious card."}
+                            <Text variant="caption" color={colors.arcane.emerald} style={{ fontStyle: 'italic', marginBottom: 8, opacity: 0.7 }}>
+                                {card.flavorText || "A mysterious echo from the void."}
                             </Text>
-                            <Text variant="body" color={colors.text.primary} style={{ fontSize: 12 }}>
+                            <Text variant="body" color={colors.arcane.white} style={{ fontSize: 13, lineHeight: 18, opacity: 0.9 }}>
                                 {card.description}
                             </Text>
                         </Animated.View>
@@ -212,7 +189,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                         marginBottom: 16
                     }}
                     renderItem={({ item, index }) => (
-                        <Animated.View entering={FadeIn.delay(idxToDelay(index))}>
+                        <Animated.View entering={FadeIn.delay(Math.min(index * 30, 1000))}>
                             <CardComponent
                                 card={item}
                                 width={cardWidth}
@@ -229,30 +206,14 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     );
 };
 
-const idxToDelay = (index: number) => Math.min(index * 30, 1000);
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background.primary,
+        backgroundColor: colors.arcane.obsidian,
     },
-    glowOrb: {
-        position: 'absolute',
-        width: 400,
-        height: 400,
-        borderRadius: 200,
-        opacity: 0.15,
-        filter: 'blur(60px)',
-    },
-    orb1: {
-        backgroundColor: colors.primary[500],
-        top: -100,
-        left: -100,
-    },
-    orb2: {
-        backgroundColor: colors.secondary[500],
-        bottom: -150,
-        right: -100,
+    voidMist: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(16, 185, 129, 0.02)',
     },
     content: {
         flex: 1,
@@ -267,8 +228,8 @@ const styles = StyleSheet.create({
         minWidth: 80,
     },
     backText: {
-        fontWeight: 'bold',
-        letterSpacing: 1,
+        fontWeight: '900',
+        letterSpacing: 2,
     },
     titleContainer: {
         alignItems: 'center',
@@ -276,15 +237,16 @@ const styles = StyleSheet.create({
     },
     title: {
         textAlign: 'center',
-        color: colors.text.primary,
-        letterSpacing: 2,
-        alignSelf: 'center'
+        color: colors.arcane.white,
+        letterSpacing: 6,
+        fontFamily: 'serif',
     },
     titleUnderline: {
-        width: 40,
+        width: 60,
         height: 2,
-        backgroundColor: colors.secondary[400],
+        backgroundColor: colors.arcane.emerald,
         marginTop: 4,
+        opacity: 0.5,
     },
     metaRow: {
         flexDirection: 'row',
@@ -299,35 +261,35 @@ const styles = StyleSheet.create({
     },
     categoryBtn: {
         paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: borderRadius.full,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        paddingHorizontal: 16,
+        borderRadius: 2,
+        backgroundColor: 'rgba(16, 185, 129, 0.05)',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(16, 185, 129, 0.2)',
         marginRight: spacing.xs,
     },
     categoryBtnActive: {
-        backgroundColor: colors.secondary[400],
-        borderColor: colors.secondary[300],
+        backgroundColor: colors.arcane.emerald,
+        borderColor: colors.arcane.emeraldLight,
     },
     statsGlass: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(20,20,32,0.8)',
-        borderRadius: borderRadius.lg,
+        backgroundColor: 'rgba(11, 15, 20, 0.8)',
+        borderRadius: 2,
         paddingVertical: spacing.xs,
         paddingHorizontal: spacing.md,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(16, 185, 129, 0.1)',
     },
     statItem: {
         alignItems: 'center',
-        minWidth: 60,
+        minWidth: 50,
     },
     statDivider: {
         width: 1,
         height: 20,
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: 'rgba(255,255,255,0.05)',
         marginHorizontal: spacing.sm,
     },
     cardDetailsPanel: {
@@ -335,30 +297,31 @@ const styles = StyleSheet.create({
         bottom: spacing.xl + 20,
         left: '10%',
         right: '10%',
-        backgroundColor: 'rgba(20, 20, 30, 0.98)',
+        backgroundColor: 'rgba(11, 15, 20, 0.98)',
         borderWidth: 1,
-        borderColor: colors.primary[500],
-        borderRadius: borderRadius.md,
-        padding: spacing.md,
+        borderColor: colors.arcane.emeraldDark,
+        borderRadius: 2,
+        padding: spacing.lg,
         zIndex: 100,
         elevation: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.6,
-        shadowRadius: 8,
+        shadowColor: colors.arcane.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.3,
+        shadowRadius: 15,
     },
     cardDetailHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 12,
     },
     miniBadge: {
-        width: 24,
-        height: 24,
-        borderRadius: 12,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
-        marginLeft: 4,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        borderWidth: 1,
     },
 });

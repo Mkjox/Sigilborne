@@ -28,15 +28,19 @@ interface Props {
     route: GameBoardScreenRouteProp;
 }
 
-// Simple Background - Warm tones
+// Simple Background - Dark Arcane Void
 const SimpleBackground: React.FC = () => {
     return (
-        <LinearGradient
-            colors={['#1A1410', '#2D2520', '#1A1410']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
-        />
+        <View style={StyleSheet.absoluteFill}>
+            <LinearGradient
+                colors={[colors.arcane.obsidian, colors.arcane.void, colors.arcane.obsidian]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+            />
+            {/* Subtle Void Texture Overlay */}
+            <View style={[styles.voidOverlay, { opacity: 0.05 }]} />
+        </View>
     );
 };
 
@@ -46,8 +50,8 @@ const BoardZone: React.FC<{
     isPlayer: boolean;
     cardWidth: number;
     cardHeight: number;
-    onPress?: () => void; // Zone press (for play)
-    onCardPress?: (card: Card) => void; // Card press (for attack/details)
+    onPress?: () => void;
+    onCardPress?: (card: Card) => void;
     isActive?: boolean;
     highlightedCardIds?: string[];
     selectedCardId?: string | null;
@@ -59,9 +63,14 @@ const BoardZone: React.FC<{
                 isActive && styles.activeBoardZone
             ]}
             onPress={onPress}
-            // Only disable zone press if no handler. Children presses still work.
             disabled={!onPress}
+            pointerEvents={onPress ? "auto" : "box-none"}
         >
+            {/* Zone Highlight Seams */}
+            {isActive && (
+                <View style={styles.zoneSeam} />
+            )}
+
             <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -77,17 +86,16 @@ const BoardZone: React.FC<{
                             entering={FadeIn.delay(index * 100)}
                             exiting={FadeOut}
                             style={{
-                                marginHorizontal: 4,
-                                transform: [{ scale: isHighlighted ? 1.05 : 1 }],
-                                opacity: (highlightedCardIds.length > 0 && !isHighlighted && !isSelected) ? 0.6 : 1,
+                                marginHorizontal: spacing.sm,
+                                transform: [{ scale: isHighlighted ? 1.08 : (isSelected ? 1.04 : 1) }],
+                                opacity: (highlightedCardIds.length > 0 && !isHighlighted && !isSelected) ? 0.4 : 1,
+                                zIndex: isSelected || isHighlighted ? 20 : 1,
                             }}
                         >
-                            {/* Target indicator */}
+                            {/* Target indicator - Arcane Sigil */}
                             {isHighlighted && !isPlayer && (
-                                <View style={{
-                                    position: 'absolute', top: -10, left: 0, right: 0, alignItems: 'center', zIndex: 10
-                                }}>
-                                    <Text style={{ fontSize: 20 }}>🎯</Text>
+                                <View style={styles.targetIndicator}>
+                                    <Text style={{ fontSize: 18, color: colors.arcane.emerald }}>✧</Text>
                                 </View>
                             )}
 
@@ -95,10 +103,10 @@ const BoardZone: React.FC<{
                                 card={card}
                                 width={cardWidth}
                                 height={cardHeight}
-                                isPlayable={true} // Allow interaction
+                                isPlayable={true}
                                 hideStats={false}
                                 isSelected={isSelected}
-                                isTargeted={isHighlighted && !isPlayer} // Target highlighting
+                                isTargeted={isHighlighted && !isPlayer}
                                 onPress={() => onCardPress?.(card)}
                             />
                         </Animated.View>
@@ -125,16 +133,19 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
     useEffect(() => { startGame(difficulty); }, [difficulty]);
 
     // Dimensions
-    const sideColWidth = 90;
-    const availableHeight = screenHeight - 60;
+    const sideColWidth = 100;
+    const TOTAL_PLAY_SPACE = screenHeight - 60 - insets.bottom;
 
-    // Board calculations
-    // Two main zones + hand.
-    const boardZoneHeight = availableHeight * 0.35;
-    const cardHeight = Math.min(boardZoneHeight * 0.7, 110);
+    // Explicit Vertical Zones (35/35/30)
+    const BOARD_HALF_HEIGHT = TOTAL_PLAY_SPACE * 0.35;
+    const HAND_ZONE_HEIGHT = TOTAL_PLAY_SPACE * 0.30;
+
+    // Board Card Styling - Dominant
+    const cardHeight = Math.min(BOARD_HALF_HEIGHT * 0.75, 140);
     const cardWidth = cardHeight * 0.72;
 
-    const handCardH = Math.min(screenHeight * 0.25, 160);
+    // Hand Card Styling - Secondary (Reduced by ~25%)
+    const handCardH = Math.min(HAND_ZONE_HEIGHT * 0.7, 100);
     const handCardW = handCardH * 0.72;
 
     const shouldHighlightPass = currentTurn === 'player' && !isAIThinking && !player.hasPassed;
@@ -145,14 +156,12 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
     const handleCardPress = (card: Card) => {
         if (!isPlayerTurn || player.hasPassed) return;
 
-        // If we are in attack mode, generally we shouldn't interact with hand, but maybe cancel attack?
         if (attackingCardId) {
             setAttackingCard(null);
             return;
         }
 
         if (selectedCardId === card.id) {
-            // Play directly to board (no row selection needed)
             playCard(card.id);
         } else {
             selectCard(card.id);
@@ -163,7 +172,6 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
         if (selectedCardId) {
             playCard(selectedCardId);
         } else if (attackingCardId) {
-            // Tapping empty space cancels attack
             setAttackingCard(null);
         }
     };
@@ -173,19 +181,14 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
         if (!isPlayerTurn) return;
 
         if (isPlayerSide) {
-            // START ATTACK: Select player unit
             if (attackingCardId === card.id) {
-                // Deselect
                 setAttackingCard(null);
             } else {
                 if (!card.isExhausted) {
                     setAttackingCard(card.id);
-                } else {
-                    // Maybe show message "Unit is exhausted"
                 }
             }
         } else {
-            // END ATTACK: Target enemy unit
             if (attackingCardId) {
                 attackCard(card.id);
             }
@@ -199,7 +202,6 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
     const Toast = () => {
         if (!message) return null;
         const isRoundResult = message.includes('Won Round') || message.includes('Draw');
-        // also show attack messages temporarily
         const isAttackMsg = message.includes('Attack');
 
         if (!isRoundResult && !isAttackMsg) return null;
@@ -210,9 +212,9 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                 exiting={FadeOut}
                 style={styles.toastContainer}
             >
-                <View style={styles.toastContent}>
-                    <Text variant="h4" color={message.includes('You') || message === 'Victory!' ? colors.success : (message.includes('AI') || message === 'Defeat!' ? colors.error : colors.text.primary)}>
-                        {message}
+                <View style={[styles.toastContent, { backgroundColor: colors.arcane.obsidian }]}>
+                    <Text variant="h4" style={{ textAlign: 'center' }} color={message.includes('You') || message === 'Victory!' ? colors.arcane.emerald : (message.includes('AI') || message === 'Defeat!' ? colors.error : colors.arcane.white)}>
+                        {message.toUpperCase()}
                     </Text>
                 </View>
             </Animated.View>
@@ -221,6 +223,7 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
 
     return (
         <BoardSurface style={styles.container}>
+            <SimpleBackground />
             <StatusBar hidden />
 
             {/* TOP HUD BAR */}
@@ -228,22 +231,22 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                 {/* Left: Opponent Name */}
                 <View style={styles.topBarLeft}>
                     <View style={styles.avatarMini}>
-                        <Text style={{ fontSize: 18 }}>🤖</Text>
+                        <Text style={{ fontSize: 18 }}>👁</Text>
                     </View>
                     <View>
-                        <Text variant="caption" color={colors.text.secondary} style={{ fontWeight: 'bold' }}>OPPONENT</Text>
-                        <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 10 }}>The Innkeeper</Text>
+                        <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '900', letterSpacing: 1 }}>VOID KEEPER</Text>
+                        <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 10 }}>The Innkeeper's Shadow</Text>
                     </View>
                 </View>
 
                 {/* Center: Score */}
                 <View style={styles.topBarCenter}>
-                    <View style={styles.scoreContainer}>
+                    <View style={[styles.scoreContainer, { borderColor: colors.error }]}>
                         <Text variant="h4" color={colors.error} style={styles.scoreText}>{roundsWon.ai}</Text>
                     </View>
-                    <Text variant="caption" color={colors.text.tertiary} style={{ marginHorizontal: 8, fontSize: 12 }}>VS</Text>
-                    <View style={[styles.scoreContainer, { borderColor: colors.primary[500] }]}>
-                        <Text variant="h4" color={colors.primary[400]} style={styles.scoreText}>{roundsWon.player}</Text>
+                    <Text variant="caption" color={colors.arcane.emerald} style={{ marginHorizontal: 16, fontSize: 12, opacity: 0.5 }}>⫘</Text>
+                    <View style={[styles.scoreContainer, { borderColor: colors.arcane.emerald }]}>
+                        <Text variant="h4" color={colors.arcane.emerald} style={styles.scoreText}>{roundsWon.player}</Text>
                     </View>
                 </View>
 
@@ -252,32 +255,36 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                     onPress={() => { resetGame(); navigation.navigate('MainMenu'); }}
                     style={styles.menuBtn}
                 >
-                    <Text variant="caption" color={colors.text.disabled}>MENU</Text>
+                    <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '600' }}>ESCAPE</Text>
                 </Pressable>
             </View>
 
-            {/* MAIN CONTENT */}
-            <View style={[styles.mainRow, { marginTop: 60, marginBottom: insets.bottom }]}>
+            {/* MAIN CONTENT - BATTLEFIELD LAYER */}
+            <View style={[styles.mainRow, {
+                marginTop: 60,
+                height: BOARD_HALF_HEIGHT * 2,
+                zIndex: 5
+            }]}>
 
                 {/* LEFT COLUMN: Stats */}
                 <View style={[styles.sideColumnLeft, { width: sideColWidth }]}>
                     <View style={styles.statDisplay}>
                         <Text variant="caption" color={colors.text.disabled} style={styles.statLabel}>HAND</Text>
-                        <Text variant="h4" color={colors.text.primary}>{ai.hand.length}</Text>
+                        <Text variant="h4" color={colors.arcane.white}>{ai.hand.length}</Text>
                     </View>
 
                     <View style={[styles.statDisplay, { marginTop: 'auto' }]}>
                         <View style={[styles.powerBadge, { borderColor: colors.error }]}>
-                            <Text variant="h3" color="#fff" style={styles.powerText}>{aiPower}</Text>
+                            <Text variant="h3" color={colors.arcane.white} style={styles.powerText}>{aiPower}</Text>
                         </View>
-                        <Text variant="caption" color={colors.error} style={styles.statLabel}>POWER</Text>
+                        <Text variant="caption" color={colors.error} style={styles.statLabel}>CORRUPTION</Text>
                     </View>
                 </View>
 
                 {/* CENTER BOARD */}
                 <View style={styles.boardArea}>
-                    {/* AI ZONE */}
-                    <View style={styles.boardHalf}>
+                    {/* AI ZONE (35%) */}
+                    <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT }]}>
                         <BoardZone
                             cards={ai.board}
                             isPlayer={false}
@@ -288,18 +295,21 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                         />
                     </View>
 
-                    {/* DIVIDER */}
-                    <View style={styles.boardDivider} />
+                    {/* DIVIDER - Depth Shift */}
+                    <View style={styles.boardDividerContainer}>
+                        <View style={styles.boardDivider} />
+                        <View style={styles.dividerGlow} />
+                    </View>
 
-                    {/* PLAYER ZONE */}
-                    <View style={styles.boardHalf}>
+                    {/* PLAYER ZONE (35%) */}
+                    <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT }]}>
                         <BoardZone
                             cards={player.board}
                             isPlayer={true}
                             cardWidth={cardWidth}
                             cardHeight={cardHeight}
                             isActive={isPlayerTurn && !!selectedCardId}
-                            onPress={handleBoardPress} // For playing cards to zone
+                            onPress={handleBoardPress}
                             onCardPress={(card) => handleBoardCardPress(card, true)}
                             selectedCardId={attackingCardId}
                         />
@@ -309,17 +319,17 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                 {/* RIGHT COLUMN: Player Actions */}
                 <View style={[styles.sideColumnRight, { width: sideColWidth }]}>
                     <View style={[styles.statDisplay, { marginBottom: 'auto' }]}>
-                        <View style={[styles.powerBadge, { borderColor: colors.primary[500], backgroundColor: 'rgba(212,175,55,0.2)' }]}>
-                            <Text variant="h3" color={colors.primary[200]} style={styles.powerText}>{playerPower}</Text>
+                        <View style={[styles.powerBadge, { borderColor: colors.arcane.emerald, backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                            <Text variant="h3" color={colors.arcane.emerald} style={styles.powerText}>{playerPower}</Text>
                         </View>
-                        <Text variant="caption" color={colors.primary[400]} style={styles.statLabel}>POWER</Text>
+                        <Text variant="caption" color={colors.arcane.emerald} style={styles.statLabel}>ESSENCE</Text>
                     </View>
 
                     <View style={styles.statDisplay}>
                         <View style={[styles.manaBadge]}>
-                            <Text variant="h4" color="#fff" style={{ fontWeight: 'bold' }}>{player.mana}</Text>
+                            <Text variant="h4" color={colors.arcane.white} style={{ fontWeight: 'bold' }}>{player.mana}</Text>
                         </View>
-                        <Text variant="caption" color={colors.accent[400]} style={styles.statLabel}>MANA</Text>
+                        <Text variant="caption" color={colors.arcane.cyan} style={styles.statLabel}>MANA</Text>
                     </View>
 
                     <Pressable
@@ -333,11 +343,11 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
                         ]}
                     >
                         <LinearGradient
-                            colors={player.hasPassed ? ['#4A2511', '#3E1F0E'] : ['#E8C547', '#B8941F']}
+                            colors={player.hasPassed ? [colors.arcane.obsidian, colors.arcane.graphite] : [colors.arcane.emerald, colors.arcane.emeraldDark]}
                             style={StyleSheet.absoluteFill}
                         />
                         <View style={styles.passButtonInner}>
-                            <Text variant="button" color={player.hasPassed ? colors.text.disabled : '#3E1F0E'} style={{ fontWeight: '900', fontSize: 12, letterSpacing: 1 }}>
+                            <Text variant="button" color={player.hasPassed ? colors.text.disabled : colors.arcane.white} style={{ fontWeight: '900', fontSize: 10, letterSpacing: 2 }}>
                                 {player.hasPassed ? "PASSED" : "END TURN"}
                             </Text>
                         </View>
@@ -346,44 +356,56 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
 
             </View>
 
-            {/* BOTTOM HAND ZONE */}
+            {/* BOTTOM HAND ZONE - UI LAYER */}
             <View
-                style={[styles.handZone, { left: sideColWidth, right: sideColWidth, paddingBottom: insets.bottom + 10 }]}
+                style={[
+                    styles.handZone,
+                    {
+                        left: 0,
+                        right: 0,
+                        height: HAND_ZONE_HEIGHT,
+                        bottom: insets.bottom,
+                        paddingTop: 10,
+                        zIndex: 20
+                    }
+                ]}
                 pointerEvents="box-none"
             >
-                {player.hand.map((card, index) => {
-                    const totalCards = player.hand.length;
-                    const centerIndex = (totalCards - 1) / 2;
-                    const rotate = (index - centerIndex) * 3;
-                    const translateY = Math.abs(index - centerIndex) * 2;
+                <View style={[styles.handContainer, { left: sideColWidth, right: sideColWidth }]}>
+                    {player.hand.map((card, index) => {
+                        const totalCards = player.hand.length;
+                        const centerIndex = (totalCards - 1) / 2;
+                        const rotate = (index - centerIndex) * 3;
+                        const translateY = Math.abs(index - centerIndex) * 2;
 
-                    return (
-                        <Animated.View
-                            key={card.id}
-                            entering={SlideInDown.delay(index * 50)}
-                            style={[
-                                styles.handCardContainer,
-                                {
-                                    transform: [
-                                        { rotate: `${rotate}deg` },
-                                        { translateY: selectedCardId === card.id ? -30 : translateY }
-                                    ],
-                                    zIndex: selectedCardId === card.id ? 100 : index,
-                                    marginLeft: index === 0 ? 0 : -40
-                                }
-                            ]}
-                        >
-                            <CardComponent
-                                card={card}
-                                width={handCardW}
-                                height={handCardH}
-                                isSelected={selectedCardId === card.id}
-                                isPlayable={isPlayerTurn && !player.hasPassed && (card.manaCost ?? 0) <= player.mana}
-                                onPress={() => handleCardPress(card)}
-                            />
-                        </Animated.View>
-                    );
-                })}
+                        return (
+                            <Animated.View
+                                key={card.id}
+                                entering={SlideInDown.delay(index * 50)}
+                                style={[
+                                    styles.handCardContainer,
+                                    {
+                                        transform: [
+                                            { rotate: `${rotate}deg` },
+                                            { translateY: selectedCardId === card.id ? -12 : translateY }
+                                        ],
+                                        zIndex: selectedCardId === card.id ? 100 : index,
+                                        marginLeft: index === 0 ? 0 : -handCardW * 0.35
+                                    }
+                                ]}
+                            >
+                                <CardComponent
+                                    card={card}
+                                    width={handCardW}
+                                    height={handCardH}
+                                    isSelected={selectedCardId === card.id}
+                                    isPlayable={isPlayerTurn && !player.hasPassed && (card.manaCost ?? 0) <= player.mana}
+                                    onPress={() => handleCardPress(card)}
+                                />
+                            </Animated.View>
+                        );
+                    })}
+                </View>
             </View>
 
             <Toast />
@@ -392,14 +414,14 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
             {gameOver && (
                 <View style={styles.overlay}>
                     <View style={styles.overlayCard}>
-                        <Text variant="h2" style={{ color: colors.text.primary, marginBottom: 20 }}>
-                            {winner === 'player' ? 'VICTORY' : (winner === 'draw' ? 'DRAW' : 'DEFEAT')}
+                        <Text variant="h2" style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: 'serif' }}>
+                            {winner === 'player' ? 'VICTORY' : (winner === 'draw' ? 'STALEMATE' : 'OBLIVION')}
                         </Text>
                         <Pressable onPress={() => startGame(difficulty)} style={styles.overlayBtn}>
-                            <Text variant="button" color="#FFFFFF">RETRY</Text>
+                            <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>REAWAKEN</Text>
                         </Pressable>
-                        <Pressable onPress={() => { resetGame(); navigation.navigate('MainMenu'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: 'white', marginTop: 10 }]}>
-                            <Text variant="button" color={colors.text.primary}>EXIT</Text>
+                        <Pressable onPress={() => { resetGame(); navigation.navigate('MainMenu'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald, marginTop: 16 }]}>
+                            <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>ABANDON</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -411,7 +433,11 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#1a1a1a',
+        backgroundColor: colors.arcane.obsidian,
+    },
+    voidOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: '#000',
     },
     topBar: {
         position: 'absolute',
@@ -420,82 +446,100 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 24,
         zIndex: 20,
+        backgroundColor: 'rgba(0,0,0,0.3)',
     },
-    topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     topBarCenter: { flexDirection: 'row', alignItems: 'center' },
-    menuBtn: { padding: 8, backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: 20, paddingHorizontal: 16 },
+    menuBtn: {
+        paddingVertical: 6,
+        paddingHorizontal: 16,
+        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: 'rgba(16, 185, 129, 0.2)'
+    },
     mainRow: {
         flex: 1,
         flexDirection: 'row',
     },
     sideColumnLeft: {
         borderRightWidth: 1,
-        borderRightColor: 'rgba(255,255,255,0.05)',
+        borderRightColor: 'rgba(16, 185, 129, 0.05)',
         alignItems: 'center',
         paddingVertical: 20,
         gap: 20,
     },
     sideColumnRight: {
         borderLeftWidth: 1,
-        borderLeftColor: 'rgba(255,255,255,0.05)',
+        borderLeftColor: 'rgba(16, 185, 129, 0.05)',
         alignItems: 'center',
         paddingVertical: 20,
         gap: 20,
         justifyContent: 'flex-end',
     },
     avatarMini: {
-        width: 36, height: 36, borderRadius: 18, backgroundColor: colors.secondary[700],
-        alignItems: 'center', justifyContent: 'center', marginRight: 8, borderWidth: 2, borderColor: colors.accent[500],
+        width: 36, height: 36, borderRadius: 2, backgroundColor: colors.arcane.graphite,
+        alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderColor: colors.arcane.emeraldDark,
     },
     scoreContainer: {
-        width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center',
-        backgroundColor: 'rgba(0,0,0,0.3)', borderWidth: 1, borderColor: colors.error,
+        width: 32, height: 32, borderRadius: 2, alignItems: 'center', justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,0.6)', borderWidth: 1.5,
     },
-    scoreText: { fontSize: 14, fontWeight: 'bold', lineHeight: 18 },
-    statDisplay: { alignItems: 'center', gap: 2, paddingVertical: 8 },
+    scoreText: { fontSize: 16, fontWeight: '900', fontFamily: 'serif' },
+    statDisplay: { alignItems: 'center', gap: 4, paddingVertical: 8 },
     powerBadge: {
-        width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)', borderWidth: 2, marginBottom: 4,
-        shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.5, shadowRadius: 4,
+        width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,0,0.8)', borderWidth: 2, marginBottom: 4,
+        shadowColor: colors.arcane.emerald, shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.3, shadowRadius: 10,
     },
     manaBadge: {
-        width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center',
-        backgroundColor: colors.accent[600], borderWidth: 2, borderColor: colors.accent[300], marginBottom: 4,
-        shadowColor: colors.accent[500], shadowRadius: 6, shadowOpacity: 0.5,
+        width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
+        backgroundColor: 'rgba(6, 182, 212, 0.1)', borderWidth: 2, borderColor: colors.arcane.cyan, marginBottom: 4,
     },
-    powerText: { fontWeight: '900', textShadowColor: 'rgba(0,0,0,0.8)', textShadowOffset: { width: 1, height: 1 }, textShadowRadius: 2 },
-    statLabel: { fontSize: 9, letterSpacing: 1, opacity: 0.8, fontWeight: 'bold', textShadowColor: '#000', textShadowRadius: 2 },
+    powerText: { fontWeight: '900', fontFamily: 'serif', fontSize: 20 },
+    statLabel: { fontSize: 8, letterSpacing: 1.5, opacity: 0.6, fontWeight: '900', fontFamily: 'serif' },
     passButton: {
-        width: 80, height: 50, borderRadius: 25, alignItems: 'center', justifyContent: 'center',
-        marginTop: 'auto', marginBottom: 20, overflow: 'hidden', borderWidth: 3, borderColor: '#8B4513',
-        shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 6, elevation: 5,
+        width: 90, height: 44, borderRadius: 2, alignItems: 'center', justifyContent: 'center',
+        marginTop: 'auto', marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.2)',
     },
     passButtonInner: {
         width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center',
-        borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)', borderRadius: 22,
     },
     passButtonHighlight: {
-        borderColor: colors.primary[400], shadowColor: colors.primary[500], shadowRadius: 10, shadowOpacity: 0.8,
+        borderColor: colors.arcane.emerald, shadowColor: colors.arcane.emerald, shadowRadius: 8, shadowOpacity: 0.5,
     },
-    passButtonDisabled: { opacity: 0.8, borderColor: '#3E1F0E' },
+    passButtonDisabled: { opacity: 0.4 },
     boardArea: {
         flex: 1,
-        paddingHorizontal: 10,
-        justifyContent: 'center',
+        paddingHorizontal: 16,
     },
     boardHalf: {
-        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 10,
+    },
+    boardDividerContainer: {
+        height: 2,
+        width: '90%',
+        alignSelf: 'center',
+        marginVertical: 4,
+        position: 'relative',
+        justifyContent: 'center',
     },
     boardDivider: {
         height: 1,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        width: '90%',
-        alignSelf: 'center',
+        backgroundColor: colors.arcane.emeraldDark,
+        opacity: 0.3,
+        width: '100%',
+    },
+    dividerGlow: {
+        position: 'absolute',
+        height: 4,
+        width: '100%',
+        backgroundColor: colors.arcane.emerald,
+        opacity: 0.05,
+        filter: 'blur(4px)',
     },
     boardZoneContainer: {
         flex: 1,
@@ -510,22 +554,78 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     activeBoardZone: {
-        // Optional: Subtle highlight when card is selected and player needs to play
-        backgroundColor: 'rgba(255, 255, 255, 0.02)',
-        borderRadius: 12,
+        backgroundColor: 'rgba(16, 185, 129, 0.02)',
+    },
+    zoneSeam: {
+        position: 'absolute',
+        top: 0, bottom: 0, left: 0, right: 0,
+        borderWidth: 1,
+        borderColor: 'rgba(16, 185, 129, 0.1)',
+        borderRadius: 4,
+    },
+    targetIndicator: {
+        position: 'absolute', top: -14, left: 0, right: 0, alignItems: 'center', zIndex: 10
     },
     handZone: {
-        position: 'absolute', bottom: 0, height: 120, flexDirection: 'row',
-        justifyContent: 'center', alignItems: 'flex-end', zIndex: 50,
+        position: 'absolute',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(16, 185, 129, 0.1)',
+        backgroundColor: 'rgba(11, 15, 20, 0.8)',
+    },
+    handContainer: {
+        position: 'absolute',
+        bottom: 0,
+        height: '100%',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        paddingBottom: 10,
     },
     handCardContainer: {
-        shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 4.65, elevation: 8,
+        shadowColor: colors.arcane.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
     },
-    toastContainer: { position: 'absolute', top: 100, alignSelf: 'center', zIndex: 100 },
-    toastContent: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 12, borderRadius: 8 },
-    overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'center', alignItems: 'center', zIndex: 200 },
-    overlayCard: { padding: 40, backgroundColor: '#111', borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: '#333' },
-    overlayBtn: { backgroundColor: colors.primary[500], paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8, minWidth: 150, alignItems: 'center' },
-
-    // Removed old row styles
+    toastContainer: {
+        position: 'absolute',
+        top: '40%',
+        alignSelf: 'center',
+        zIndex: 500,
+        width: '60%',
+        maxWidth: 350,
+    },
+    toastContent: {
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: colors.arcane.emerald,
+        shadowColor: colors.arcane.emerald,
+        shadowRadius: 15,
+        shadowOpacity: 0.2,
+    },
+    overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center', zIndex: 200 },
+    overlayCard: {
+        padding: 48,
+        backgroundColor: colors.arcane.obsidian,
+        borderRadius: 2,
+        alignItems: 'center',
+        borderWidth: 1.5,
+        borderColor: colors.arcane.emeraldDark,
+        shadowColor: colors.arcane.emerald,
+        shadowRadius: 30,
+        shadowOpacity: 0.2,
+    },
+    overlayBtn: {
+        backgroundColor: colors.arcane.emeraldDark,
+        paddingVertical: 14,
+        paddingHorizontal: 40,
+        borderRadius: 2,
+        minWidth: 200,
+        alignItems: 'center'
+    },
 });

@@ -93,15 +93,41 @@ export const colors = {
     // Border colors
     border: {
         primary: 'rgba(212, 175, 55, 0.3)', // Gold with transparency
-        secondary: 'rgba(139, 69, 19, 0.2)', // Brown with transparency
+        secondary: 'rgba(139, 69, 19, 0.2)',
         focus: 'rgba(212, 175, 55, 0.6)', // Bright gold
     },
 
-    // Glassmorphism (now warmer)
-    glass: {
-        background: 'rgba(74, 63, 53, 0.7)', // Warm brown glass
-        border: 'rgba(212, 175, 55, 0.2)', // Gold border
-        shadow: 'rgba(26, 20, 16, 0.4)', // Dark brown shadow
+    // Semantic Colors
+    semantic: {
+        success: '#10B981',
+        error: '#EF4444',
+        warning: '#F59E0B',
+        info: '#3B82F6',
     },
-};
 
+    // Arcane Theme Colors
+    arcane: {
+        obsidian: '#0B0F14',
+        graphite: '#1F2937',
+        emerald: '#10B981',
+        emeraldDark: '#065F46',
+        emeraldLight: '#34D399',
+        cyan: '#06B6D4',
+        white: '#F8FAFC',
+        teal: '#14B8A6',
+        void: '#020617',
+        translucentEmerald: 'rgba(16, 185, 129, 0.2)',
+        translucentObsidian: 'rgba(11, 15, 20, 0.8)',
+    },
+
+    // Glassmorphism/Overlay
+    glass: {
+        white: 'rgba(255, 255, 255, 0.1)',
+        black: 'rgba(0, 0, 0, 0.4)',
+        gold: 'rgba(212, 175, 55, 0.1)',
+        surface: 'rgba(26, 20, 16, 0.8)',
+        arcane: 'rgba(11, 15, 20, 0.9)',
+        background: 'rgba(11, 15, 20, 0.7)',
+        border: 'rgba(16, 185, 129, 0.2)',
+    }
+};
