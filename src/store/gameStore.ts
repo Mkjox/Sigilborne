@@ -496,7 +496,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
     },
 
     selectCard: (cardId) => {
-        set({ selectedCardId: cardId });
+        const state = get();
+        if (cardId) {
+            const card = state.player.hand.find(c => c.id === cardId) ||
+                state.player.board.find(c => c.id === cardId);
+            if (card) {
+                set({
+                    selectedCardId: cardId,
+                    message: `${card.name}: ${card.description || 'No description'}`
+                });
+            } else {
+                set({ selectedCardId: cardId });
+            }
+        } else {
+            set({ selectedCardId: null, message: null });
+        }
     },
 
     setMessage: (message) => {

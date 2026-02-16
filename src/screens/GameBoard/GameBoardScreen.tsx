@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, StatusBar, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, StatusBar, Pressable, ScrollView, useWindowDimensions, ImageBackground } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,17 +7,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
     FadeIn,
     FadeOut,
-    SlideInDown,
-    useAnimatedStyle,
-    useSharedValue,
-    withRepeat,
-    withTiming,
-    interpolate
+    SlideInDown
 } from 'react-native-reanimated';
 import { RootStackParamList, Card } from '../../types';
 import { Text, BoardSurface } from '../../components/ui';
 import { CardComponent } from '../../components/game';
-import { colors, borderRadius, spacing } from '../../theme';
+import { colors, spacing } from '../../theme';
 import { useGameStore } from '../../store';
 
 type GameBoardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameBoard'>;
@@ -32,12 +27,14 @@ interface Props {
 const SimpleBackground: React.FC = () => {
     return (
         <View style={StyleSheet.absoluteFill}>
-            <LinearGradient
-                colors={[colors.arcane.obsidian, colors.arcane.void, colors.arcane.obsidian]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+            <ImageBackground
+                source={require('../../../assets/board_bg.png')}
                 style={StyleSheet.absoluteFill}
-            />
+                resizeMode="cover"
+            >
+                {/* Subtle dark tint to ensure text/card readability over the texture */}
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
+            </ImageBackground>
             {/* Subtle Void Texture Overlay */}
             <View style={[styles.voidOverlay, { opacity: 0.05 }]} />
         </View>
@@ -120,7 +117,7 @@ const BoardZone: React.FC<{
 export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
     const difficulty = route.params?.difficulty || 'medium';
     const insets = useSafeAreaInsets();
-    const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+    const { height: screenHeight } = useWindowDimensions();
 
     const {
         startGame, playCard, passTurn, resetGame, selectCard,
@@ -200,20 +197,40 @@ export const GameBoardScreen: React.FC<Props> = ({ navigation, route }) => {
 
     // Toast Component
     const Toast = () => {
-        if (!message) return null;
-        const isRoundResult = message.includes('Won Round') || message.includes('Draw');
-        const isAttackMsg = message.includes('Attack');
+        const { message, setMessage, selectedCardId } = useGameStore();
 
-        if (!isRoundResult && !isAttackMsg) return null;
+        useEffect(() => {
+            if (!message) return;
+
+            // Persistent messages are those that start with card selection info
+            const isPersistent = !!selectedCardId && (
+                player.hand.some(c => c.id === selectedCardId) ||
+                player.board.some(c => c.id === selectedCardId)
+            );
+
+            if (!isPersistent) {
+                const timer = setTimeout(() => {
+                    setMessage(null);
+                }, 2000);
+                return () => clearTimeout(timer);
+            }
+        }, [message, selectedCardId]);
+
+        if (!message) return null;
 
         return (
             <Animated.View
                 entering={SlideInDown.springify()}
                 exiting={FadeOut}
                 style={styles.toastContainer}
+                pointerEvents="none"
             >
                 <View style={[styles.toastContent, { backgroundColor: colors.arcane.obsidian }]}>
-                    <Text variant="h4" style={{ textAlign: 'center' }} color={message.includes('You') || message === 'Victory!' ? colors.arcane.emerald : (message.includes('AI') || message === 'Defeat!' ? colors.error : colors.arcane.white)}>
+                    <Text
+                        variant="caption"
+                        style={{ textAlign: 'center', lineHeight: 16 }}
+                        color={message.includes('Victory') || message.includes('You Won') || message.includes('Played') ? colors.arcane.emerald : (message.includes('Defeat') || message.includes('AI Won') ? colors.error : colors.arcane.white)}
+                    >
                         {message.toUpperCase()}
                     </Text>
                 </View>
@@ -592,21 +609,21 @@ const styles = StyleSheet.create({
     },
     toastContainer: {
         position: 'absolute',
-        top: '40%',
+        top: '38%',
         alignSelf: 'center',
         zIndex: 500,
-        width: '60%',
-        maxWidth: 350,
+        width: '50%',
+        maxWidth: 280,
     },
     toastContent: {
-        paddingVertical: 12,
-        paddingHorizontal: 24,
+        paddingVertical: 8,
+        paddingHorizontal: 16,
         borderRadius: 2,
         borderWidth: 1,
         borderColor: colors.arcane.emerald,
         shadowColor: colors.arcane.emerald,
-        shadowRadius: 15,
-        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        shadowOpacity: 0.15,
     },
     overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center', zIndex: 200 },
     overlayCard: {
