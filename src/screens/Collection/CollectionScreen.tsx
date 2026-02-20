@@ -75,104 +75,72 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
         <BoardSurface style={styles.container}>
             <AnimatedBackground />
 
-            <View style={[
-                styles.content,
-                {
-                    paddingTop: insets.top,
-                    paddingBottom: insets.bottom,
-                    paddingLeft: insets.left,
-                    paddingRight: insets.right,
-                }
-            ]}>
-                {/* Header */}
-                <Animated.View
-                    entering={SlideInLeft.duration(600).springify()}
-                    style={[styles.header, { paddingHorizontal: layout.contentPadding, paddingTop: spacing.sm }]}
-                >
-                    <Pressable
-                        onPress={() => navigation.goBack()}
-                        style={styles.backButton}
+            {/* 1. TOP BAR (The "Upper Layer") */}
+            <View style={styles.headerBar}>
+                <View style={{ paddingTop: insets.top }}>
+                    {/* Header */}
+                    <Animated.View
+                        entering={SlideInLeft.duration(600).springify()}
+                        style={[styles.header, { paddingHorizontal: layout.contentPadding, paddingTop: spacing.sm }]}
                     >
-                        <Text variant="body" color={colors.arcane.emerald} style={styles.backText}>← VOID</Text>
-                    </Pressable>
-                    <View style={styles.titleContainer}>
-                        <Text variant="h2" style={styles.title}>COLLECTION</Text>
-                        <View style={styles.titleUnderline} />
-                    </View>
-                    <View style={styles.backButton} />
-                </Animated.View>
-
-                {/* Categories & Stats Row */}
-                <View style={[styles.metaRow, { paddingHorizontal: layout.contentPadding }]}>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.categoryScroll}
-                    >
-                        {categories.map((cat, idx) => (
-                            <Animated.View key={cat.id} entering={FadeIn.delay(300 + idx * 50)}>
-                                <Pressable
-                                    onPress={() => { setSelectedCategory(cat.id); setSelectedCardId(null); }}
-                                    style={[
-                                        styles.categoryBtn,
-                                        selectedCategory === cat.id && styles.categoryBtnActive
-                                    ]}
-                                >
-                                    <Text
-                                        variant="caption"
-                                        color={selectedCategory === cat.id ? colors.arcane.obsidian : colors.arcane.emerald}
-                                        style={{ fontWeight: '900', letterSpacing: 1 }}
-                                    >
-                                        {cat.label.toUpperCase()}
-                                    </Text>
-                                </Pressable>
-                            </Animated.View>
-                        ))}
-                    </ScrollView>
-
-                    <Animated.View entering={FadeIn.delay(500)} style={styles.statsGlass}>
-                        <View style={styles.statItem}>
-                            <Text variant="h4" color={colors.arcane.emerald} style={{ fontWeight: '900' }}>{ALL_CARDS.length}</Text>
-                            <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>CARDS</Text>
+                        <Pressable
+                            onPress={() => navigation.goBack()}
+                            style={styles.backButton}
+                        >
+                            <Text variant="body" color={colors.arcane.emerald} style={styles.backText}>← VOID</Text>
+                        </Pressable>
+                        <View style={styles.titleContainer}>
+                            <Text variant="h2" style={styles.title}>COLLECTION</Text>
+                            <View style={styles.titleUnderline} />
                         </View>
-                        <View style={styles.statDivider} />
-                        <View style={styles.statItem}>
-                            <Text variant="h4" color={colors.arcane.cyan} style={{ fontWeight: '900' }}>{decks.length}</Text>
-                            <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>DECKS</Text>
-                        </View>
+                        <View style={styles.backButton} />
                     </Animated.View>
-                </View>
 
-                {/* CARD DETAILS PANEL */}
-                {selectedCardId && (() => {
-                    const card = ALL_CARDS.find(c => c.id === selectedCardId);
-                    if (card) return (
-                        <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.cardDetailsPanel}>
-                            <View style={styles.cardDetailHeader}>
-                                <Text variant="h4" color={colors.arcane.white} style={{ flex: 1, fontFamily: 'serif', letterSpacing: 2 }}>{card.name.toUpperCase()}</Text>
-                                <View style={{ flexDirection: 'row', gap: 8 }}>
-                                    <View style={[styles.miniBadge, { borderColor: colors.arcane.cyan }]}>
-                                        <Text variant="caption" color={colors.arcane.cyan}>{card.manaCost}</Text>
-                                    </View>
-                                    {card.power !== undefined && (
-                                        <View style={[styles.miniBadge, { borderColor: colors.error }]}>
-                                            <Text variant="caption" color={colors.error}>{card.power}</Text>
-                                        </View>
-                                    )}
-                                </View>
+                    {/* Categories & Stats Row */}
+                    <View style={[styles.metaRow, { paddingHorizontal: layout.contentPadding }]}>
+                        <ScrollView
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={styles.categoryScroll}
+                        >
+                            {categories.map((cat, idx) => (
+                                <Animated.View key={cat.id} entering={FadeIn.delay(300 + idx * 50)}>
+                                    <Pressable
+                                        onPress={() => { setSelectedCategory(cat.id); setSelectedCardId(null); }}
+                                        style={[
+                                            styles.categoryBtn,
+                                            selectedCategory === cat.id && styles.categoryBtnActive
+                                        ]}
+                                    >
+                                        <Text
+                                            variant="caption"
+                                            color={selectedCategory === cat.id ? colors.arcane.obsidian : colors.arcane.emerald}
+                                            style={{ fontWeight: '900', letterSpacing: 1 }}
+                                        >
+                                            {cat.label.toUpperCase()}
+                                        </Text>
+                                    </Pressable>
+                                </Animated.View>
+                            ))}
+                        </ScrollView>
+
+                        <Animated.View entering={FadeIn.delay(500)} style={styles.statsGlass}>
+                            <View style={styles.statItem}>
+                                <Text variant="h4" color={colors.arcane.emerald} style={{ fontWeight: '900' }}>{ALL_CARDS.length}</Text>
+                                <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>CARDS</Text>
                             </View>
-                            <Text variant="caption" color={colors.arcane.emerald} style={{ fontStyle: 'italic', marginBottom: 8, opacity: 0.7 }}>
-                                {card.flavorText || "A mysterious echo from the void."}
-                            </Text>
-                            <Text variant="body" color={colors.arcane.white} style={{ fontSize: 13, lineHeight: 18, opacity: 0.9 }}>
-                                {card.description}
-                            </Text>
+                            <View style={styles.statDivider} />
+                            <View style={styles.statItem}>
+                                <Text variant="h4" color={colors.arcane.cyan} style={{ fontWeight: '900' }}>{decks.length}</Text>
+                                <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>DECKS</Text>
+                            </View>
                         </Animated.View>
-                    );
-                    return null;
-                })()}
+                    </View>
+                </View>
+            </View>
 
-                {/* Cards grid */}
+            {/* 2. MAIN GRID AREA */}
+            <View style={styles.gridContainer}>
                 <FlatList
                     data={filteredCards}
                     keyExtractor={(item) => item.id}
@@ -180,7 +148,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                     key={`grid-${numColumns}`}
                     contentContainerStyle={{
                         paddingHorizontal: layout.contentPadding,
-                        paddingBottom: spacing.xl,
+                        paddingBottom: spacing.xl + 100,
                         paddingTop: spacing.md
                     }}
                     columnWrapperStyle={{
@@ -200,8 +168,45 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                             />
                         </Animated.View>
                     )}
+                    showsVerticalScrollIndicator={false}
                 />
             </View>
+
+            {/* 3. OVERLAY LAYER (Absolute bottom of JSX = Top z-index) */}
+            {selectedCardId && (() => {
+                const card = ALL_CARDS.find(c => c.id === selectedCardId);
+                if (card) return (
+                    <Animated.View entering={FadeIn} exiting={FadeOut} style={StyleSheet.absoluteFill}>
+                        <Pressable style={styles.backdrop} onPress={() => setSelectedCardId(null)} />
+
+                        <View style={styles.cardDetailsPanel}>
+                            <View style={styles.cardDetailHeader}>
+                                <Text variant="h4" color={colors.arcane.white} style={{ flex: 1, fontFamily: 'serif', letterSpacing: 2 }}>{card.name.toUpperCase()}</Text>
+                                <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+                                    <View style={[styles.miniBadge, { borderColor: colors.arcane.cyan }]}>
+                                        <Text variant="caption" color={colors.arcane.cyan}>{card.manaCost}</Text>
+                                    </View>
+                                    {card.power !== undefined && (
+                                        <View style={[styles.miniBadge, { borderColor: colors.error }]}>
+                                            <Text variant="caption" color={colors.error}>{card.power}</Text>
+                                        </View>
+                                    )}
+                                    <Pressable onPress={() => setSelectedCardId(null)} style={styles.closeBtn}>
+                                        <Text variant="h4" color={colors.arcane.emerald}>✕</Text>
+                                    </Pressable>
+                                </View>
+                            </View>
+                            <Text variant="caption" color={colors.arcane.emerald} style={{ fontStyle: 'italic', marginBottom: 8, opacity: 0.7 }}>
+                                {card.flavorText || "A mysterious echo from the void."}
+                            </Text>
+                            <Text variant="body" color={colors.arcane.white} style={{ fontSize: 13, lineHeight: 18, opacity: 0.9 }}>
+                                {card.description}
+                            </Text>
+                        </View>
+                    </Animated.View>
+                );
+                return null;
+            })()}
         </BoardSurface>
     );
 };
@@ -218,18 +223,29 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
     },
+    headerBar: {
+        backgroundColor: 'rgba(11, 15, 20, 0.95)',
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(16, 185, 129, 0.1)',
+        zIndex: 10,
+        elevation: 5,
+    },
+    gridContainer: {
+        flex: 1,
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: spacing.sm,
+        marginBottom: spacing.xs,
     },
     backButton: {
-        minWidth: 80,
+        minWidth: 60,
     },
     backText: {
         fontWeight: '900',
-        letterSpacing: 2,
+        letterSpacing: 1,
+        fontSize: 10,
     },
     titleContainer: {
         alignItems: 'center',
@@ -238,30 +254,31 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'center',
         color: colors.arcane.white,
-        letterSpacing: 6,
+        letterSpacing: 4,
         fontFamily: 'serif',
+        fontSize: 18,
     },
     titleUnderline: {
-        width: 60,
-        height: 2,
+        width: 40,
+        height: 1,
         backgroundColor: colors.arcane.emerald,
-        marginTop: 4,
-        opacity: 0.5,
+        marginTop: 2,
+        opacity: 0.3,
     },
     metaRow: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: spacing.md,
-        gap: spacing.md,
+        marginBottom: spacing.sm,
+        gap: spacing.sm,
     },
     categoryScroll: {
         gap: spacing.xs,
         paddingRight: spacing.md,
     },
     categoryBtn: {
-        paddingVertical: 6,
-        paddingHorizontal: 16,
+        paddingVertical: 4,
+        paddingHorizontal: 12,
         borderRadius: 2,
         backgroundColor: 'rgba(16, 185, 129, 0.05)',
         borderWidth: 1,
@@ -277,37 +294,37 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(11, 15, 20, 0.8)',
         borderRadius: 2,
-        paddingVertical: spacing.xs,
-        paddingHorizontal: spacing.md,
+        paddingVertical: 2,
+        paddingHorizontal: spacing.sm,
         borderWidth: 1,
         borderColor: 'rgba(16, 185, 129, 0.1)',
     },
     statItem: {
         alignItems: 'center',
-        minWidth: 50,
+        minWidth: 40,
     },
     statDivider: {
         width: 1,
-        height: 20,
+        height: 14,
         backgroundColor: 'rgba(255,255,255,0.05)',
-        marginHorizontal: spacing.sm,
+        marginHorizontal: spacing.xs,
     },
     cardDetailsPanel: {
         position: 'absolute',
         bottom: spacing.xl + 20,
         left: '10%',
         right: '10%',
-        backgroundColor: 'rgba(11, 15, 20, 0.98)',
+        backgroundColor: 'rgba(11, 15, 20, 1)', // Darker for readability
         borderWidth: 1,
-        borderColor: colors.arcane.emeraldDark,
+        borderColor: colors.arcane.emerald,
         borderRadius: 2,
-        padding: spacing.lg,
-        zIndex: 100,
-        elevation: 10,
+        padding: spacing.md,
+        zIndex: 1000, // Very high
+        elevation: 20,
         shadowColor: colors.arcane.emerald,
         shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.3,
-        shadowRadius: 15,
+        shadowOpacity: 0.5,
+        shadowRadius: 20,
     },
     cardDetailHeader: {
         flexDirection: 'row',
@@ -323,5 +340,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: 'rgba(0,0,0,0.4)',
         borderWidth: 1,
+    },
+    closeBtn: {
+        marginLeft: 10,
+        padding: 5,
+    },
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.7)',
     },
 });

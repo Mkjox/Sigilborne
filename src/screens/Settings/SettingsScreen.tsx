@@ -1,12 +1,27 @@
 import React from 'react';
-import { View, StyleSheet, Pressable, useWindowDimensions, Switch, ScrollView } from 'react-native';
+import {
+    View,
+    StyleSheet,
+    Pressable,
+    Switch,
+    ScrollView,
+    useWindowDimensions,
+} from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
+import Animated, {
+    FadeIn,
+    FadeInDown,
+    useSharedValue,
+    useAnimatedStyle,
+    withRepeat,
+    withTiming,
+    Easing,
+} from 'react-native-reanimated';
 import { RootStackParamList } from '../../types';
 import { Text, BoardSurface } from '../../components/ui';
-import { colors, spacing, borderRadius } from '../../theme';
+import { colors, spacing } from '../../theme';
 import { useSettingsStore } from '../../store';
 
 type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
@@ -15,125 +30,205 @@ interface Props {
     navigation: SettingsScreenNavigationProp;
 }
 
-const AnimatedBackground: React.FC = () => {
+// ─── Background ──────────────────────────────────────────────────────────────
+const ScreenBackground: React.FC = () => (
+    <View style={StyleSheet.absoluteFill}>
+        <LinearGradient
+            colors={[colors.arcane.obsidian, colors.arcane.void, colors.arcane.obsidian]}
+            locations={[0, 0.5, 1]}
+            style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.bgLineH} />
+        <View style={styles.bgLineV} />
+    </View>
+);
+
+// ─── Pulsing corner rune ──────────────────────────────────────────────────────
+const CornerRune: React.FC<{ pos: object }> = ({ pos }) => {
+    const glow = useSharedValue(0.15);
+    React.useEffect(() => {
+        glow.value = withRepeat(
+            withTiming(0.7, { duration: 2400, easing: Easing.inOut(Easing.ease) }),
+            -1, true
+        );
+    }, []);
+    const style = useAnimatedStyle(() => ({ opacity: glow.value }));
     return (
-        <View style={StyleSheet.absoluteFill}>
-            <LinearGradient
-                colors={[colors.arcane.obsidian, colors.arcane.void, colors.arcane.obsidian]}
-                style={StyleSheet.absoluteFill}
-            />
-            {/* Subtle Void Energy Lines */}
-            <View style={styles.voidEnergyLine} />
-        </View>
+        <Animated.View style={[styles.cornerRune, pos, style]}>
+            <View style={styles.cornerRuneInner} />
+        </Animated.View>
     );
 };
 
+// ─── Section wrapper ──────────────────────────────────────────────────────────
+const Section: React.FC<{ title: string; children: React.ReactNode; delay?: number }> = ({
+    title, children, delay = 0
+}) => (
+    <Animated.View entering={FadeInDown.delay(delay).duration(500)} style={styles.section}>
+        {/* Corner runes */}
+        <CornerRune pos={{ top: 6, left: 6 }} />
+        <CornerRune pos={{ top: 6, right: 6 }} />
+        <CornerRune pos={{ bottom: 6, left: 6 }} />
+        <CornerRune pos={{ bottom: 6, right: 6 }} />
+
+        <LinearGradient
+            colors={['rgba(16,185,129,0.04)', 'rgba(0,0,0,0)']}
+            style={StyleSheet.absoluteFill}
+        />
+
+        {/* Section label */}
+        <View style={styles.sectionTitleRow}>
+            <View style={styles.sectionTitleLine} />
+            <Text style={styles.sectionTitle}>{title}</Text>
+            <View style={styles.sectionTitleLine} />
+        </View>
+
+        {children}
+    </Animated.View>
+);
+
+// ─── Toggle row ───────────────────────────────────────────────────────────────
+const ToggleRow: React.FC<{
+    icon: string; label: string; sublabel: string;
+    value: boolean; onValueChange: () => void;
+}> = ({ icon, label, sublabel, value, onValueChange }) => (
+    <Pressable onPress={onValueChange} style={styles.toggleRow}>
+        <View style={[styles.iconBox, value && styles.iconBoxActive]}>
+            <Text style={styles.iconText}>{icon}</Text>
+        </View>
+        <View style={styles.toggleInfo}>
+            <Text style={styles.toggleLabel}>{label}</Text>
+            <Text style={styles.toggleSublabel}>{sublabel}</Text>
+        </View>
+        <Switch
+            value={value}
+            onValueChange={onValueChange}
+            trackColor={{ false: 'rgba(255,255,255,0.08)', true: colors.arcane.emeraldDark }}
+            thumbColor={value ? colors.arcane.emerald : colors.arcane.graphite}
+            style={{ transform: [{ scale: 0.8 }] }}
+        />
+    </Pressable>
+);
+
+// ─── Main Screen ─────────────────────────────────────────────────────────────
 export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
-    const { width: screenWidth } = useWindowDimensions();
+    const { width, height } = useWindowDimensions();
+    const isLandscape = width > height;
+
     const {
-        soundEnabled,
-        musicEnabled,
-        hapticsEnabled,
-        animationSpeed,
-        toggleSound,
-        toggleMusic,
-        toggleHaptics,
-        setAnimationSpeed
+        soundEnabled, musicEnabled, hapticsEnabled, animationSpeed,
+        toggleSound, toggleMusic, toggleHaptics, setAnimationSpeed,
     } = useSettingsStore();
-
-    const handleBack = () => navigation.goBack();
-
-    const SettingRow = ({ label, value, onValueChange, icon }: { label: string, value: boolean, onValueChange: () => void, icon: string }) => (
-        <View style={styles.settingRow}>
-            <View style={styles.settingInfo}>
-                <Text style={{ fontSize: 18, marginRight: 10 }}>{icon}</Text>
-                <Text variant="bodySmall" color={colors.arcane.white} style={{ fontWeight: '700' }}>{label.toUpperCase()}</Text>
-            </View>
-            <Switch
-                value={value}
-                onValueChange={onValueChange}
-                trackColor={{ false: colors.arcane.graphite, true: colors.arcane.emeraldDark }}
-                thumbColor={value ? colors.arcane.emerald : colors.text.disabled}
-                style={{ transform: [{ scale: 0.85 }] }}
-            />
-        </View>
-    );
 
     return (
         <BoardSurface style={styles.container}>
-            <AnimatedBackground />
+            <ScreenBackground />
 
-            <View style={[styles.content, {
-                paddingTop: insets.top,
-                paddingBottom: insets.bottom,
-                paddingLeft: insets.left,
-                paddingRight: insets.right,
-                paddingHorizontal: 20
-            }]}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <Pressable onPress={handleBack} style={styles.backButton}>
-                        <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '900', letterSpacing: 1.5 }}>← RETREAT</Text>
-                    </Pressable>
-                    <Text variant="h3" style={styles.title}>CHAMBER OF ECHOES</Text>
-                    <View style={{ width: 80 }} />
+            {/* ── HEADER ── */}
+            <Animated.View
+                entering={FadeIn.duration(600)}
+                style={[styles.header, { paddingTop: insets.top + 8, paddingHorizontal: 20 }]}
+            >
+                <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
+                    <View style={styles.backBtnInner}>
+                        <Text style={styles.backArrow}>‹</Text>
+                        <Text style={styles.backText}>BACK</Text>
+                    </View>
+                </Pressable>
+
+                <View style={styles.titleBlock}>
+                    <Text style={styles.titleEyebrow}>ARCANE</Text>
+                    <Text style={styles.titleMain}>SETTINGS</Text>
+                    <View style={styles.titleUnderline} />
                 </View>
 
-                <ScrollView
-                    style={{ width: '100%' }}
-                    contentContainerStyle={styles.scrollContent}
-                    showsVerticalScrollIndicator={false}
-                >
-                    <Animated.View entering={FadeIn.delay(200)} style={styles.settingsPanel}>
-                        <LinearGradient
-                            colors={['rgba(11, 15, 20, 0.9)', 'rgba(31, 41, 55, 0.4)']}
-                            style={StyleSheet.absoluteFill}
+                {/* Right spacer to balance the back button */}
+                <View style={{ width: 72 }} />
+            </Animated.View>
+
+            {/* ── CONTENT ── */}
+            <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={[
+                    styles.scrollContent,
+                    {
+                        paddingBottom: insets.bottom + 20,
+                        paddingHorizontal: 16,
+                        flexDirection: isLandscape ? 'row' : 'column',
+                        alignItems: isLandscape ? 'flex-start' : 'center',
+                        gap: 12,
+                    }
+                ]}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* SENSORY */}
+                <View style={isLandscape ? styles.columnHalf : styles.columnFull}>
+                    <Section title="SENSORY" delay={150}>
+                        <ToggleRow
+                            icon="🔊"
+                            label="Sound Effects"
+                            sublabel="Card plays, impacts & ambience"
+                            value={soundEnabled}
+                            onValueChange={toggleSound}
                         />
+                        <View style={styles.rowDivider} />
+                        <ToggleRow
+                            icon="🎵"
+                            label="Background Music"
+                            sublabel="Arcane void melodies"
+                            value={musicEnabled}
+                            onValueChange={toggleMusic}
+                        />
+                        <View style={styles.rowDivider} />
+                        <ToggleRow
+                            icon="📳"
+                            label="Haptic Feedback"
+                            sublabel="Tactile response on actions"
+                            value={hapticsEnabled}
+                            onValueChange={toggleHaptics}
+                        />
+                    </Section>
+                </View>
 
-                        <Text variant="caption" color={colors.arcane.emerald} style={styles.sectionHeader}>SENSORY TUNING</Text>
-                        <View style={styles.sectionDivider} />
-
-                        <SettingRow icon="🔊" label="Audio Resonance" value={soundEnabled} onValueChange={toggleSound} />
-                        <SettingRow icon="🎵" label="Void Melodies" value={musicEnabled} onValueChange={toggleMusic} />
-                        <SettingRow icon="📳" label="Tactile Feedback" value={hapticsEnabled} onValueChange={toggleHaptics} />
-
-                        <View style={{ height: 16 }} />
-                        <Text variant="caption" color={colors.arcane.emerald} style={styles.sectionHeader}>TEMPORARY DYNAMICS</Text>
-                        <View style={styles.sectionDivider} />
-
-                        <View style={styles.speedSection}>
-                            <Text variant="caption" color={colors.text.disabled} style={{ marginBottom: 12, fontSize: 10 }}>ANIMATION VELOCITY</Text>
-                            <View style={styles.speedRow}>
-                                {(['slow', 'normal', 'fast'] as const).map((speed) => (
+                {/* VISUALS */}
+                <View style={isLandscape ? styles.columnHalf : styles.columnFull}>
+                    <Section title="VISUALS" delay={280}>
+                        <Text style={styles.speedLabel}>ANIMATION SPEED</Text>
+                        <View style={styles.speedRow}>
+                            {(['slow', 'normal', 'fast'] as const).map((speed) => {
+                                const isActive = animationSpeed === speed;
+                                return (
                                     <Pressable
                                         key={speed}
                                         onPress={() => setAnimationSpeed(speed)}
-                                        style={[
-                                            styles.speedBtn,
-                                            animationSpeed === speed && styles.speedBtnActive
-                                        ]}
+                                        style={[styles.speedBtn, isActive && styles.speedBtnActive]}
                                     >
-                                        <Text
-                                            variant="caption"
-                                            color={animationSpeed === speed ? colors.arcane.obsidian : colors.arcane.emerald}
-                                            style={{ fontWeight: '900', fontSize: 10 }}
-                                        >
+                                        <LinearGradient
+                                            colors={isActive
+                                                ? [colors.arcane.emerald, colors.arcane.emeraldDark]
+                                                : ['rgba(16,185,129,0.04)', 'rgba(0,0,0,0)']}
+                                            style={StyleSheet.absoluteFill}
+                                        />
+                                        <Text style={[styles.speedBtnText, isActive && styles.speedBtnTextActive]}>
                                             {speed.toUpperCase()}
                                         </Text>
                                     </Pressable>
-                                ))}
-                            </View>
+                                );
+                            })}
                         </View>
-                    </Animated.View>
+                    </Section>
+                </View>
+            </ScrollView>
 
-                    {/* Footer Info */}
-                    <Animated.View entering={SlideInDown.delay(400)} style={styles.footer}>
-                        <Text variant="caption" color={colors.text.disabled} style={{ opacity: 0.5, fontSize: 9 }}>ARCANE PROTOCOL v1.0.4</Text>
-                        <Text variant="caption" color={colors.arcane.emerald} style={{ opacity: 0.3, marginTop: 2, fontSize: 8 }}>✧ FORGED IN THE VOID ✧</Text>
-                    </Animated.View>
-                </ScrollView>
-            </View>
+            {/* ── FOOTER ── */}
+            <Animated.View
+                entering={FadeIn.delay(500).duration(600)}
+                style={[styles.footer, { paddingBottom: insets.bottom + 8 }]}
+            >
+                <Text style={styles.footerText}>✧ FORGED IN THE VOID ✧</Text>
+                <Text style={styles.footerVersion}>ARCANE PROTOCOL v0.1.0</Text>
+            </Animated.View>
         </BoardSurface>
     );
 };
@@ -143,72 +238,186 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.arcane.obsidian,
     },
-    voidEnergyLine: {
-        position: 'absolute',
-        top: '30%',
-        left: 0,
-        right: 0,
-        height: 1,
-        backgroundColor: colors.arcane.emerald,
-        opacity: 0.05,
+
+    // Background
+    bgLineH: {
+        position: 'absolute', top: '35%', left: 0, right: 0,
+        height: 1, backgroundColor: colors.arcane.emerald, opacity: 0.04,
     },
-    content: {
-        flex: 1,
-        alignItems: 'center',
+    bgLineV: {
+        position: 'absolute', top: 0, bottom: 0, left: '50%',
+        width: 1, backgroundColor: colors.arcane.emerald, opacity: 0.03,
     },
-    scrollContent: {
-        alignItems: 'center',
-        paddingBottom: 20,
-    },
+
+    // Header
     header: {
-        width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginVertical: spacing.md,
+        paddingBottom: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(16,185,129,0.08)',
     },
-    backButton: {
-        paddingVertical: 8,
+    backBtn: {
+        width: 72,
     },
-    title: {
-        color: colors.arcane.white,
-        letterSpacing: 6,
-        fontFamily: 'serif',
-        textAlign: 'center',
-    },
-    settingsPanel: {
-        width: '100%',
-        maxWidth: 500,
-        borderRadius: 2,
+    backBtnInner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 6,
+        paddingHorizontal: 10,
         borderWidth: 1,
-        borderColor: 'rgba(16, 185, 129, 0.1)',
-        padding: 20,
+        borderColor: 'rgba(16,185,129,0.2)',
+        borderRadius: 2,
+        gap: 4,
+        backgroundColor: 'rgba(16,185,129,0.04)',
+    },
+    backArrow: {
+        fontSize: 18,
+        color: colors.arcane.emerald,
+        lineHeight: 18,
+        fontWeight: '300',
+    },
+    backText: {
+        fontSize: 10,
+        color: colors.arcane.emerald,
+        fontWeight: '700',
+        letterSpacing: 1.5,
+        fontFamily: 'serif',
+    },
+    titleBlock: {
+        alignItems: 'center',
+    },
+    titleEyebrow: {
+        fontSize: 9,
+        color: colors.arcane.emerald,
+        letterSpacing: 5,
+        opacity: 0.6,
+        fontWeight: '700',
+        fontFamily: 'serif',
+    },
+    titleMain: {
+        fontSize: 22,
+        fontWeight: '900',
+        color: colors.arcane.white,
+        letterSpacing: 8,
+        fontFamily: 'serif',
+        textShadowColor: colors.arcane.emerald,
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 10,
+    },
+    titleUnderline: {
+        width: 60,
+        height: 1,
+        backgroundColor: colors.arcane.emerald,
+        opacity: 0.35,
+        marginTop: 3,
+    },
+
+    // Scroll
+    scrollContent: {
+        paddingTop: 16,
+    },
+    columnFull: { width: '100%', maxWidth: 480, alignSelf: 'center' },
+    columnHalf: { flex: 1, minWidth: 240 },
+
+    // Section
+    section: {
+        borderWidth: 1,
+        borderColor: 'rgba(16,185,129,0.12)',
+        borderRadius: 2,
+        padding: 16,
+        marginBottom: 12,
+        backgroundColor: 'rgba(0,0,0,0.35)',
         overflow: 'hidden',
     },
-    sectionHeader: {
-        letterSpacing: 2,
-        fontWeight: '900',
-        marginBottom: 6,
-        fontSize: 10,
+    sectionTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 14,
+        gap: 8,
     },
-    sectionDivider: {
+    sectionTitleLine: {
+        flex: 1,
         height: 1,
         backgroundColor: colors.arcane.emerald,
         opacity: 0.2,
-        marginBottom: 12,
     },
-    settingRow: {
+    sectionTitle: {
+        fontSize: 9,
+        color: colors.arcane.emerald,
+        letterSpacing: 3,
+        fontWeight: '900',
+        fontFamily: 'serif',
+        opacity: 0.85,
+    },
+
+    // Corner rune
+    cornerRune: {
+        position: 'absolute',
+        width: 10,
+        height: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    cornerRuneInner: {
+        width: 5,
+        height: 5,
+        backgroundColor: colors.arcane.emerald,
+        transform: [{ rotate: '45deg' }],
+    },
+
+    // Toggle row
+    toggleRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 8,
+        gap: 12,
+        paddingVertical: 6,
     },
-    settingInfo: {
-        flexDirection: 'row',
+    iconBox: {
+        width: 34,
+        height: 34,
+        borderRadius: 2,
+        backgroundColor: 'rgba(16,185,129,0.06)',
+        borderWidth: 1,
+        borderColor: 'rgba(16,185,129,0.15)',
         alignItems: 'center',
+        justifyContent: 'center',
     },
-    speedSection: {
-        marginTop: 4,
+    iconBoxActive: {
+        backgroundColor: 'rgba(16,185,129,0.15)',
+        borderColor: 'rgba(16,185,129,0.4)',
+    },
+    iconText: { fontSize: 15 },
+    toggleInfo: { flex: 1 },
+    toggleLabel: {
+        fontSize: 12,
+        color: colors.arcane.white,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+        fontFamily: 'serif',
+    },
+    toggleSublabel: {
+        fontSize: 9,
+        color: colors.text.disabled,
+        marginTop: 1,
+        letterSpacing: 0.3,
+        opacity: 0.7,
+    },
+    rowDivider: {
+        height: 1,
+        backgroundColor: 'rgba(16,185,129,0.06)',
+        marginVertical: 2,
+    },
+
+    // Speed
+    speedLabel: {
+        fontSize: 9,
+        color: colors.text.disabled,
+        letterSpacing: 2,
+        fontWeight: '700',
+        marginBottom: 10,
+        opacity: 0.6,
     },
     speedRow: {
         flexDirection: 'row',
@@ -216,20 +425,53 @@ const styles = StyleSheet.create({
     },
     speedBtn: {
         flex: 1,
-        paddingVertical: 8,
+        paddingVertical: 10,
         alignItems: 'center',
-        borderRadius: 1,
-        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+        borderRadius: 2,
         borderWidth: 1,
-        borderColor: 'rgba(16, 185, 129, 0.2)',
+        borderColor: 'rgba(16,185,129,0.18)',
+        overflow: 'hidden',
     },
     speedBtnActive: {
-        backgroundColor: colors.arcane.emerald,
-        borderColor: colors.arcane.emeraldLight,
+        borderColor: colors.arcane.emerald,
+        shadowColor: colors.arcane.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowRadius: 8,
+        shadowOpacity: 0.4,
+        elevation: 4,
     },
+    speedBtnText: {
+        fontSize: 10,
+        color: colors.arcane.emerald,
+        fontWeight: '900',
+        letterSpacing: 1.5,
+        fontFamily: 'serif',
+        opacity: 0.6,
+    },
+    speedBtnTextActive: {
+        color: colors.arcane.obsidian,
+        opacity: 1,
+    },
+
+    // Footer
     footer: {
-        marginTop: 'auto',
         alignItems: 'center',
-        paddingBottom: 12,
+        paddingTop: 6,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(16,185,129,0.06)',
+    },
+    footerText: {
+        fontSize: 9,
+        color: colors.arcane.emerald,
+        letterSpacing: 2,
+        opacity: 0.3,
+        fontFamily: 'serif',
+    },
+    footerVersion: {
+        fontSize: 8,
+        color: colors.text.disabled,
+        opacity: 0.3,
+        marginTop: 2,
+        letterSpacing: 1,
     },
 });

@@ -36,6 +36,10 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const isLandscape = width > height;
 
+    // Scale title font relative to screen width so it never overflows
+    const titleFontSize = Math.min(width * 0.11, 44);
+    const titleLetterSpacing = Math.min(width * 0.018, 7);
+
     const titleScale = useSharedValue(0.9);
     const titleGlow = useSharedValue(0.4);
 
@@ -73,22 +77,25 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
 
             <View style={[
                 styles.content,
-                { paddingTop: insets.top, paddingBottom: insets.bottom },
+                { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 8 },
                 isLandscape && styles.contentLandscape
             ]}>
 
-                {/* 1. TITLE SECTION - Ritual Sigil Styling */}
+                {/* TITLE SECTION */}
                 <Animated.View
                     entering={FadeIn.delay(300).duration(1000)}
                     style={[styles.header, isLandscape && styles.headerLandscape]}
                 >
                     <View style={styles.titleContainer}>
-                        {/* DECORATIVE ACCENTS */}
                         <Animated.View style={[styles.accentBracket, styles.bracketTopLeft, bracketStyle]} />
                         <Animated.View style={[styles.accentBracket, styles.bracketBottomRight, bracketStyle]} />
 
                         <Animated.View style={titleStyle}>
-                            <Animated.Text style={[styles.title, textGlowStyle]}>
+                            <Animated.Text style={[
+                                styles.title,
+                                { fontSize: titleFontSize, letterSpacing: titleLetterSpacing },
+                                textGlowStyle
+                            ]}>
                                 SIGILBORNE
                             </Animated.Text>
                         </Animated.View>
@@ -98,7 +105,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                     <Text style={styles.subtitle}>ARCANE CHRONICLES</Text>
                 </Animated.View>
 
-                {/* 2. MENU PANEL SECTION */}
+                {/* MENU PANEL SECTION */}
                 <Animated.View
                     entering={FadeIn.delay(600).duration(1000)}
                     style={[styles.menuContainer, isLandscape && styles.menuContainerLandscape]}
@@ -123,7 +130,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                     </MenuPanel>
 
                     <View style={styles.footer}>
-                        <Text style={styles.versionText}>v0.5.0 - Arcane Beta</Text>
+                        <Text style={styles.versionText}>v0.1.0 — Arcane Beta</Text>
                     </View>
                 </Animated.View>
             </View>
@@ -138,85 +145,85 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        paddingHorizontal: spacing.xl,
+        paddingHorizontal: spacing.lg,
         justifyContent: 'center',
         alignItems: 'center',
     },
     contentLandscape: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        paddingHorizontal: spacing.xxl,
+        paddingHorizontal: spacing.xl,
     },
     header: {
         alignItems: 'center',
-        marginBottom: spacing.xxl * 1.5,
+        marginBottom: spacing.xl,
     },
     headerLandscape: {
         marginBottom: 0,
-        marginRight: spacing.xl,
+        marginRight: spacing.lg,
+        justifyContent: 'center',
     },
     titleContainer: {
         alignItems: 'center',
+        paddingHorizontal: 4,
     },
     title: {
-        fontSize: 56, // Slightly larger
         fontWeight: '900',
         color: colors.arcane.white,
-        letterSpacing: 10, // More premium spacing
         fontFamily: 'serif',
         textShadowColor: colors.arcane.emerald,
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 15,
     },
     titleUnderline: {
-        width: 140,
-        height: 1, // Thinner, sharper
+        width: 100,
+        height: 1,
         backgroundColor: colors.arcane.emerald,
-        marginTop: -6,
+        marginTop: -4,
         opacity: 0.3,
     },
     accentBracket: {
         position: 'absolute',
-        width: 30,
-        height: 30,
+        width: 22,
+        height: 22,
         borderColor: colors.arcane.emerald,
         opacity: 0.2,
     },
     bracketTopLeft: {
-        top: -10,
-        left: -20,
+        top: -8,
+        left: -14,
         borderLeftWidth: 1,
         borderTopWidth: 1,
     },
     bracketBottomRight: {
-        bottom: 10,
-        right: -20,
+        bottom: 8,
+        right: -14,
         borderRightWidth: 1,
         borderBottomWidth: 1,
     },
     subtitle: {
-        fontSize: 14,
+        fontSize: 11,
         color: colors.arcane.emerald,
         letterSpacing: 4,
-        marginTop: spacing.sm,
-        opacity: 0.8,
+        marginTop: spacing.xs,
+        opacity: 0.7,
         fontWeight: '500',
     },
     menuContainer: {
         width: '100%',
-        maxWidth: 340,
-    },
-    menuContainerLandscape: {
         maxWidth: 300,
     },
+    menuContainerLandscape: {
+        maxWidth: 260,
+    },
     footer: {
-        marginTop: spacing.md,
+        marginTop: spacing.sm,
         alignItems: 'center',
     },
     versionText: {
-        fontSize: 10,
+        fontSize: 9,
         color: colors.arcane.emerald,
-        opacity: 0.4,
+        opacity: 0.35,
         letterSpacing: 1,
     }
 });

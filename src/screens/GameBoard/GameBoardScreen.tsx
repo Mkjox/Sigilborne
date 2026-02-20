@@ -82,30 +82,33 @@ const BoardZone: React.FC<{
                             key={`${card.id}-${index}`}
                             entering={FadeIn.delay(index * 100)}
                             exiting={FadeOut}
-                            style={{
-                                marginHorizontal: spacing.sm,
-                                transform: [{ scale: isHighlighted ? 1.08 : (isSelected ? 1.04 : 1) }],
-                                opacity: (highlightedCardIds.length > 0 && !isHighlighted && !isSelected) ? 0.4 : 1,
-                                zIndex: isSelected || isHighlighted ? 20 : 1,
-                            }}
                         >
-                            {/* Target indicator - Arcane Sigil */}
-                            {isHighlighted && !isPlayer && (
-                                <View style={styles.targetIndicator}>
-                                    <Text style={{ fontSize: 18, color: colors.arcane.emerald }}>✧</Text>
-                                </View>
-                            )}
+                            <Animated.View
+                                style={{
+                                    marginHorizontal: spacing.sm,
+                                    transform: [{ scale: isHighlighted ? 1.08 : (isSelected ? 1.04 : 1) }],
+                                    opacity: (highlightedCardIds.length > 0 && !isHighlighted && !isSelected) ? 0.4 : 1,
+                                    zIndex: isSelected || isHighlighted ? 20 : 1,
+                                }}
+                            >
+                                {/* Target indicator - Arcane Sigil */}
+                                {isHighlighted && !isPlayer && (
+                                    <View style={styles.targetIndicator}>
+                                        <Text style={{ fontSize: 18, color: colors.arcane.emerald }}>✧</Text>
+                                    </View>
+                                )}
 
-                            <CardComponent
-                                card={card}
-                                width={cardWidth}
-                                height={cardHeight}
-                                isPlayable={true}
-                                hideStats={false}
-                                isSelected={isSelected}
-                                isTargeted={isHighlighted && !isPlayer}
-                                onPress={() => onCardPress?.(card)}
-                            />
+                                <CardComponent
+                                    card={card}
+                                    width={cardWidth}
+                                    height={cardHeight}
+                                    isPlayable={true}
+                                    hideStats={false}
+                                    isSelected={isSelected}
+                                    isTargeted={isHighlighted && !isPlayer}
+                                    onPress={() => onCardPress?.(card)}
+                                />
+                            </Animated.View>
                         </Animated.View>
                     );
                 })}

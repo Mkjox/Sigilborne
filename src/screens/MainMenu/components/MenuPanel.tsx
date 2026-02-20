@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         marginTop: 0,
     },
     innerContainer: {
-        margin: 10,
+        margin: 7,
         backgroundColor: 'rgba(0,0,0,0.4)',
         borderRadius: 2,
         borderWidth: 1,
@@ -111,7 +111,8 @@ const styles = StyleSheet.create({
     content: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingVertical: spacing.md,
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.sm,
     },
     rune: {
         position: 'absolute',

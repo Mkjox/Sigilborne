@@ -113,7 +113,7 @@ export const MenuButton: React.FC<MenuButtonProps> = ({
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        marginVertical: spacing.xs,
+        marginVertical: 3,
     },
     pressable: {
         width: '100%',
@@ -134,17 +134,17 @@ const styles = StyleSheet.create({
     },
     buttonBody: {
         width: '100%',
-        height: 54,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#000',
-        borderRadius: 2, // Sharp edges
+        borderRadius: 2,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.05)',
         overflow: 'hidden',
     },
     largeBody: {
-        height: 64,
+        height: 50,
     },
     primaryBody: {
         borderColor: colors.arcane.emeraldDark,
@@ -189,14 +189,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.03)',
     },
     text: {
-        fontSize: 16,
+        fontSize: 13,
         fontWeight: '600',
         letterSpacing: 2,
         fontFamily: 'serif',
         textTransform: 'uppercase',
     },
     largeText: {
-        fontSize: 20,
+        fontSize: 15,
         letterSpacing: 3,
     },
     primaryText: {
