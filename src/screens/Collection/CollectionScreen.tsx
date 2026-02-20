@@ -75,10 +75,9 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
         <BoardSurface style={styles.container}>
             <AnimatedBackground />
 
-            {/* 1. TOP BAR (The "Upper Layer") */}
+            {/* 1. TOP BAR (Fixed Title - Area 1) */}
             <View style={styles.headerBar}>
                 <View style={{ paddingTop: insets.top }}>
-                    {/* Header */}
                     <Animated.View
                         entering={SlideInLeft.duration(600).springify()}
                         style={[styles.header, { paddingHorizontal: layout.contentPadding, paddingTop: spacing.sm }]}
@@ -95,47 +94,6 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                         </View>
                         <View style={styles.backButton} />
                     </Animated.View>
-
-                    {/* Categories & Stats Row */}
-                    <View style={[styles.metaRow, { paddingHorizontal: layout.contentPadding }]}>
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={styles.categoryScroll}
-                        >
-                            {categories.map((cat, idx) => (
-                                <Animated.View key={cat.id} entering={FadeIn.delay(300 + idx * 50)}>
-                                    <Pressable
-                                        onPress={() => { setSelectedCategory(cat.id); setSelectedCardId(null); }}
-                                        style={[
-                                            styles.categoryBtn,
-                                            selectedCategory === cat.id && styles.categoryBtnActive
-                                        ]}
-                                    >
-                                        <Text
-                                            variant="caption"
-                                            color={selectedCategory === cat.id ? colors.arcane.obsidian : colors.arcane.emerald}
-                                            style={{ fontWeight: '900', letterSpacing: 1 }}
-                                        >
-                                            {cat.label.toUpperCase()}
-                                        </Text>
-                                    </Pressable>
-                                </Animated.View>
-                            ))}
-                        </ScrollView>
-
-                        <Animated.View entering={FadeIn.delay(500)} style={styles.statsGlass}>
-                            <View style={styles.statItem}>
-                                <Text variant="h4" color={colors.arcane.emerald} style={{ fontWeight: '900' }}>{ALL_CARDS.length}</Text>
-                                <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>CARDS</Text>
-                            </View>
-                            <View style={styles.statDivider} />
-                            <View style={styles.statItem}>
-                                <Text variant="h4" color={colors.arcane.cyan} style={{ fontWeight: '900' }}>{decks.length}</Text>
-                                <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>DECKS</Text>
-                            </View>
-                        </Animated.View>
-                    </View>
                 </View>
             </View>
 
@@ -146,13 +104,55 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                     keyExtractor={(item) => item.id}
                     numColumns={numColumns}
                     key={`grid-${numColumns}`}
+                    ListHeaderComponent={() => (
+                        /* Categories & Stats Row (Area 2) - Now scrollable */
+                        <View style={[styles.metaRow, { paddingHorizontal: layout.contentPadding, marginTop: spacing.md }]}>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={styles.categoryScroll}
+                            >
+                                {categories.map((cat, idx) => (
+                                    <Animated.View key={cat.id} entering={FadeIn.delay(300 + idx * 50)}>
+                                        <Pressable
+                                            onPress={() => { setSelectedCategory(cat.id); setSelectedCardId(null); }}
+                                            style={[
+                                                styles.categoryBtn,
+                                                selectedCategory === cat.id && styles.categoryBtnActive
+                                            ]}
+                                        >
+                                            <Text
+                                                variant="caption"
+                                                color={selectedCategory === cat.id ? colors.arcane.obsidian : colors.arcane.emerald}
+                                                style={{ fontWeight: '900', letterSpacing: 1 }}
+                                            >
+                                                {cat.label.toUpperCase()}
+                                            </Text>
+                                        </Pressable>
+                                    </Animated.View>
+                                ))}
+                            </ScrollView>
+
+                            <Animated.View entering={FadeIn.delay(500)} style={styles.statsGlass}>
+                                <View style={styles.statItem}>
+                                    <Text variant="h4" color={colors.arcane.emerald} style={{ fontWeight: '900' }}>{ALL_CARDS.length}</Text>
+                                    <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>CARDS</Text>
+                                </View>
+                                <View style={styles.statDivider} />
+                                <View style={styles.statItem}>
+                                    <Text variant="h4" color={colors.arcane.cyan} style={{ fontWeight: '900' }}>{decks.length}</Text>
+                                    <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>DECKS</Text>
+                                </View>
+                            </Animated.View>
+                        </View>
+                    )}
                     contentContainerStyle={{
                         paddingHorizontal: layout.contentPadding,
                         paddingBottom: spacing.xl + 100,
-                        paddingTop: spacing.md
+                        paddingTop: spacing.xs
                     }}
                     columnWrapperStyle={{
-                        justifyContent: 'flex-start',
+                        justifyContent: 'center',
                         gap: 16,
                         marginBottom: 16
                     }}
@@ -263,6 +263,7 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: colors.arcane.emerald,
         marginTop: 2,
+        marginBottom: 10,
         opacity: 0.3,
     },
     metaRow: {

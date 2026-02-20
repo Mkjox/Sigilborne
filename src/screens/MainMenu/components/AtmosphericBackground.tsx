@@ -18,8 +18,8 @@ const FRAGMENT_COUNT = 6;
 
 const ManaWisp: React.FC<{ index: number }> = ({ index }) => {
     const { width, height } = useWindowDimensions();
-    const translateY = useSharedValue(Math.random() * height);
-    const translateX = useSharedValue(Math.random() * width);
+    const translateY = useSharedValue(Math.random() * (height + 200));
+    const translateX = useSharedValue(Math.random() * (width + 200));
     const opacity = useSharedValue(0);
     const scale = useSharedValue(Math.random() * 0.5 + 0.5);
 
@@ -108,8 +108,8 @@ const ArcaneVein: React.FC<{ index: number }> = ({ index }) => {
 
 const FloatingFragment: React.FC<{ index: number }> = ({ index }) => {
     const { width, height } = useWindowDimensions();
-    const translateY = useSharedValue(Math.random() * height * 0.8);
-    const translateX = useSharedValue(Math.random() * width * 0.8);
+    const translateY = useSharedValue(Math.random() * (height + 100));
+    const translateX = useSharedValue(Math.random() * (width + 100));
     const rotate = useSharedValue(Math.random() * 360);
 
     useEffect(() => {
@@ -181,10 +181,8 @@ const ArcaneBloom: React.FC<{ color?: string }> = ({ color = colors.arcane.emera
 };
 
 export const AtmosphericBackground: React.FC = () => {
-    const { width, height } = useWindowDimensions();
-
     return (
-        <View style={[styles.container, { width, height }]}>
+        <View style={styles.container}>
             {/* 1. LAYER: DEEP VOID BACKDROP */}
             <View style={StyleSheet.absoluteFill}>
                 <LinearGradient
@@ -205,10 +203,10 @@ export const AtmosphericBackground: React.FC = () => {
             <ArcaneVein index={3} />
 
             {/* 4. LAYER: ARCANE BLOOM (DYNAMIC CENTERS) */}
-            <View style={[styles.glowContainer, { left: width * 0.15, top: '20%' }]}>
+            <View style={[styles.glowContainer, { left: '15%', top: '20%' }]}>
                 <ArcaneBloom color="rgba(16, 185, 129, 0.2)" />
             </View>
-            <View style={[styles.glowContainer, { right: width * 0.1, bottom: '25%' }]}>
+            <View style={[styles.glowContainer, { right: '10%', bottom: '25%' }]}>
                 <ArcaneBloom color="rgba(6, 182, 212, 0.15)" />
             </View>
 
@@ -228,7 +226,7 @@ export const AtmosphericBackground: React.FC = () => {
             {/* DENSE VIGNETTE OVERLAY */}
             <LinearGradient
                 colors={['rgba(0,0,0,0.85)', 'transparent', 'rgba(0,0,0,0.85)']}
-                style={[StyleSheet.absoluteFill, { width, height }]}
+                style={StyleSheet.absoluteFill}
             />
         </View>
     );

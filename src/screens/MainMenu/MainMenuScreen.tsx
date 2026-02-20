@@ -66,7 +66,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
         textShadowRadius: 20 * titleGlow.value,
     }));
 
-    const handleEnterTavern = () => {
+    const handleEnterVoid = () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         navigation.navigate('GameBoard', { difficulty: 'medium' });
     };
@@ -113,7 +113,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                     <MenuPanel>
                         <MenuButton
                             title="Enter The Void"
-                            onPress={handleEnterTavern}
+                            onPress={handleEnterVoid}
                         />
                         <MenuButton
                             title="Collection"
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
     },
     bracketBottomRight: {
-        bottom: 8,
+        bottom: -28,
         right: -14,
         borderRightWidth: 1,
         borderBottomWidth: 1,
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
         maxWidth: 300,
     },
     menuContainerLandscape: {
-        maxWidth: 260,
+        maxWidth: 300,
     },
     footer: {
         marginTop: spacing.sm,
