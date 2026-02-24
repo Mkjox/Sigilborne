@@ -21,7 +21,7 @@ import { Text } from '../../components/ui';
 import { colors, spacing } from '../../theme';
 
 // Components
-import { AtmosphericBackground } from './components/AtmosphericBackground';
+import { MainMenuSkiaBackground } from './components/MainMenuSkiaBackground';
 import { MenuPanel } from './components/MenuPanel';
 import { MenuButton } from './components/MenuButton';
 
@@ -73,7 +73,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <AtmosphericBackground />
+            <MainMenuSkiaBackground />
 
             <View style={[
                 styles.content,

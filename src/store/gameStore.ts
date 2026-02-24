@@ -24,6 +24,7 @@ interface GameStore extends GameState {
     isAIThinking: boolean;
     selectedCardId: string | null;
     message: string | null;
+    currentVFX: 'scorch' | 'boost' | 'revive' | 'frost' | 'fog' | 'none';
 
     // Actions
     startGame: (difficulty: Difficulty) => void;
@@ -37,6 +38,7 @@ interface GameStore extends GameState {
     triggerAI: () => void;
     setAttackingCard: (cardId: string | null) => void;
     attackCard: (targetId: string) => void;
+    setVFX: (vfx: 'scorch' | 'boost' | 'revive' | 'frost' | 'fog' | 'none') => void;
 
     // Computed
     getPlayerPower: () => number;
@@ -120,6 +122,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     isAIThinking: false,
     selectedCardId: null,
     message: null,
+    currentVFX: 'none',
 
     startGame: (difficulty) => {
         // Check for custom deck
@@ -185,10 +188,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
         }
 
+        // Determine VFX
+        let vfx: 'scorch' | 'boost' | 'revive' | 'frost' | 'fog' | 'none' = 'none';
+        const mainAbility = card.abilities[0]?.type;
+        if (mainAbility === 'destroy' || card.name.toLowerCase().includes('scorch') || card.name.toLowerCase().includes('void bolt')) {
+            vfx = 'scorch';
+        } else if (mainAbility === 'boost' || mainAbility === 'boost_row') {
+            vfx = 'boost';
+        } else if (mainAbility === 'revive') {
+            vfx = 'revive';
+        } else if (card.type === 'weather') {
+            vfx = card.abilities[0]?.id === 'frost' ? 'frost' : 'fog';
+        }
+
         set({
             ...newState,
             selectedCardId: null,
             message: `Played ${card.name}`,
+            currentVFX: vfx,
         });
 
         // End turn after playing
@@ -526,4 +543,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const state = get();
         return getTotalPower(state.ai.board, state.weather, state.player.board);
     },
+
+    setVFX: (vfx) => set({ currentVFX: vfx }),
 }));
