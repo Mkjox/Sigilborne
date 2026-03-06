@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, StatusBar, Pressable, ScrollView, useWindowDimensions, ImageBackground } from 'react-native';
+import { View, StyleSheet, StatusBar, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -22,6 +22,7 @@ import { VFXProvider, useVFX } from '../../context/VFXContext';
 import { WeatherProvider, useWeather } from '../../context/WeatherContext';
 import { SpectralEffectType } from '../../components/game/vfx/SpectralEffect';
 import { UnifiedVFXManager } from '../../components/game';
+import { GameBoardSkiaBackground } from './components/GameBoardSkiaBackground';
 
 type GameBoardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameBoard'>;
 type GameBoardScreenRouteProp = RouteProp<RootStackParamList, 'GameBoard'>;
@@ -30,24 +31,6 @@ interface Props {
     navigation: GameBoardScreenNavigationProp;
     route: GameBoardScreenRouteProp;
 }
-
-// Simple Background - Dark Arcane Void
-const SimpleBackground: React.FC = () => {
-    return (
-        <View style={StyleSheet.absoluteFill}>
-            <ImageBackground
-                source={require('../../../assets/board_bg.png')}
-                style={StyleSheet.absoluteFill}
-                resizeMode="cover"
-            >
-                {/* Subtle dark tint to ensure text/card readability over the texture */}
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.4)' }]} />
-            </ImageBackground>
-            {/* Subtle Void Texture Overlay */}
-            <View style={[styles.voidOverlay, { opacity: 0.05 }]} />
-        </View>
-    );
-};
 
 // Single Board Zone Component
 const BoardZone: React.FC<{
@@ -299,221 +282,226 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
     };
 
     return (
-        <BoardSurface style={styles.container}>
-            <Animated.View style={[StyleSheet.absoluteFill, animatedBoardStyle]}>
-                <SimpleBackground />
-                <UnifiedVFXManager />
-                <StatusBar hidden />
+        <View style={styles.container}>
+            {/* Animated shader background — rendered first, at the very bottom of the z-stack */}
+            <GameBoardSkiaBackground />
 
-                {/* TOP HUD BAR */}
-                <View style={[styles.topBar, { paddingTop: insets.top + 4 }]}>
-                    {/* Left: Opponent Name */}
-                    <View style={styles.topBarLeft}>
-                        <View style={styles.avatarMini}>
-                            <Text style={{ fontSize: 18 }}>👁</Text>
-                        </View>
-                        <View>
-                            <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '900', letterSpacing: 1 }}>VOID KEEPER</Text>
-                            <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 10 }}>The Innkeeper's Shadow</Text>
-                        </View>
-                    </View>
+            <BoardSurface style={{ flex: 1, backgroundColor: 'transparent' }}>
+                <Animated.View style={[StyleSheet.absoluteFill, animatedBoardStyle]}>
+                    <UnifiedVFXManager />
+                    <StatusBar hidden />
 
-                    {/* Center: Score */}
-                    <View style={styles.topBarCenter}>
-                        <View style={[styles.scoreContainer, { borderColor: colors.error }]}>
-                            <Text variant="h4" color={colors.error} style={styles.scoreText}>{roundsWon.ai}</Text>
-                        </View>
-                        <Text variant="caption" color={colors.arcane.emerald} style={{ marginHorizontal: 16, fontSize: 12, opacity: 0.5 }}>⫘</Text>
-                        <View style={[styles.scoreContainer, { borderColor: colors.arcane.emerald }]}>
-                            <Text variant="h4" color={colors.arcane.emerald} style={styles.scoreText}>{roundsWon.player}</Text>
-                        </View>
-                    </View>
 
-                    {/* Right: Menu */}
-                    <Pressable
-                        onPress={() => { resetGame(); navigation.navigate('MainMenu'); }}
-                        style={styles.menuBtn}
-                    >
-                        <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '600' }}>ESCAPE</Text>
-                    </Pressable>
-                </View>
-
-                {/* MAIN CONTENT - BATTLEFIELD LAYER */}
-                <View style={[styles.mainRow, {
-                    marginTop: 60,
-                    height: BOARD_HALF_HEIGHT * 2,
-                    zIndex: 5
-                }]}>
-
-                    {/* LEFT COLUMN: Stats */}
-                    <View style={[styles.sideColumnLeft, { width: sideColWidth }]}>
-                        <View style={styles.statDisplay}>
-                            <Text variant="caption" color={colors.text.disabled} style={styles.statLabel}>HAND</Text>
-                            <Text variant="h4" color={colors.arcane.white}>{ai.hand.length}</Text>
-                        </View>
-
-                        <View style={[styles.statDisplay, { marginTop: 'auto' }]}>
-                            <View style={[styles.powerBadge, { borderColor: colors.error }]}>
-                                <Text variant="h3" color={colors.arcane.white} style={styles.powerText}>{aiPower}</Text>
+                    {/* TOP HUD BAR */}
+                    <View style={[styles.topBar, { paddingTop: insets.top + 4 }]}>
+                        {/* Left: Opponent Name */}
+                        <View style={styles.topBarLeft}>
+                            <View style={styles.avatarMini}>
+                                <Text style={{ fontSize: 18 }}>👁</Text>
                             </View>
-                            <Text variant="caption" color={colors.error} style={styles.statLabel}>CORRUPTION</Text>
-                        </View>
-                    </View>
-
-                    {/* CENTER BOARD */}
-                    <View style={styles.boardArea}>
-                        {/* AI ZONE (35%) */}
-                        <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT }]}>
-                            <BoardZone
-                                cards={ai.board}
-                                isPlayer={false}
-                                cardWidth={cardWidth}
-                                cardHeight={cardHeight}
-                                onCardPress={(card) => handleBoardCardPress(card, false)}
-                                highlightedCardIds={validTargets}
-                            />
-                        </View>
-
-                        {/* DIVIDER - Depth Shift */}
-                        <View style={styles.boardDividerContainer}>
-                            <View style={styles.boardDivider} />
-                            <View style={styles.dividerGlow} />
-                        </View>
-
-                        {/* PLAYER ZONE (35%) */}
-                        <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT }]}>
-                            <BoardZone
-                                cards={player.board}
-                                isPlayer={true}
-                                cardWidth={cardWidth}
-                                cardHeight={cardHeight}
-                                isActive={isPlayerTurn && !!selectedCardId}
-                                onPress={handleBoardPress}
-                                onCardPress={(card) => handleBoardCardPress(card, true)}
-                                selectedCardId={attackingCardId}
-                            />
-                        </View>
-                    </View>
-
-                    {/* RIGHT COLUMN: Player Actions */}
-                    <View style={[styles.sideColumnRight, { width: sideColWidth }]}>
-                        <View style={[styles.statDisplay, { marginBottom: 'auto' }]}>
-                            <View style={[styles.powerBadge, { borderColor: colors.arcane.emerald, backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
-                                <Text variant="h3" color={colors.arcane.emerald} style={styles.powerText}>{playerPower}</Text>
+                            <View>
+                                <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '900', letterSpacing: 1 }}>VOID KEEPER</Text>
+                                <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 10 }}>The Innkeeper's Shadow</Text>
                             </View>
-                            <Text variant="caption" color={colors.arcane.emerald} style={styles.statLabel}>ESSENCE</Text>
                         </View>
 
-                        <View style={styles.statDisplay}>
-                            <View style={[styles.manaBadge]}>
-                                <Text variant="h4" color={colors.arcane.white} style={{ fontWeight: 'bold' }}>{player.mana}</Text>
+                        {/* Center: Score */}
+                        <View style={styles.topBarCenter}>
+                            <View style={[styles.scoreContainer, { borderColor: colors.error }]}>
+                                <Text variant="h4" color={colors.error} style={styles.scoreText}>{roundsWon.ai}</Text>
                             </View>
-                            <Text variant="caption" color={colors.arcane.cyan} style={styles.statLabel}>MANA</Text>
+                            <Text variant="caption" color={colors.arcane.emerald} style={{ marginHorizontal: 16, fontSize: 12, opacity: 0.5 }}>⫘</Text>
+                            <View style={[styles.scoreContainer, { borderColor: colors.arcane.emerald }]}>
+                                <Text variant="h4" color={colors.arcane.emerald} style={styles.scoreText}>{roundsWon.player}</Text>
+                            </View>
                         </View>
 
+                        {/* Right: Menu */}
                         <Pressable
-                            onPress={passTurn}
-                            disabled={!isPlayerTurn || player.hasPassed}
-                            style={({ pressed }) => [
-                                styles.passButton,
-                                pressed && { transform: [{ scale: 0.95 }] },
-                                shouldHighlightPass && styles.passButtonHighlight,
-                                player.hasPassed && styles.passButtonDisabled
-                            ]}
+                            onPress={() => { resetGame(); navigation.navigate('MainMenu'); }}
+                            style={styles.menuBtn}
                         >
-                            <LinearGradient
-                                colors={player.hasPassed ? [colors.arcane.obsidian, colors.arcane.graphite] : [colors.arcane.emerald, colors.arcane.emeraldDark]}
-                                style={StyleSheet.absoluteFill}
-                            />
-                            <View style={styles.passButtonInner}>
-                                <Text variant="button" color={player.hasPassed ? colors.text.disabled : colors.arcane.white} style={{ fontWeight: '900', fontSize: 10, letterSpacing: 2 }}>
-                                    {player.hasPassed ? "PASSED" : "END TURN"}
-                                </Text>
-                            </View>
+                            <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '600' }}>ESCAPE</Text>
                         </Pressable>
                     </View>
 
-                </View>
+                    {/* MAIN CONTENT - BATTLEFIELD LAYER */}
+                    <View style={[styles.mainRow, {
+                        marginTop: 60,
+                        height: BOARD_HALF_HEIGHT * 2,
+                        zIndex: 5
+                    }]}>
 
-                {/* BOTTOM HAND ZONE - UI LAYER */}
-                <View
-                    style={[
-                        styles.handZone,
-                        {
-                            left: 0,
-                            right: 0,
-                            height: HAND_ZONE_HEIGHT,
-                            bottom: insets.bottom,
-                            paddingTop: 10,
-                            zIndex: 20
-                        }
-                    ]}
-                    pointerEvents="box-none"
-                >
-                    <View style={[styles.handContainer, { left: sideColWidth, right: sideColWidth }]}>
-                        {player.hand.map((card, index) => {
-                            const totalCards = player.hand.length;
-                            const centerIndex = (totalCards - 1) / 2;
-                            const rotate = (index - centerIndex) * 3;
-                            const translateY = Math.abs(index - centerIndex) * 2;
+                        {/* LEFT COLUMN: Stats */}
+                        <View style={[styles.sideColumnLeft, { width: sideColWidth }]}>
+                            <View style={styles.statDisplay}>
+                                <Text variant="caption" color={colors.text.disabled} style={styles.statLabel}>HAND</Text>
+                                <Text variant="h4" color={colors.arcane.white}>{ai.hand.length}</Text>
+                            </View>
 
-                            return (
-                                <Animated.View
-                                    key={card.id}
-                                    entering={SlideInDown.delay(index * 50)}
-                                    style={[
-                                        styles.handCardContainer,
-                                        {
-                                            transform: [
-                                                { rotate: `${rotate}deg` },
-                                                { translateY: selectedCardId === card.id ? -12 : translateY }
-                                            ],
-                                            zIndex: selectedCardId === card.id ? 100 : index,
-                                            marginLeft: index === 0 ? 0 : -handCardW * 0.35
-                                        }
-                                    ]}
-                                >
-                                    <CardComponent
-                                        card={card}
-                                        width={handCardW}
-                                        height={handCardH}
-                                        isSelected={selectedCardId === card.id}
-                                        isPlayable={isPlayerTurn && !player.hasPassed && (card.manaCost ?? 0) <= player.mana}
-                                        onPress={() => handleCardPress(card)}
-                                    />
-                                </Animated.View>
-                            );
-                        })}
-                    </View>
-                </View>
+                            <View style={[styles.statDisplay, { marginTop: 'auto' }]}>
+                                <View style={[styles.powerBadge, { borderColor: colors.error }]}>
+                                    <Text variant="h3" color={colors.arcane.white} style={styles.powerText}>{aiPower}</Text>
+                                </View>
+                                <Text variant="caption" color={colors.error} style={styles.statLabel}>CORRUPTION</Text>
+                            </View>
+                        </View>
 
-                <Toast />
+                        {/* CENTER BOARD */}
+                        <View style={styles.boardArea}>
+                            {/* AI ZONE (35%) */}
+                            <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT }]}>
+                                <BoardZone
+                                    cards={ai.board}
+                                    isPlayer={false}
+                                    cardWidth={cardWidth}
+                                    cardHeight={cardHeight}
+                                    onCardPress={(card) => handleBoardCardPress(card, false)}
+                                    highlightedCardIds={validTargets}
+                                />
+                            </View>
 
-                {/* Game Over Overlay */}
-                {gameOver && (
-                    <View style={styles.overlay}>
-                        <View style={styles.overlayCard}>
-                            <Text variant="h2" style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: 'serif' }}>
-                                {winner === 'player' ? 'VICTORY' : (winner === 'draw' ? 'STALEMATE' : 'OBLIVION')}
-                            </Text>
-                            <Pressable onPress={() => startGame(difficulty)} style={styles.overlayBtn}>
-                                <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>REAWAKEN</Text>
-                            </Pressable>
-                            <Pressable onPress={() => { resetGame(); navigation.navigate('MainMenu'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald, marginTop: 16 }]}>
-                                <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>ABANDON</Text>
+                            {/* DIVIDER - Depth Shift */}
+                            <View style={styles.boardDividerContainer}>
+                                <View style={styles.boardDivider} />
+                                <View style={styles.dividerGlow} />
+                            </View>
+
+                            {/* PLAYER ZONE (35%) */}
+                            <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT }]}>
+                                <BoardZone
+                                    cards={player.board}
+                                    isPlayer={true}
+                                    cardWidth={cardWidth}
+                                    cardHeight={cardHeight}
+                                    isActive={isPlayerTurn && !!selectedCardId}
+                                    onPress={handleBoardPress}
+                                    onCardPress={(card) => handleBoardCardPress(card, true)}
+                                    selectedCardId={attackingCardId}
+                                />
+                            </View>
+                        </View>
+
+                        {/* RIGHT COLUMN: Player Actions */}
+                        <View style={[styles.sideColumnRight, { width: sideColWidth }]}>
+                            <View style={[styles.statDisplay, { marginBottom: 'auto' }]}>
+                                <View style={[styles.powerBadge, { borderColor: colors.arcane.emerald, backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                                    <Text variant="h3" color={colors.arcane.emerald} style={styles.powerText}>{playerPower}</Text>
+                                </View>
+                                <Text variant="caption" color={colors.arcane.emerald} style={styles.statLabel}>ESSENCE</Text>
+                            </View>
+
+                            <View style={styles.statDisplay}>
+                                <View style={[styles.manaBadge]}>
+                                    <Text variant="h4" color={colors.arcane.white} style={{ fontWeight: 'bold' }}>{player.mana}</Text>
+                                </View>
+                                <Text variant="caption" color={colors.arcane.cyan} style={styles.statLabel}>MANA</Text>
+                            </View>
+
+                            <Pressable
+                                onPress={passTurn}
+                                disabled={!isPlayerTurn || player.hasPassed}
+                                style={({ pressed }) => [
+                                    styles.passButton,
+                                    pressed && { transform: [{ scale: 0.95 }] },
+                                    shouldHighlightPass && styles.passButtonHighlight,
+                                    player.hasPassed && styles.passButtonDisabled
+                                ]}
+                            >
+                                <LinearGradient
+                                    colors={player.hasPassed ? [colors.arcane.obsidian, colors.arcane.graphite] : [colors.arcane.emerald, colors.arcane.emeraldDark]}
+                                    style={StyleSheet.absoluteFill}
+                                />
+                                <View style={styles.passButtonInner}>
+                                    <Text variant="button" color={player.hasPassed ? colors.text.disabled : colors.arcane.white} style={{ fontWeight: '900', fontSize: 10, letterSpacing: 2 }}>
+                                        {player.hasPassed ? "PASSED" : "END TURN"}
+                                    </Text>
+                                </View>
                             </Pressable>
                         </View>
+
                     </View>
-                )}
-            </Animated.View>
-        </BoardSurface>
+
+                    {/* BOTTOM HAND ZONE - UI LAYER */}
+                    <View
+                        style={[
+                            styles.handZone,
+                            {
+                                left: 0,
+                                right: 0,
+                                height: HAND_ZONE_HEIGHT,
+                                bottom: insets.bottom,
+                                paddingTop: 10,
+                                zIndex: 20
+                            }
+                        ]}
+                        pointerEvents="box-none"
+                    >
+                        <View style={[styles.handContainer, { left: sideColWidth, right: sideColWidth }]}>
+                            {player.hand.map((card, index) => {
+                                const totalCards = player.hand.length;
+                                const centerIndex = (totalCards - 1) / 2;
+                                const rotate = (index - centerIndex) * 3;
+                                const translateY = Math.abs(index - centerIndex) * 2;
+
+                                return (
+                                    <Animated.View
+                                        key={card.id}
+                                        entering={SlideInDown.delay(index * 50)}
+                                        style={[
+                                            styles.handCardContainer,
+                                            {
+                                                transform: [
+                                                    { rotate: `${rotate}deg` },
+                                                    { translateY: selectedCardId === card.id ? -12 : translateY }
+                                                ],
+                                                zIndex: selectedCardId === card.id ? 100 : index,
+                                                marginLeft: index === 0 ? 0 : -handCardW * 0.35
+                                            }
+                                        ]}
+                                    >
+                                        <CardComponent
+                                            card={card}
+                                            width={handCardW}
+                                            height={handCardH}
+                                            isSelected={selectedCardId === card.id}
+                                            isPlayable={isPlayerTurn && !player.hasPassed && (card.manaCost ?? 0) <= player.mana}
+                                            onPress={() => handleCardPress(card)}
+                                        />
+                                    </Animated.View>
+                                );
+                            })}
+                        </View>
+                    </View>
+
+                    <Toast />
+
+                    {/* Game Over Overlay */}
+                    {gameOver && (
+                        <View style={styles.overlay}>
+                            <View style={styles.overlayCard}>
+                                <Text variant="h2" style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: 'serif' }}>
+                                    {winner === 'player' ? 'VICTORY' : (winner === 'draw' ? 'STALEMATE' : 'OBLIVION')}
+                                </Text>
+                                <Pressable onPress={() => startGame(difficulty)} style={styles.overlayBtn}>
+                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>REAWAKEN</Text>
+                                </Pressable>
+                                <Pressable onPress={() => { resetGame(); navigation.navigate('MainMenu'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald, marginTop: 16 }]}>
+                                    <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>ABANDON</Text>
+                                </Pressable>
+                            </View>
+                        </View>
+                    )}
+                </Animated.View>
+            </BoardSurface>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.arcane.obsidian,
+        backgroundColor: 'transparent',
     },
     voidOverlay: {
         ...StyleSheet.absoluteFillObject,
@@ -651,9 +639,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'flex-end',
-        borderTopWidth: 1,
-        borderTopColor: 'rgba(16, 185, 129, 0.1)',
-        backgroundColor: 'rgba(11, 15, 20, 0.8)',
+        backgroundColor: 'transparent',
     },
     handContainer: {
         position: 'absolute',

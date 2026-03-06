@@ -57,9 +57,9 @@ export const ShaderLibrary = {
             
             vec3 color = mix(u_color_secondary, u_color_primary, n);
             float dist = distance(uv, vec2(0.5 * u_resolution.x / u_resolution.y, 0.5));
-            color *= smoothstep(1.2, 0.4, dist);
+            color *= smoothstep(1.5, 0.4, dist); // Wider vignette
             
-            return vec4(color, n * 0.7 * u_intensity);
+            return vec4(color, n * 0.9 * u_intensity); // Increased alpha
         }
     `)!,
 
@@ -80,10 +80,10 @@ export const ShaderLibrary = {
             float t = u_time * 0.5;
             float shimmer = hash(uv + t * 0.01) * hash(uv * 10.0 - t * 0.05);
             
-            vec3 frostColor = vec3(0.8, 0.95, 1.0);
-            float density = 0.2 + 0.1 * sin(t + uv.x * 5.0);
+            vec3 frostColor = vec3(0.9, 0.98, 1.0); // Brighter Blue
+            float density = 0.5 + 0.2 * sin(t + uv.x * 5.0); // Higher base density
             
-            return vec4(frostColor, (density + shimmer * 0.1) * u_intensity);
+            return vec4(frostColor, (density + shimmer * 0.2) * u_intensity);
         }
     `)!,
 
@@ -119,11 +119,11 @@ export const ShaderLibrary = {
         vec4 main(vec2 FragCoord) {
             vec2 uv = FragCoord / u_resolution.xy;
             float wave = sin(uv.x * 10.0 + u_time * 2.0) * 0.02;
-            float mask = smoothstep(1.0 - u_progress - 0.2, 1.0 - u_progress, uv.y + wave);
-            mask *= (1.0 - uv.y); // Fade at top
+            float mask = smoothstep(1.0 - u_progress - 0.3, 1.0 - u_progress, uv.y + wave);
+            mask *= (1.0 - uv.y); 
             
-            vec3 color = vec3(0.1, 0.9, 0.6);
-            return vec4(color, mask * (1.0 - u_progress) * 0.4);
+            vec3 color = vec3(0.2, 1.0, 0.7); // Vivid Mint
+            return vec4(color, mask * (1.0 - u_progress) * 0.7);
         }
     `)!,
 
@@ -138,13 +138,13 @@ export const ShaderLibrary = {
 
         vec4 main(vec2 FragCoord) {
             float dist = distance(FragCoord, u_origin);
-            float radius = u_progress * 300.0;
-            float thickness = 10.0 * (1.0 - u_progress);
+            float radius = 20.0 + u_progress * 150.0; // Slightly larger
+            float thickness = 15.0 * (1.0 - u_progress);
             
             float ring = smoothstep(radius - thickness, radius, dist) * (1.0 - smoothstep(radius, radius + thickness, dist));
-            vec3 color = mix(vec3(0.0, 0.8, 1.0), vec3(0.0, 1.0, 0.5), u_progress);
+            vec3 color = mix(vec3(0.0, 0.9, 1.0), vec3(0.2, 1.0, 0.8), u_progress);
             
-            return vec4(color, ring * (1.0 - u_progress));
+            return vec4(color, ring * (1.0 - u_progress) * 0.9);
         }
     `)!,
 
