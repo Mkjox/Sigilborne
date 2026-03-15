@@ -147,17 +147,17 @@ export const RANGED_UNITS: Card[] = [
 // Siege Units
 export const SIEGE_UNITS: Card[] = [
     createCard('Catapult', 'unit', 'common', 2, 4, [], 'Basic siege weapon', 'Rocks incoming!', require('../../assets/units/catapult.jpg')),
-    createCard('Ballista', 'unit', 'common', 3, 6, [], 'Heavy siege weapon', 'Pierces any armor.', require('../../assets/units/')),
-    createCard('Trebuchet', 'unit', 'rare', 4, 8, [], 'Massive siege engine', 'Walls crumble before it.', require('../../assets/units/')),
-    createCard('War Elephant', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'Armored beast of war', 'Unstoppable force.', require('../../assets/units/')),
-    createCard('Siege Tower', 'unit', 'epic', 5, 5, [ABILITIES.COMMANDER_HORN()], 'Mobile fortress', 'Brings victory closer.', require('../../assets/units/')),
-    createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'The ultimate weapon', 'Fire and fury.', require('../../assets/units/')),
+    createCard('Ballista', 'unit', 'common', 3, 6, [], 'Heavy siege weapon', 'Pierces any armor.', require('../../assets/units/ballista.jpg')),
+    createCard('Trebuchet', 'unit', 'rare', 4, 8, [], 'Massive siege engine', 'Walls crumble before it.', require('../../assets/units/trebutchet.jpg')),
+    createCard('War Elephant', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'Armored beast of war', 'Unstoppable force.', require('../../assets/units/war_elephant.jpg')),
+    createCard('Siege Tower', 'unit', 'epic', 5, 5, [ABILITIES.COMMANDER_HORN()], 'Mobile fortress', 'Brings victory closer.', require('../../assets/units/siege_tower.jpg')),
+    createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'The ultimate weapon', 'Fire and fury.', require('../../assets/units/dragon.jpg')),
     // Sinister Expansion
-    createCard('Bone Catapult', 'unit', 'common', 2, 4, [], 'Siege engine made of remains', 'Fires more than just rocks.', require('../../assets/units/')),
-    createCard('Plague Spreader', 'unit', 'rare', 4, 6, [], 'Infects the battlefield', 'Let the sickness take them.', require('../../assets/units/')),
-    createCard('Abomination', 'unit', 'epic', 6, 12, [], 'Stitched together from titans', 'A masterpiece of gore.', require('../../assets/units/')),
-    createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'Ruler of the burning planes', 'Kneel or burn.', require('../../assets/units/')),
-    createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'Firespitting beast of the abyss', 'The jaws that bite.', require('../../assets/units/')),
+    createCard('Bone Catapult', 'unit', 'common', 2, 4, [], 'Siege engine made of remains', 'Fires more than just rocks.', require('../../assets/units/bone_catapult.jpg')),
+    createCard('Plague Spreader', 'unit', 'rare', 4, 6, [], 'Infects the battlefield', 'Let the sickness take them.', require('../../assets/units/plague_spreader.jpg')),
+    createCard('Abomination', 'unit', 'epic', 6, 12, [], 'Stitched together from titans', 'A masterpiece of gore.', require('../../assets/units/abomination.jpg')),
+    createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'Ruler of the burning planes', 'Kneel or burn.', require('../../assets/units/demon_prince.jpg')),
+    createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'Firespitting beast of the abyss', 'The jaws that bite.', require('../../assets/units/hellhound.jpg')),
     createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'Stone turned flesh and malice', 'Watch the skies.', require('../../assets/units/')),
     createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'Enchanted bolts of shadow', 'Pierce the soul.', require('../../assets/units/')),
 ];
