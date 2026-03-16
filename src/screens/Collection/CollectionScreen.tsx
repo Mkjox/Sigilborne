@@ -14,10 +14,11 @@ import Animated, {
     interpolate
 } from 'react-native-reanimated';
 import { RootStackParamList, Card, CardType } from '../../types';
+import { Hero } from '../../types/hero.types';
 import { Text, BoardSurface } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing, borderRadius, getCardDimensions, getLayoutDimensions } from '../../theme';
-import { getAllCards } from '../../data/cardData';
+import { getAllCards, AVAILABLE_HEROES } from '../../data/cardData';
 import { useDeckStore } from '../../store/deckStore';
 
 type CollectionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Collection'>;
@@ -27,6 +28,22 @@ interface Props {
 }
 
 const ALL_CARDS = getAllCards();
+
+// Helper to wrap Hero in a Card interface for the grid
+const heroToCard = (hero: Hero): Card => ({
+    id: hero.id,
+    name: hero.name,
+    type: 'unit', // Heroes behave like units in terms of display
+    rarity: 'legendary', // Heroes are always legendary
+    manaCost: hero.ability.manaCost || 0,
+    power: hero.health,
+    attack: 0,
+    abilities: [hero.ability],
+    description: hero.ability.description,
+    flavorText: `${hero.className} Hero`,
+    artwork: hero.artwork,
+    isHero: true,
+});
 
 const AnimatedBackground: React.FC = () => {
     return (
@@ -48,7 +65,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const { decks } = useDeckStore();
 
-    const [selectedCategory, setSelectedCategory] = useState<'all' | CardType>('all');
+    const [selectedCategory, setSelectedCategory] = useState<'all' | CardType | 'hero'>('all');
     const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
 
     const layout = getLayoutDimensions(screenWidth, screenHeight);
@@ -57,15 +74,22 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     const cardWidth = cardDims.width * 1.1;
     const cardHeight = cardDims.height * 1.1;
 
-    const categories: { id: 'all' | CardType; label: string }[] = [
-        { id: 'all', label: 'All' },
-        { id: 'unit', label: 'Units' },
-        { id: 'spell', label: 'Spells' },
-        { id: 'weather', label: 'Weather' },
+    const categories: { id: 'all' | CardType | 'hero'; label: string; icon: string }[] = [
+        { id: 'all', label: 'All', icon: '✧' },
+        { id: 'unit', label: 'Units', icon: '⚔' },
+        { id: 'hero', label: 'Heroes', icon: '👑' },
+        { id: 'spell', label: 'Spells', icon: '✨' },
+        { id: 'weather', label: 'Weather', icon: '☁' },
     ];
 
     const filteredCards = useMemo(() => {
-        if (selectedCategory === 'all') return ALL_CARDS;
+        const units = ALL_CARDS.filter(c => c.type === 'unit');
+        const spells = ALL_CARDS.filter(c => c.type === 'spell');
+        const weather = ALL_CARDS.filter(c => c.type === 'weather');
+        const heroes = AVAILABLE_HEROES.map(heroToCard);
+
+        if (selectedCategory === 'all') return [...heroes, ...units, ...spells, ...weather];
+        if (selectedCategory === 'hero') return heroes;
         return ALL_CARDS.filter(card => card.type === selectedCategory);
     }, [selectedCategory]);
 
@@ -126,7 +150,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                                                 color={selectedCategory === cat.id ? colors.arcane.obsidian : colors.arcane.emerald}
                                                 style={{ fontWeight: '900', letterSpacing: 1 }}
                                             >
-                                                {cat.label.toUpperCase()}
+                                                {cat.icon} {cat.label.toUpperCase()}
                                             </Text>
                                         </Pressable>
                                     </Animated.View>
@@ -135,8 +159,8 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
 
                             <Animated.View entering={FadeIn.delay(500)} style={styles.statsGlass}>
                                 <View style={styles.statItem}>
-                                    <Text variant="h4" color={colors.arcane.emerald} style={{ fontWeight: '900' }}>{ALL_CARDS.length}</Text>
-                                    <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>CARDS</Text>
+                                    <Text variant="h4" color={colors.arcane.emerald} style={{ fontWeight: '900' }}>{ALL_CARDS.length + AVAILABLE_HEROES.length}</Text>
+                                    <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>TOTAL</Text>
                                 </View>
                                 <View style={styles.statDivider} />
                                 <View style={styles.statItem}>
@@ -162,7 +186,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                                 card={item}
                                 width={cardWidth}
                                 height={cardHeight}
-                                isPlayable={false}
+                                isPlayable={true}
                                 isSelected={selectedCardId === item.id}
                                 onPress={() => setSelectedCardId(selectedCardId === item.id ? null : item.id)}
                             />
@@ -174,7 +198,13 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
 
             {/* 3. OVERLAY LAYER (Absolute bottom of JSX = Top z-index) */}
             {selectedCardId && (() => {
-                const card = ALL_CARDS.find(c => c.id === selectedCardId);
+                // Search in all sources for the full data
+                const card = ALL_CARDS.find(c => c.id === selectedCardId) || 
+                             AVAILABLE_HEROES.map(heroToCard).find(c => c.id === selectedCardId);
+                
+                const hero = AVAILABLE_HEROES.find(h => h.id === selectedCardId);
+                const isHero = !!hero;
+
                 if (card) return (
                     <Animated.View entering={FadeIn} exiting={FadeOut} style={StyleSheet.absoluteFill}>
                         <Pressable style={styles.backdrop} onPress={() => setSelectedCardId(null)} />
@@ -183,10 +213,16 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                             <View style={styles.cardDetailHeader}>
                                 <Text variant="h4" color={colors.arcane.white} style={{ flex: 1, fontFamily: 'serif', letterSpacing: 2 }}>{card.name.toUpperCase()}</Text>
                                 <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
-                                    <View style={[styles.miniBadge, { borderColor: colors.arcane.cyan }]}>
-                                        <Text variant="caption" color={colors.arcane.cyan}>{card.manaCost}</Text>
-                                    </View>
-                                    {card.power !== undefined && (
+                                    {isHero ? (
+                                        <View style={[styles.miniBadge, { borderColor: colors.arcane.emerald, width: 'auto', paddingHorizontal: 8 }]}>
+                                            <Text variant="caption" color={colors.arcane.emerald}>HERO</Text>
+                                        </View>
+                                    ) : (
+                                        <View style={[styles.miniBadge, { borderColor: colors.arcane.cyan }]}>
+                                            <Text variant="caption" color={colors.arcane.cyan}>{card.manaCost}</Text>
+                                        </View>
+                                    )}
+                                    {card.power !== undefined && !isHero && (
                                         <View style={[styles.miniBadge, { borderColor: colors.error }]}>
                                             <Text variant="caption" color={colors.error}>{card.power}</Text>
                                         </View>
@@ -197,10 +233,10 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                                 </View>
                             </View>
                             <Text variant="caption" color={colors.arcane.emerald} style={{ fontStyle: 'italic', marginBottom: 8, opacity: 0.7 }}>
-                                {card.flavorText || "A mysterious echo from the void."}
+                                {isHero ? `${hero?.className} Hero • ${hero?.ability.name}` : (card.flavorText || "A mysterious echo from the void.")}
                             </Text>
                             <Text variant="body" color={colors.arcane.white} style={{ fontSize: 13, lineHeight: 18, opacity: 0.9 }}>
-                                {card.description}
+                                {isHero ? `${hero?.ability.description} (Cooldown: ${hero?.ability.cooldown} Rounds)` : card.description}
                             </Text>
                         </View>
                     </Animated.View>

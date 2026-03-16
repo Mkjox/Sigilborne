@@ -1,4 +1,5 @@
 import { Card, CardType, CardRarity, Ability } from '../types';
+import { Hero } from '../types/hero.types';
 
 // Helper to create unique IDs
 const createId = () => Math.random().toString(36).substring(2, 11);
@@ -185,6 +186,155 @@ export const WEATHER_CARDS: Card[] = [
     // Sinister Expansion
     createCard('Corrupt Ground', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Melee units lose their resolve'),
     createCard('Wailing Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Ranged units lose their sight'),
+];
+
+// ============ HEROES ============
+
+export const AVAILABLE_HEROES: Hero[] = [
+    {
+        id: 'hero_commander',
+        name: 'Commander',
+        health: 2,
+        maxHealth: 2,
+        ability: {
+            id: 'ability_rally',
+            name: 'Rally',
+            type: 'boost_all',
+            trigger: 'activate',
+            description: 'Boost all friendly units by +1 power',
+            value: 1,
+            cooldown: 3,
+            currentCooldown: 0,
+        },
+        artwork: require('../../assets/units/hero_commander.jpg'),
+        className: 'Warrior',
+    },
+    {
+        id: 'hero_darklord',
+        name: 'Dark Lord',
+        health: 2,
+        maxHealth: 2,
+        ability: {
+            id: 'ability_dark_command',
+            name: 'Dark Command',
+            type: 'damage_strongest',
+            trigger: 'activate',
+            description: 'Deal 2 damage to the strongest enemy unit',
+            value: 2,
+            cooldown: 3,
+            currentCooldown: 0,
+        },
+        artwork: require('../../assets/units/hero_darklord.jpg'),
+        className: 'Warlock',
+    },
+    {
+        id: 'hero_archmage',
+        name: 'Archmage',
+        health: 2,
+        maxHealth: 2,
+        ability: {
+            id: 'ability_arcane_blast',
+            name: 'Arcane Blast',
+            type: 'damage_all', // We will implement this in gameEngine
+            trigger: 'activate',
+            description: 'Deal 1 damage to all enemy units',
+            value: 1,
+            cooldown: 4,
+            currentCooldown: 0,
+        },
+        artwork: require('../../assets/units/lich_king.jpg'), // Placeholder artwork
+        className: 'Mage',
+    },
+    {
+        id: 'hero_ranger',
+        name: 'Ranger',
+        health: 2,
+        maxHealth: 2,
+        ability: {
+            id: 'ability_precision_strike',
+            name: 'Precision Strike',
+            type: 'destroy_weakest', // We will implement this in gameEngine
+            trigger: 'activate',
+            description: 'Destroy the weakest enemy unit',
+            value: 1, // Doesn't use value, but for consistency
+            cooldown: 4,
+            currentCooldown: 0,
+        },
+        artwork: require('../../assets/units/elven_marksman.jpg'), // Placeholder artwork
+        className: 'Hunter',
+    },
+    {
+        id: 'hero_paladin',
+        name: 'Paladin',
+        health: 2,
+        maxHealth: 2,
+        ability: {
+            id: 'ability_divine_shield',
+            name: 'Divine Light',
+            type: 'heal',
+            trigger: 'activate',
+            description: 'Restore 2 health to your hero',
+            value: 2,
+            cooldown: 3,
+            currentCooldown: 0,
+        },
+        artwork: require('../../assets/units/elven_marksman.jpg'), // Placeholder ../../assets/styles/light.jpg
+        className: 'Cleric',
+    },
+    {
+        id: 'hero_rogue',
+        name: 'Trickster',
+        health: 2,
+        maxHealth: 2,
+        ability: {
+            id: 'ability_quick_draw',
+            name: 'Quick Dig',
+            type: 'draw_card',
+            trigger: 'activate',
+            description: 'Draw a card',
+            value: 1,
+            cooldown: 4,
+            currentCooldown: 0,
+        },
+        artwork: require('../../assets/units/champion.jpg'), // Placeholder ../../assets/units/assassin.jpg
+        className: 'Rogue',
+    },
+    {
+        id: 'hero_berserker',
+        name: 'Berserker',
+        health: 2,
+        maxHealth: 2,
+        ability: {
+            id: 'ability_bloodlust',
+            name: 'Bloodlust',
+            type: 'damage_random',
+            trigger: 'activate',
+            description: 'Deal 1 damage to a random enemy unit',
+            value: 1,
+            cooldown: 2,
+            currentCooldown: 0,
+        },
+        artwork: require('../../assets/units/champion.jpg'), // Placeholder ../../assets/styles/fire.jpg
+        className: 'Fighter',
+    },
+    {
+        id: 'hero_druid',
+        name: 'Druid',
+        health: 2,
+        maxHealth: 2,
+        ability: {
+            id: 'ability_nature_growth',
+            name: 'Wild Growth',
+            type: 'boost_random',
+            trigger: 'activate',
+            description: 'Boost a random friendly unit by +2 power',
+            value: 2,
+            cooldown: 3,
+            currentCooldown: 0,
+        },
+        artwork: require('../../assets/units/champion.jpg'), // Placeholder ../../assets/styles/nature.jpg
+        className: 'Shaman',
+    }
 ];
 
 // ============ STARTER DECKS ============

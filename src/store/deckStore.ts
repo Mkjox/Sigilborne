@@ -10,6 +10,7 @@ const createId = () => Math.random().toString(36).substring(2, 11);
 export interface Deck {
     id: string;
     name: string;
+    heroId: string;
     cards: Card[];
     createdAt: number;
 }
@@ -22,6 +23,7 @@ interface DeckStore {
     createDeck: (name: string) => string;
     deleteDeck: (deckId: string) => void;
     renameDeck: (deckId: string, name: string) => void;
+    setDeckHero: (deckId: string, heroId: string) => void;
     addCardToDeck: (deckId: string, card: Card) => void;
     removeCardFromDeck: (deckId: string, cardId: string) => void;
     setActiveDeck: (deckId: string | null) => void;
@@ -39,6 +41,7 @@ export const useDeckStore = create<DeckStore>()(
                 const newDeck: Deck = {
                     id: createId(),
                     name,
+                    heroId: 'hero_commander', // Default hero
                     cards: [],
                     createdAt: Date.now(),
                 };
@@ -56,6 +59,12 @@ export const useDeckStore = create<DeckStore>()(
             renameDeck: (deckId: string, name: string) => {
                 set(state => ({
                     decks: state.decks.map(d => d.id === deckId ? { ...d, name } : d),
+                }));
+            },
+
+            setDeckHero: (deckId: string, heroId: string) => {
+                set(state => ({
+                    decks: state.decks.map(d => d.id === deckId ? { ...d, heroId } : d),
                 }));
             },
 

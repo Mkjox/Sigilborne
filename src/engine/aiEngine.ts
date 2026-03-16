@@ -101,6 +101,30 @@ const hardAI = (state: GameState): AIDecision => {
         if (abilityType === 'damage_strongest' && playerPower > aiPower) {
             return { action: 'ability' };
         }
+        // Arcane Blast (damage_all): Use when enemy has units and we are behind
+        if (abilityType === 'damage_all' && playerPower > aiPower && state.player.board.length > 0) {
+            return { action: 'ability' };
+        }
+        // Precision Strike (destroy_weakest): Use when enemy has units
+        if (abilityType === 'destroy_weakest' && state.player.board.length > 0 && playerPower > aiPower) {
+            return { action: 'ability' };
+        }
+        // Divine Light (heal): Use if lives are lost
+        if (abilityType === 'heal' && state.ai.health < 2) {
+            return { action: 'ability' };
+        }
+        // Quick Dig (draw_card): Always good to have more cards
+        if (abilityType === 'draw_card' && state.ai.hand.length < 10) {
+            return { action: 'ability' };
+        }
+        // Bloodlust (damage_random): Use when enemy has units
+        if (abilityType === 'damage_random' && state.player.board.length > 0) {
+            return { action: 'ability' };
+        }
+        // Wild Growth (boost_random): Use when we have units
+        if (abilityType === 'boost_random' && state.ai.board.length > 0) {
+            return { action: 'ability' };
+        }
     }
 
     // 1. Victory Condition: If we can pass and win the round/game, do it.

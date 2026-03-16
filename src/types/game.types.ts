@@ -2,7 +2,7 @@ import { Card } from './card.types';
 import { Hero } from './hero.types';
 
 // Game phases
-export type GamePhase = 'draw' | 'main' | 'combat' | 'end';
+export type GamePhase = 'mulligan' | 'draw' | 'main' | 'combat' | 'round_end' | 'end';
 export type PlayerType = 'player' | 'ai';
 
 // Board structure (Single Zone)
@@ -41,6 +41,11 @@ export interface GameState {
     phase: GamePhase;
     player: PlayerState;
     ai: PlayerState;
+    weather: {
+        melee: boolean;
+        ranged: boolean;
+        siege: boolean;
+    };
     roundHistory: RoundInfo[];
     gameOver: boolean;
     winner?: PlayerType | 'draw';

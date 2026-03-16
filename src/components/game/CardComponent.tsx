@@ -189,7 +189,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                     </View>
 
                     {/* Stats HUD */}
-                    {!hideStats && (
+                    {!hideStats && !card.isHero && (
                         <>
                             {/* Mana (Top Left) */}
                             <View style={[
@@ -246,6 +246,31 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                 </View>
                             )}
                         </>
+                    )}
+
+                    {/* Hero Indicator */}
+                    {card.isHero && !hideStats && (
+                        <View style={[
+                            styles.statOrb,
+                            {
+                                width: badgeSize,
+                                height: badgeSize,
+                                borderRadius: badgeSize / 2,
+                                top: padding,
+                                left: padding,
+                                borderColor: colors.warning,
+                                backgroundColor: 'rgba(218, 165, 32, 0.2)', // Golden mist
+                            }
+                        ]}>
+                            <Text style={[
+                                styles.statText,
+                                { 
+                                    fontSize: badgeFontSize * 0.8,
+                                    color: undefined, // Don't override with statText color
+                                    fontFamily: undefined // Don't override with statText font
+                                }
+                            ]}>👑</Text>
+                        </View>
                     )}
 
                     {/* Name Bar */}

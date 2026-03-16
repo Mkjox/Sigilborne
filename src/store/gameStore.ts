@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { GameState, PlayerType, Difficulty } from '../types';
+import { GameState, PlayerType, Difficulty, PlayerState, GamePhase } from '../types';
 import {
     createInitialGameState,
     playCard as enginePlayCard,
@@ -15,7 +15,7 @@ import {
 } from '../engine';
 import { makeAIDecision, getAIDelay } from '../engine/aiEngine';
 import { useDeckStore } from './deckStore';
-import { createStarterDeck } from '../data/cardData';
+import { createStarterDeck, AVAILABLE_HEROES } from '../data/cardData';
 
 interface GameStore extends GameState {
     // Game settings
@@ -36,6 +36,7 @@ interface GameStore extends GameState {
     selectCard: (cardId: string | null) => void;
     setMessage: (message: string | null) => void;
     triggerAI: () => void;
+    continueToNextRound: () => void;
     setAttackingCard: (cardId: string | null) => void;
     attackCard: (targetId: string) => void;
     setVFX: (vfx: 'scorch' | 'boost' | 'revive' | 'frost' | 'fog' | 'none') => void;
@@ -50,7 +51,7 @@ const createEmptyState = (): GameState => ({
     currentRound: 1,
     roundsWon: { player: 0, ai: 0 },
     currentTurn: 'player' as PlayerType,
-    phase: 'draw',
+    phase: 'mulligan',
     player: {
         id: 'player',
         type: 'player' as PlayerType,
@@ -91,24 +92,25 @@ const createEmptyState = (): GameState => ({
         board: [],
         graveyard: [],
         hero: {
-            id: 'hero2',
-            name: 'Dark Lord',
+            id: 'dummy_hero_ai',
+            name: 'Dummy AI',
             health: 2,
             maxHealth: 2,
             ability: {
-                id: 'ability2',
-                name: 'Dark Command',
+                id: 'dummy_ability_ai',
+                name: 'Dummy',
                 type: 'damage_strongest',
                 trigger: 'activate',
-                description: 'Deal 2 damage to a unit',
-                cooldown: 3,
+                description: 'Dummy',
+                cooldown: 0,
                 currentCooldown: 0,
             },
-            artwork: '',
-            className: 'Warlock',
+            artwork: require('../../assets/units/hero_darklord.jpg'),
+            className: 'Dummy'
         },
         hasPassed: false,
     },
+    weather: { melee: false, ranged: false, siege: false },
     roundHistory: [],
     gameOver: false,
 });
@@ -130,9 +132,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // If deck has at least 10 cards, use it. Otherwise uses default starter deck logic in engine
         const playerDeck = activeDeck && activeDeck.cards.length >= 10
             ? activeDeck.cards.map(c => ({ ...c, id: Math.random().toString(36).substring(2, 11) }))
-            : null;
+            : [];
 
-        const initialState = createInitialGameState(difficulty, playerDeck || undefined);
+        // Get selected hero
+        const playerHero = activeDeck && activeDeck.heroId
+            ? AVAILABLE_HEROES.find(h => h.id === activeDeck.heroId)
+            : undefined;
+
+        const initialState = createInitialGameState(playerDeck, [], playerHero);
         set({
             ...initialState,
             difficulty,
@@ -163,9 +170,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             phase: state.phase,
             player: state.player,
             ai: state.ai,
+            weather: state.weather,
             roundHistory: state.roundHistory,
             gameOver: state.gameOver,
             winner: state.winner,
+            attackingCardId: state.attackingCardId,
         };
 
         const { newState, success, message } = enginePlayCard(
@@ -248,17 +257,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
             phase: state.phase,
             player: state.player,
             ai: state.ai,
+            weather: state.weather,
             roundHistory: state.roundHistory,
             gameOver: state.gameOver,
             winner: state.winner,
+            attackingCardId: state.attackingCardId,
         };
 
         const passedState = enginePassTurn(gameState, 'player');
-
-        set({
-            ...passedState,
-            message: 'You passed',
-        });
 
         if (shouldEndRound(passedState)) {
             const resolvedState = resolveRound(passedState);
@@ -266,28 +272,44 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (resolvedState.gameOver) {
                 set({
                     ...resolvedState,
-                    message: resolvedState.winner === 'player' ? 'Victory!' : (resolvedState.winner === 'draw' ? 'Draw!' : 'Defeat!'),
+                    phase: 'end',
+                    message: resolvedState.winner === 'player' ? 'Victory!' : (resolvedState.winner === 'draw' ? 'Stalemate!' : 'Defeat!'),
                 });
             } else {
-                // Start next round
-                const nextRoundState = startNextRound(resolvedState);
                 const lastRound = resolvedState.roundHistory[resolvedState.roundHistory.length - 1];
                 const roundWinner = lastRound.playerScore > lastRound.aiScore ? 'You Won' : (lastRound.aiScore > lastRound.playerScore ? 'AI Won' : 'Draw');
 
                 set({
-                    ...nextRoundState,
-                    weather: { melee: false, ranged: false, siege: false },
-                    message: `${roundWinner} Round ${resolvedState.currentRound}!`,
+                    ...resolvedState,
+                    phase: 'round_end',
+                    message: `${roundWinner}!`,
                 });
-
-                // Check if AI goes first next round
-                if (nextRoundState.currentTurn === 'ai') {
-                    get().triggerAI();
-                }
             }
         } else {
             // AI's turn
+            set({
+                ...passedState,
+                message: 'You passed',
+            });
             get().endTurn();
+        }
+    },
+
+    continueToNextRound: () => {
+        const state = get();
+        if (state.phase !== 'round_end') return;
+
+        const nextRoundState = startNextRound(state);
+        
+        set({
+            ...nextRoundState,
+            weather: { melee: false, ranged: false, siege: false },
+            message: `Round ${nextRoundState.currentRound} Start!`,
+        });
+
+        // Check if AI goes first next round
+        if (nextRoundState.currentTurn === 'ai') {
+            get().triggerAI();
         }
     },
 
@@ -301,6 +323,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             phase: state.phase,
             player: state.player,
             ai: state.ai,
+            weather: state.weather,
             roundHistory: state.roundHistory,
             gameOver: state.gameOver,
             winner: state.winner,
@@ -355,6 +378,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             phase: state.phase,
             player: state.player,
             ai: state.ai,
+            weather: state.weather,
             roundHistory: state.roundHistory,
             gameOver: state.gameOver,
             winner: state.winner,
@@ -384,22 +408,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
             const delay = getAIDelay(state.difficulty);
 
-            setTimeout(() => {
-                const currentState = get();
-                const decision = makeAIDecision(
-                    {
-                        currentRound: currentState.currentRound,
-                        roundsWon: currentState.roundsWon,
-                        currentTurn: currentState.currentTurn,
-                        phase: currentState.phase,
-                        player: currentState.player,
-                        ai: currentState.ai,
-                        roundHistory: currentState.roundHistory,
-                        gameOver: currentState.gameOver,
-                        winner: currentState.winner,
-                    },
-                    currentState.difficulty
-                );
+        // Wait for AI decision
+        setTimeout(() => {
+            const currentState = get();
+            if (currentState.gameOver || currentState.currentTurn !== 'ai') {
+                set({ isAIThinking: false });
+                return;
+            }
+
+            const gameState: GameState = {
+                currentRound: currentState.currentRound,
+                roundsWon: currentState.roundsWon,
+                currentTurn: currentState.currentTurn,
+                phase: currentState.phase,
+                player: currentState.player,
+                ai: currentState.ai,
+                weather: currentState.weather,
+                roundHistory: currentState.roundHistory,
+                gameOver: currentState.gameOver,
+                winner: currentState.winner,
+                attackingCardId: currentState.attackingCardId,
+            };
+
+            const decision = makeAIDecision(gameState, currentState.difficulty);
 
                 if (decision.action === 'pass') {
                     // AI passes
@@ -410,20 +441,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         phase: currentState.phase,
                         player: currentState.player,
                         ai: currentState.ai,
+                        weather: currentState.weather,
                         roundHistory: currentState.roundHistory,
                         gameOver: currentState.gameOver,
                         winner: currentState.winner,
+                        attackingCardId: currentState.attackingCardId,
                     };
 
                     const aiPassedState = enginePassTurn(aiGameState, 'ai');
                     // Swap currentTurn back to ai before checking
                     aiPassedState.currentTurn = 'ai';
-
-                    set({
-                        ai: { ...aiPassedState.ai, hasPassed: true },
-                        isAIThinking: false,
-                        message: 'AI passed',
-                    });
 
                     // Check if round ends
                     if (currentState.player.hasPassed) {
@@ -434,42 +461,47 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         if (resolvedState.gameOver) {
                             set({
                                 ...resolvedState,
+                                phase: 'end',
                                 isAIThinking: false,
-                                message: resolvedState.winner === 'player' ? 'Victory!' : 'Defeat!',
+                                message: resolvedState.winner === 'player' ? 'Victory!' : (resolvedState.winner === 'draw' ? 'Stalemate!' : 'Defeat!'),
                             });
                         } else {
-                            const nextRoundState = startNextRound(resolvedState);
+                            const lastRound = resolvedState.roundHistory[resolvedState.roundHistory.length - 1];
+                            const roundWinner = lastRound.playerScore > lastRound.aiScore ? 'You Won' : (lastRound.aiScore > lastRound.playerScore ? 'AI Won' : 'Draw');
+                            
                             set({
-                                ...nextRoundState,
-                                weather: { melee: false, ranged: false, siege: false },
+                                ...resolvedState,
+                                phase: 'round_end',
                                 isAIThinking: false,
-                                message: `Round ${nextRoundState.currentRound} started`,
+                                message: `${roundWinner}!`,
                             });
-
-                            // Check if AI goes first next round
-                            if (nextRoundState.currentTurn === 'ai') {
-                                get().triggerAI();
-                            }
                         }
                     } else {
                         // Player's turn
-                        set({ currentTurn: 'player', isAIThinking: false });
+                        set({ 
+                            ...aiPassedState,
+                            ai: { ...aiPassedState.ai, hasPassed: true },
+                            currentTurn: 'player', 
+                            isAIThinking: false,
+                            message: 'AI passed',
+                        });
                     }
                 } else if (decision.action === 'ability') {
-                    // AI uses hero ability
-                    const aiGameState: GameState = {
-                        currentRound: currentState.currentRound,
-                        roundsWon: currentState.roundsWon,
-                        currentTurn: 'ai',
-                        phase: currentState.phase,
-                        player: currentState.player,
-                        ai: currentState.ai,
-                        roundHistory: currentState.roundHistory,
-                        gameOver: currentState.gameOver,
-                        winner: currentState.winner,
-                    };
+                const abilityGameState: GameState = {
+                    currentRound: currentState.currentRound,
+                    roundsWon: currentState.roundsWon,
+                    currentTurn: currentState.currentTurn,
+                    phase: currentState.phase,
+                    player: currentState.player,
+                    ai: currentState.ai,
+                    weather: currentState.weather,
+                    roundHistory: currentState.roundHistory,
+                    gameOver: currentState.gameOver,
+                    winner: currentState.winner,
+                    attackingCardId: currentState.attackingCardId,
+                };
 
-                    const { newState, success, message: abilityMsg } = engineUseHeroAbility(aiGameState);
+                    const { newState, success, message: abilityMsg } = engineUseHeroAbility(abilityGameState);
 
                     if (success) {
                         set({
@@ -485,22 +517,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     }
                 } else if (decision.cardId) {
                     // AI plays a card
-                    const aiGameState: GameState = {
-                        currentRound: currentState.currentRound,
-                        roundsWon: currentState.roundsWon,
-                        currentTurn: 'ai',
-                        phase: currentState.phase,
-                        player: currentState.player,
-                        ai: currentState.ai,
-                        roundHistory: currentState.roundHistory,
-                        gameOver: currentState.gameOver,
-                        winner: currentState.winner,
-                    };
+                const playGameState: GameState = {
+                    currentRound: currentState.currentRound,
+                    roundsWon: currentState.roundsWon,
+                    currentTurn: currentState.currentTurn,
+                    phase: currentState.phase,
+                    player: currentState.player,
+                    ai: currentState.ai,
+                    weather: currentState.weather,
+                    roundHistory: currentState.roundHistory,
+                    gameOver: currentState.gameOver,
+                    winner: currentState.winner,
+                    attackingCardId: currentState.attackingCardId,
+                };
 
                     const card = currentState.ai.hand.find(c => c.id === decision.cardId);
 
                     const { newState } = enginePlayCard(
-                        aiGameState,
+                        playGameState,
                         decision.cardId,
                         currentState.weather
                     );

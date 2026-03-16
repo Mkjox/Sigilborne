@@ -25,7 +25,7 @@ import { Text } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing } from '../../theme';
 import { useDeckStore } from '../../store/deckStore';
-import { getAllCards } from '../../data/cardData';
+import { getAllCards, AVAILABLE_HEROES } from '../../data/cardData';
 
 type DeckBuilderScreenNavigationProp = StackNavigationProp<RootStackParamList, 'DeckBuilder'>;
 interface Props { navigation: DeckBuilderScreenNavigationProp; }
@@ -62,17 +62,23 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     const { width: sw, height: sh } = useWindowDimensions();
     const {
         decks, activeDeckId,
-        addCardToDeck, removeCardFromDeck, createDeck, deleteDeck, setActiveDeck,
+        addCardToDeck, removeCardFromDeck, createDeck, deleteDeck, setActiveDeck, setDeckHero,
     } = useDeckStore();
 
-    const [filter, setFilter] = useState<'all' | CardType>('all');
+    const [filter, setFilter] = useState<'all' | CardType | 'hero'>('hero');
     const [libWidth, setLibWidth] = useState(0);
 
     const activeDeck = useMemo(() => decks.find(d => d.id === activeDeckId), [decks, activeDeckId]);
     const filteredCards = useMemo(() => {
+        if (filter === 'hero') return []; // Heroes are handled separately
         if (filter === 'all') return ALL_CARDS;
         return ALL_CARDS.filter(c => c.type === filter);
     }, [filter]);
+
+    const activeHero = useMemo(() => {
+        if (!activeDeck) return null;
+        return AVAILABLE_HEROES.find(h => h.id === activeDeck.heroId) || null;
+    }, [activeDeck]);
 
     const cardCountInDeck = (cardId: string) => {
         if (!activeDeck) return 0;
@@ -107,6 +113,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                         <Text style={styles.backText}>‹</Text>
                     </Pressable>
                     <View style={styles.spacer} />
+                    <SigilIcon active={filter === 'hero'} label="HERO" icon="♆" onPress={() => setFilter('hero')} />
                     <SigilIcon active={filter === 'all'} label="ALL" icon="◈" onPress={() => setFilter('all')} />
                     <SigilIcon active={filter === 'unit'} label="UNITS" icon="⚔" onPress={() => setFilter('unit')} />
                     <SigilIcon active={filter === 'spell'} label="SPELLS" icon="🝧" onPress={() => setFilter('spell')} />
@@ -120,34 +127,78 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                 <View style={[styles.vaultPillar, { flex: 0.75 }]} onLayout={(e) => setLibWidth(e.nativeEvent.layout.width)}>
                     <View style={styles.pillarHeader}>
                         <Text style={styles.pillarTitle}>VAULT</Text>
-                        <Text style={styles.pillarCount}>{filteredCards.length} ESSENCES</Text>
+                        <Text style={styles.pillarCount}>
+                            {filter === 'hero' ? `${AVAILABLE_HEROES.length} HEROES` : `${filteredCards.length} ESSENCES`}
+                        </Text>
                     </View>
-                    <FlatList
-                        data={filteredCards}
-                        numColumns={4}
-                        keyExtractor={item => item.id}
-                        renderItem={({ item, index }) => {
-                            const count = cardCountInDeck(item.id);
-                            return (
-                                <Animated.View entering={FadeIn.delay(index * 10)} style={styles.vaultCardWrapper}>
-                                    <CardComponent
-                                        card={item}
-                                        width={cardW}
-                                        height={cardH}
-                                        onPress={() => activeDeckId && !isDeckFull && addCardToDeck(activeDeckId, item)}
-                                        isPlayable={!!activeDeckId && !isDeckFull}
-                                    />
-                                    {count > 0 && (
-                                        <View style={styles.countBadge}>
-                                            <Text style={styles.countBadgeText}>{count}</Text>
-                                        </View>
-                                    )}
-                                </Animated.View>
-                            );
-                        }}
-                        contentContainerStyle={styles.vaultList}
-                        showsVerticalScrollIndicator={false}
-                    />
+
+                    {filter === 'hero' ? (
+                        <FlatList
+                            data={AVAILABLE_HEROES}
+                            numColumns={4}
+                            keyExtractor={item => item.id}
+                            renderItem={({ item, index }) => {
+                                const isSelected = activeDeck?.heroId === item.id;
+                                return (
+                                    <Animated.View entering={FadeIn.delay(index * 10)} style={styles.vaultCardWrapper}>
+                                        <Pressable
+                                            style={[styles.heroCardPreview, isSelected && styles.heroCardPreviewSelected]}
+                                            onPress={() => activeDeckId && setDeckHero(activeDeckId, item.id)}
+                                        >
+                                            <Animated.Image source={item.artwork} style={styles.heroArtwork} />
+                                            {isSelected && <View style={styles.heroSelectedOverlay} />}
+                                            <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.heroGradient} />
+
+                                            <Text style={styles.heroClassName}>{item.className.toUpperCase()}</Text>
+                                            <Text style={styles.heroNameTitle} numberOfLines={1}>{item.name.toUpperCase()}</Text>
+
+                                            <View style={styles.heroAbilityStrip}>
+                                                <Text style={styles.heroAbilityIconText}>⚡</Text>
+                                                <View style={{ flex: 1 }}>
+                                                    <Text style={styles.heroAbilityNameText} numberOfLines={1}>{item.ability.name}</Text>
+                                                    <Text style={styles.heroAbilityDescText} numberOfLines={2}>{item.ability.description}</Text>
+                                                </View>
+                                            </View>
+                                        </Pressable>
+                                        {isSelected && (
+                                            <View style={styles.countBadge}>
+                                                <Text style={styles.countBadgeText}>✓</Text>
+                                            </View>
+                                        )}
+                                    </Animated.View>
+                                );
+                            }}
+                            contentContainerStyle={styles.vaultList}
+                            showsVerticalScrollIndicator={false}
+                        />
+                    ) : (
+                        <FlatList
+                            data={filteredCards}
+                            numColumns={4}
+                            keyExtractor={item => item.id}
+                            renderItem={({ item, index }) => {
+                                const count = cardCountInDeck(item.id);
+                                return (
+                                    <Animated.View entering={FadeIn.delay(index * 10)} style={styles.vaultCardWrapper}>
+                                        <CardComponent
+                                            card={item}
+                                            width={cardW}
+                                            height={cardH}
+                                            onPress={() => activeDeckId && !isDeckFull && addCardToDeck(activeDeckId, item)}
+                                            isPlayable={!!activeDeckId && !isDeckFull}
+                                        />
+                                        {count > 0 && (
+                                            <View style={styles.countBadge}>
+                                                <Text style={styles.countBadgeText}>{count}</Text>
+                                            </View>
+                                        )}
+                                    </Animated.View>
+                                );
+                            }}
+                            contentContainerStyle={styles.vaultList}
+                            showsVerticalScrollIndicator={false}
+                        />
+                    )}
                 </View>
 
                 {/* Vertical Void Line */}
@@ -216,7 +267,16 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                     onRemove={() => removeCardFromDeck(activeDeckId!, item.id)}
                                 />
                             )}
-                            ListHeaderComponent={<View style={{ height: 5 }} />}
+                            ListHeaderComponent={
+                                <View style={styles.deckHeroStrip}>
+                                    <View style={styles.deckHeroStripInner}>
+                                        <Text style={styles.deckHeroStripLabel}>ACTIVE HERO</Text>
+                                        <Text style={styles.deckHeroStripName}>{activeHero?.name.toUpperCase()}</Text>
+                                        <Text style={styles.deckHeroStripAbility}>⚡ {activeHero?.ability.name}</Text>
+                                        <Text style={styles.deckHeroStripDesc}>{activeHero?.ability.description}</Text>
+                                    </View>
+                                </View>
+                            }
                             contentContainerStyle={styles.essenceList}
                             showsVerticalScrollIndicator={false}
                         />
@@ -474,5 +534,139 @@ const styles = StyleSheet.create({
         color: colors.error,
         opacity: 0.5,
         fontWeight: '900',
+    },
+
+    // --- Hero Select Styles ---
+    heroCardPreview: {
+        width: 140,
+        height: 220, // Increased height to fit description
+        margin: 10,
+        borderRadius: 4,
+        overflow: 'hidden',
+        borderWidth: 2,
+        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: colors.arcane.obsidian,
+    },
+    heroCardPreviewSelected: {
+        borderColor: colors.arcane.emerald,
+        shadowColor: colors.arcane.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 15,
+        transform: [{ scale: 1.05 }],
+    },
+    heroArtwork: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+    },
+    heroSelectedOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(16,185,129,0.15)',
+    },
+    heroGradient: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: '70%', // Boosted gradient slightly
+    },
+    heroClassName: {
+        position: 'absolute',
+        top: 8,
+        left: 8,
+        fontSize: 9,
+        color: colors.arcane.cyan,
+        fontWeight: '900',
+        letterSpacing: 1.5,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 2,
+    },
+    heroNameTitle: {
+        position: 'absolute',
+        bottom: 65, // Adjusted position to clear the taller ability strip
+        left: 10,
+        right: 10,
+        fontSize: 14,
+        color: colors.arcane.white,
+        fontFamily: 'serif',
+        fontWeight: '900',
+        letterSpacing: 1,
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
+    },
+    heroAbilityStrip: {
+        position: 'absolute',
+        bottom: 6,
+        left: 6,
+        right: 6,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        paddingVertical: 4,
+        paddingHorizontal: 6,
+        borderRadius: 3,
+        borderWidth: 1,
+        borderColor: 'rgba(16,185,129,0.3)',
+    },
+    heroAbilityIconText: {
+        fontSize: 10,
+        marginRight: 6,
+    },
+    heroAbilityNameText: {
+        fontSize: 9,
+        color: colors.arcane.emerald,
+        fontWeight: '900',
+        letterSpacing: 0.5,
+    },
+    heroAbilityDescText: {
+        fontSize: 8,
+        color: 'rgba(255,255,255,0.7)',
+        marginTop: 2,
+        lineHeight: 10,
+    },
+    deckHeroStrip: {
+        marginBottom: 10,
+        paddingBottom: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(16,185,129,0.1)',
+        paddingHorizontal: 10,
+    },
+    deckHeroStripInner: {
+        backgroundColor: 'rgba(16,185,129,0.05)',
+        borderWidth: 1,
+        borderColor: 'rgba(16,185,129,0.2)',
+        padding: 8,
+        borderRadius: 2,
+    },
+    deckHeroStripLabel: {
+        fontSize: 7,
+        color: colors.arcane.cyan,
+        fontWeight: '900',
+        letterSpacing: 2,
+        marginBottom: 2,
+    },
+    deckHeroStripName: {
+        fontSize: 12,
+        color: colors.arcane.white,
+        fontFamily: 'serif',
+        fontWeight: '900',
+        letterSpacing: 1,
+        marginBottom: 4,
+    },
+    deckHeroStripAbility: {
+        fontSize: 9,
+        color: colors.arcane.emerald,
+        fontWeight: '700',
+        letterSpacing: 0.5,
+        marginBottom: 2,
+    },
+    deckHeroStripDesc: {
+        fontSize: 8,
+        color: 'rgba(255,255,255,0.6)',
+        lineHeight: 11,
     },
 });

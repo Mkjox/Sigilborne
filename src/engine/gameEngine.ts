@@ -2,6 +2,8 @@ import { GameState, PlayerType, PlayerState, BoardState, Difficulty, RoundInfo }
 import { Card } from '../types';
 import { createStarterDeck, createAIDeck } from '../data/cardData';
 import { shuffleArray, drawCards, calculateBoardPower, executeAbility, AbilityContext } from './abilitySystem';
+import { Hero } from '../types/hero.types';
+import { AVAILABLE_HEROES } from '../data/cardData';
 
 // Weather state tracking
 export interface WeatherState {
@@ -16,7 +18,7 @@ const MAX_ROUNDS = 3;
 const ROUNDS_TO_WIN = 2;
 
 // Create initial player state
-const createPlayerState = (id: string, type: PlayerType, deck: Card[]): PlayerState => {
+const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: Hero): PlayerState => {
     const shuffledDeck = shuffleArray(deck);
     const { newDeck, newHand } = drawCards(shuffledDeck, [], STARTING_HAND_SIZE);
 
@@ -30,7 +32,7 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[]): PlayerSt
         hand: newHand,
         board: [], // Single zone board
         graveyard: [],
-        hero: {
+        hero: hero ? { ...hero, id: `hero_${id}`, ability: { ...hero.ability, currentCooldown: 0 } } : {
             id: `hero_${id}`,
             name: type === 'player' ? 'Commander' : 'Dark Lord',
             health: 2,
@@ -141,20 +143,16 @@ export const playCard = (
     return { newState, success: true };
 };
 
-// Initialize new game
-export const createInitialGameState = (difficulty: Difficulty, playerDeck?: Card[]): GameState => {
-    const deck = playerDeck || createStarterDeck();
-    const player = createPlayerState('player', 'player', deck);
-    const aiDeck = createAIDeck();
-    const ai = createPlayerState('ai', 'ai', aiDeck);
-
+// Initialize a new game state
+export const createInitialGameState = (playerDeck: Card[] = [], aiDeck: Card[] = [], playerHero?: Hero, aiHero?: Hero): GameState => {
     return {
         currentRound: 1,
         roundsWon: { player: 0, ai: 0 },
-        currentTurn: 'player', // Coin flip? Player starts for now
-        phase: 'draw',
-        player,
-        ai,
+        currentTurn: 'player', // Player always starts first round
+        phase: 'mulligan',
+        player: createPlayerState('player', 'player', playerDeck.length > 0 ? playerDeck : createStarterDeck(), playerHero),
+        ai: createPlayerState('ai', 'ai', aiDeck.length > 0 ? aiDeck : createAIDeck(), aiHero),
+        weather: { melee: false, ranged: false, siege: false },
         roundHistory: [],
         gameOver: false,
     };
@@ -165,11 +163,9 @@ export const passTurn = (state: GameState, playerType: PlayerType): GameState =>
     const newState = { ...state };
     newState[playerType].hasPassed = true;
 
-    // Check if round should end
-    if (shouldEndRound(newState)) {
-        return resolveRound(newState);
-    }
-
+    // Round resolution is now handled by the store (orchestrator)
+    // to allow for UI pauses/transitions.
+    
     // Switch turn logic handled in endTurn usually, but if passed, we just give control to other
     return endTurn(newState);
 };
@@ -260,7 +256,9 @@ export const endTurn = (state: GameState): GameState => {
     // If opponent has passed, stay on current player
     if (state[opponent].hasPassed) {
         if (state[current].hasPassed) {
-            return resolveRound(state);
+            // Both passed. We return the state as-is.
+            // The Store (orchestrator) will detect both passed and call resolveRound.
+            return state;
         }
         // Current player keeps playing
         // Refresh units if it's "start of turn" conceptually? 
@@ -358,8 +356,9 @@ export const resolveRound = (state: GameState): GameState => {
         };
     }
 
-    // Start next round
-    return startNextRound(newState);
+    // Return the state showing the final scores and reduced health, 
+    // but before the board is cleared for the next round.
+    return newState;
 };
 
 // Use Hero Ability

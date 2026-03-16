@@ -236,6 +236,102 @@ export const abilityEffects = {
             }
         }
     },
+
+    // Arcane Blast - damage all enemy units
+    damage_all: (context: AbilityContext): void => {
+        const { state, player, card } = context;
+        const damageValue = card.abilities[0]?.value || 1;
+        const enemyPlayer = player === 'player' ? 'ai' : 'player';
+        const board = state[enemyPlayer].board;
+
+        for (let i = board.length - 1; i >= 0; i--) {
+            board[i].power = (board[i].power || 0) - damageValue;
+            if (board[i].power <= 0) {
+                const [dead] = board.splice(i, 1);
+                state[enemyPlayer].graveyard.push(dead);
+            }
+        }
+    },
+
+    // Precision Strike - destroy weakest enemy unit
+    destroy_weakest: (context: AbilityContext): void => {
+        const { state, player } = context;
+        const enemyPlayer = player === 'player' ? 'ai' : 'player';
+        const board = state[enemyPlayer].board;
+
+        if (board.length === 0) return;
+
+        const minPower = Math.min(...board.map(c => c.power || 0));
+        const targets = board.filter(c => c.power === minPower);
+
+        if (targets.length > 0) {
+            const target = targets[0];
+            const idx = board.findIndex(c => c.id === target.id);
+            if (idx !== -1) {
+                const [dead] = board.splice(idx, 1);
+                state[enemyPlayer].graveyard.push(dead);
+            }
+        }
+    },
+
+    // Divine Light - heal hero
+    heal: (context: AbilityContext): void => {
+        const { state, player, card } = context;
+        const healValue = card.abilities[0]?.value || 2;
+        const currentPlayer = player === 'player' ? 'player' : 'ai';
+        
+        state[currentPlayer].health = Math.min(
+            state[currentPlayer].health + healValue,
+            2 // Baseline max lives
+        );
+    },
+
+    // Quick Dig - draw card
+    draw_card: (context: AbilityContext): void => {
+        const { state, player, card } = context;
+        const drawCount = card.abilities[0]?.value || 1;
+        const currentPlayer = player === 'player' ? 'player' : 'ai';
+
+        const { newDeck, newHand } = drawCards(
+            state[currentPlayer].deck,
+            state[currentPlayer].hand,
+            drawCount
+        );
+        state[currentPlayer].deck = newDeck;
+        state[currentPlayer].hand = newHand;
+    },
+
+    // Bloodlust - damage random enemy unit
+    damage_random: (context: AbilityContext): void => {
+        const { state, player, card } = context;
+        const damageValue = card.abilities[0]?.value || 1;
+        const enemyPlayer = player === 'player' ? 'ai' : 'player';
+        const board = state[enemyPlayer].board;
+
+        if (board.length === 0) return;
+
+        const randomIndex = Math.floor(Math.random() * board.length);
+        const target = board[randomIndex];
+        
+        target.power = (target.power || 0) - damageValue;
+        if (target.power <= 0) {
+            board.splice(randomIndex, 1);
+            state[enemyPlayer].graveyard.push(target);
+        }
+    },
+
+    // Wild Growth - boost random friendly unit
+    boost_random: (context: AbilityContext): void => {
+        const { state, player, card } = context;
+        const boostValue = card.abilities[0]?.value || 2;
+        const currentPlayer = player === 'player' ? 'player' : 'ai';
+        const board = state[currentPlayer].board;
+
+        if (board.length === 0) return;
+
+        const randomIndex = Math.floor(Math.random() * board.length);
+        board[randomIndex].power = (board[randomIndex].power || 0) + boostValue;
+    },
 };
 
 // Execute an ability

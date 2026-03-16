@@ -28,4 +28,5 @@ export interface Card {
     artwork: any;
     description: string;
     flavorText?: string;
+    isHero?: boolean;
 }

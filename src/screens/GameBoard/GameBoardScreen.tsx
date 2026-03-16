@@ -130,7 +130,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
         selectedCardId, roundsWon, currentRound,
         getPlayerPower, getAIPower, useHeroAbility, message,
         attackingCardId, setAttackingCard, attackCard,
-        currentVFX, setVFX, weather
+        currentVFX, setVFX, weather, phase, continueToNextRound
     } = useGameStore();
 
     // Advanced VFX & Shake
@@ -305,14 +305,24 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                             </View>
                         </View>
 
-                        {/* Center: Score */}
+                        {/* Center: Score + Gems */}
                         <View style={styles.topBarCenter}>
-                            <View style={[styles.scoreContainer, { borderColor: colors.error }]}>
-                                <Text variant="h4" color={colors.error} style={styles.scoreText}>{roundsWon.ai}</Text>
+                            {/* AI Gems */}
+                            <View style={styles.gemContainer}>
+                                <View style={[styles.gem, ai.health >= 1 ? styles.gemActiveAI : styles.gemInactive]} />
+                                <View style={[styles.gem, ai.health >= 2 ? styles.gemActiveAI : styles.gemInactive]} />
                             </View>
-                            <Text variant="caption" color={colors.arcane.emerald} style={{ marginHorizontal: 16, fontSize: 12, opacity: 0.5 }}>⫘</Text>
-                            <View style={[styles.scoreContainer, { borderColor: colors.arcane.emerald }]}>
-                                <Text variant="h4" color={colors.arcane.emerald} style={styles.scoreText}>{roundsWon.player}</Text>
+
+                            <View style={styles.scoreBoard}>
+                                <Text style={styles.scoreBoardText}>{roundsWon.ai}</Text>
+                                <Text style={styles.scoreBoardDivider}>:</Text>
+                                <Text style={styles.scoreBoardText}>{roundsWon.player}</Text>
+                            </View>
+
+                            {/* Player Gems */}
+                            <View style={styles.gemContainer}>
+                                <View style={[styles.gem, player.health >= 2 ? styles.gemActivePlayer : styles.gemInactive]} />
+                                <View style={[styles.gem, player.health >= 1 ? styles.gemActivePlayer : styles.gemInactive]} />
                             </View>
                         </View>
 
@@ -511,6 +521,40 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                             </View>
                         </View>
                     )}
+
+                    {/* Round End Overlay */}
+                    {phase === 'round_end' && !gameOver && (
+                        <View style={styles.overlay}>
+                            <Animated.View entering={FadeIn.delay(300)} style={styles.overlayCard}>
+                                <Text variant="caption" color={colors.text.disabled} style={{ letterSpacing: 4, marginBottom: 8 }}>ROUND {currentRound} COMPLETE</Text>
+                                
+                                <View style={styles.roundEndScores}>
+                                    <View style={styles.roundEndScoreItem}>
+                                        <Text variant="h3" color={colors.error}>{aiPower}</Text>
+                                        <Text variant="caption" color={colors.text.disabled}>VOID</Text>
+                                    </View>
+                                    <View style={styles.roundEndScoreDivider}>
+                                        <Text style={{ color: colors.arcane.emerald, fontSize: 24 }}>⚔</Text>
+                                    </View>
+                                    <View style={styles.roundEndScoreItem}>
+                                        <Text variant="h3" color={colors.arcane.emerald}>{playerPower}</Text>
+                                        <Text variant="caption" color={colors.text.disabled}>YOU</Text>
+                                    </View>
+                                </View>
+
+                                <Text variant="h4" color={colors.arcane.white} style={{ marginVertical: 20, fontFamily: 'serif', textAlign: 'center' }}>
+                                    {message?.toUpperCase()}
+                                </Text>
+
+                                <Pressable 
+                                    onPress={continueToNextRound} 
+                                    style={styles.overlayBtn}
+                                >
+                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>CONTINUE</Text>
+                                </Pressable>
+                            </Animated.View>
+                        </View>
+                    )}
                 </Animated.View>
             </BoardSurface>
         </View>
@@ -538,7 +582,65 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.3)',
     },
     topBarLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    topBarCenter: { flexDirection: 'row', alignItems: 'center' },
+    topBarCenter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+    },
+    gemContainer: {
+        flexDirection: 'row',
+        gap: 6,
+        paddingHorizontal: 12,
+    },
+    gem: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
+    },
+    gemActiveAI: {
+        backgroundColor: colors.error,
+        shadowColor: colors.error,
+        shadowOpacity: 0.8,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    gemActivePlayer: {
+        backgroundColor: colors.arcane.emerald,
+        shadowColor: colors.arcane.emerald,
+        shadowOpacity: 0.8,
+        shadowRadius: 4,
+        elevation: 4,
+    },
+    gemInactive: {
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    scoreBoard: {
+        flexDirection: 'row',
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        paddingHorizontal: 16,
+        paddingVertical: 4,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        alignItems: 'center',
+    },
+    scoreBoardText: {
+        color: colors.arcane.white,
+        fontSize: 16,
+        fontWeight: '900',
+        fontFamily: 'serif',
+        width: 20,
+        textAlign: 'center',
+    },
+    scoreBoardDivider: {
+        color: 'rgba(255,255,255,0.3)',
+        fontSize: 14,
+        marginHorizontal: 4,
+    },
     menuBtn: {
         paddingVertical: 6,
         paddingHorizontal: 16,
@@ -731,11 +833,26 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
     },
     overlayBtn: {
-        backgroundColor: colors.arcane.emeraldDark,
-        paddingVertical: 14,
+        backgroundColor: colors.arcane.emerald,
+        paddingHorizontal: 32,
+        paddingVertical: 12,
+        borderRadius: 4,
+        minWidth: 160,
+        alignItems: 'center',
+    },
+    roundEndScores: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
         paddingHorizontal: 40,
-        borderRadius: 2,
-        minWidth: 200,
-        alignItems: 'center'
+        marginTop: 10,
+    },
+    roundEndScoreItem: {
+        alignItems: 'center',
+        gap: 4,
+    },
+    roundEndScoreDivider: {
+        paddingHorizontal: 20,
     },
 });
