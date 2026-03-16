@@ -158,8 +158,8 @@ export const SIEGE_UNITS: Card[] = [
     createCard('Abomination', 'unit', 'epic', 6, 12, [], 'Stitched together from titans', 'A masterpiece of gore.', require('../../assets/units/abomination.jpg')),
     createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'Ruler of the burning planes', 'Kneel or burn.', require('../../assets/units/demon_prince.jpg')),
     createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'Firespitting beast of the abyss', 'The jaws that bite.', require('../../assets/units/hellhound.jpg')),
-    createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'Stone turned flesh and malice', 'Watch the skies.', require('../../assets/units/')),
-    createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'Enchanted bolts of shadow', 'Pierce the soul.', require('../../assets/units/')),
+    createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'Stone turned flesh and malice', 'Watch the skies.'),
+    createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'Enchanted bolts of shadow', 'Pierce the soul.'),
 ];
 
 // ============ SPELL CARDS ============

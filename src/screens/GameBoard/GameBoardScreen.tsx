@@ -398,26 +398,45 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                 <Text variant="caption" color={colors.arcane.cyan} style={styles.statLabel}>MANA</Text>
                             </View>
 
-                            <Pressable
-                                onPress={passTurn}
-                                disabled={!isPlayerTurn || player.hasPassed}
-                                style={({ pressed }) => [
-                                    styles.passButton,
-                                    pressed && { transform: [{ scale: 0.95 }] },
-                                    shouldHighlightPass && styles.passButtonHighlight,
-                                    player.hasPassed && styles.passButtonDisabled
-                                ]}
-                            >
-                                <LinearGradient
-                                    colors={player.hasPassed ? [colors.arcane.obsidian, colors.arcane.graphite] : [colors.arcane.emerald, colors.arcane.emeraldDark]}
-                                    style={StyleSheet.absoluteFill}
-                                />
-                                <View style={styles.passButtonInner}>
-                                    <Text variant="button" color={player.hasPassed ? colors.text.disabled : colors.arcane.white} style={{ fontWeight: '900', fontSize: 10, letterSpacing: 2 }}>
-                                        {player.hasPassed ? "PASSED" : "END TURN"}
+                            {/* Bottom action cluster: Hero Ability + End Turn */}
+                            <View style={styles.actionCluster}>
+                                {/* Hero Ability — compact pill */}
+                                <Pressable
+                                    onPress={useHeroAbility}
+                                    disabled={!isPlayerTurn || player.hero.ability.currentCooldown > 0 || player.hasPassed}
+                                    style={({ pressed }) => [
+                                        styles.heroAbilityButton,
+                                        isPlayerTurn && player.hero.ability.currentCooldown === 0 && !player.hasPassed && styles.heroAbilityActive,
+                                        player.hero.ability.currentCooldown > 0 && styles.heroAbilityDisabled,
+                                        pressed && isPlayerTurn && player.hero.ability.currentCooldown === 0 && { transform: [{ scale: 0.93 }] },
+                                    ]}
+                                >
+                                    <Text style={{ fontSize: 10, color: player.hero.ability.currentCooldown > 0 ? colors.text.disabled : colors.arcane.white, fontWeight: '900', letterSpacing: 1 }}>
+                                        {player.hero.ability.currentCooldown > 0 ? '◇ USED' : `⚡ ${player.hero.ability.name.toUpperCase()}`}
                                     </Text>
-                                </View>
-                            </Pressable>
+                                </Pressable>
+
+                                <Pressable
+                                    onPress={passTurn}
+                                    disabled={!isPlayerTurn || player.hasPassed}
+                                    style={({ pressed }) => [
+                                        styles.passButton,
+                                        pressed && { transform: [{ scale: 0.95 }] },
+                                        shouldHighlightPass && styles.passButtonHighlight,
+                                        player.hasPassed && styles.passButtonDisabled
+                                    ]}
+                                >
+                                    <LinearGradient
+                                        colors={player.hasPassed ? [colors.arcane.obsidian, colors.arcane.graphite] : [colors.arcane.emerald, colors.arcane.emeraldDark]}
+                                        style={StyleSheet.absoluteFill}
+                                    />
+                                    <View style={styles.passButtonInner}>
+                                        <Text variant="button" color={player.hasPassed ? colors.text.disabled : colors.arcane.white} style={{ fontWeight: '900', fontSize: 10, letterSpacing: 2 }}>
+                                            {player.hasPassed ? "PASSED" : "END TURN"}
+                                        </Text>
+                                    </View>
+                                </Pressable>
+                            </View>
                         </View>
 
                     </View>
@@ -543,8 +562,8 @@ const styles = StyleSheet.create({
         borderLeftWidth: 1,
         borderLeftColor: 'rgba(16, 185, 129, 0.05)',
         alignItems: 'center',
-        paddingVertical: 20,
-        gap: 20,
+        paddingVertical: 12,
+        gap: 12,
         justifyContent: 'flex-end',
     },
     avatarMini: {
@@ -568,9 +587,15 @@ const styles = StyleSheet.create({
     },
     powerText: { fontWeight: '900', fontFamily: 'serif', fontSize: 20 },
     statLabel: { fontSize: 8, letterSpacing: 1.5, opacity: 0.6, fontWeight: '900', fontFamily: 'serif' },
+    actionCluster: {
+        marginTop: 'auto',
+        alignItems: 'center',
+        gap: 6,
+        paddingBottom: 8,
+    },
     passButton: {
-        width: 90, height: 44, borderRadius: 2, alignItems: 'center', justifyContent: 'center',
-        marginTop: 'auto', marginBottom: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.2)',
+        width: 90, height: 36, borderRadius: 2, alignItems: 'center', justifyContent: 'center',
+        overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.2)',
     },
     passButtonInner: {
         width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center',
@@ -579,6 +604,25 @@ const styles = StyleSheet.create({
         borderColor: colors.arcane.emerald, shadowColor: colors.arcane.emerald, shadowRadius: 8, shadowOpacity: 0.5,
     },
     passButtonDisabled: { opacity: 0.4 },
+    heroAbilityButton: {
+        width: 90,
+        height: 28,
+        borderRadius: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(16, 185, 129, 0.15)',
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    },
+    heroAbilityActive: {
+        borderColor: colors.arcane.emerald,
+        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+    },
+    heroAbilityDisabled: {
+        opacity: 0.4,
+        borderColor: 'rgba(255,255,255,0.05)',
+        backgroundColor: 'rgba(0,0,0,0.3)',
+    },
     boardArea: {
         flex: 1,
         paddingHorizontal: 16,

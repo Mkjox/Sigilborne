@@ -225,9 +225,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set({
                 ...newState,
                 message: message || 'Used Hero Ability',
+                currentVFX: 'boost' as const,
             });
-            // End turn after ability
-            get().endTurn();
+            // Hero ability is a FREE ACTION — does not end the turn.
+            // Player can still play a card or pass after using it.
         } else {
             set({ message: message || 'Cannot use ability' });
         }
@@ -453,6 +454,34 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     } else {
                         // Player's turn
                         set({ currentTurn: 'player', isAIThinking: false });
+                    }
+                } else if (decision.action === 'ability') {
+                    // AI uses hero ability
+                    const aiGameState: GameState = {
+                        currentRound: currentState.currentRound,
+                        roundsWon: currentState.roundsWon,
+                        currentTurn: 'ai',
+                        phase: currentState.phase,
+                        player: currentState.player,
+                        ai: currentState.ai,
+                        roundHistory: currentState.roundHistory,
+                        gameOver: currentState.gameOver,
+                        winner: currentState.winner,
+                    };
+
+                    const { newState, success, message: abilityMsg } = engineUseHeroAbility(aiGameState);
+
+                    if (success) {
+                        set({
+                            ...newState,
+                            isAIThinking: false,
+                            message: abilityMsg || `AI used ${currentState.ai.hero.ability.name}`,
+                        });
+                        // AI ability is also a free action — re-trigger AI to play a card or pass
+                        get().triggerAI();
+                    } else {
+                        // Fallback to pass if ability fails
+                        set({ currentTurn: 'player', isAIThinking: false, message: 'AI passed' });
                     }
                 } else if (decision.cardId) {
                     // AI plays a card

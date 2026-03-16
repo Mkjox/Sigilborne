@@ -373,36 +373,41 @@ export const useHeroAbility = (state: GameState): { newState: GameState, success
 
     // Execute ability
     const abilityType = playerState.hero.ability.type;
+
+    // Determine the correct value for each ability type
+    let abilityValue = playerState.hero.ability.value ?? 0;
+    if (abilityValue === 0) {
+        // Fallback defaults based on ability type
+        if (abilityType === 'boost_all') abilityValue = 1;
+        else if (abilityType === 'damage_strongest') abilityValue = 2;
+        else abilityValue = 1;
+    }
+
+    const dummyAbilityCard = {
+        id: 'hero_ability',
+        name: playerState.hero.ability.name,
+        abilities: [{ type: abilityType, value: abilityValue }]
+    } as Card;
+
     const context: AbilityContext = {
         state: state,
-        card: {} as Card, // Dummy card for hero ability context if needed, or update AbilityContext to allow optional card
+        card: dummyAbilityCard,
         player: player,
         updateState: () => { },
     };
 
-    // Execute logic directly since card is mocked
-    // Ideally executeAbility handles it. 
-    // We need a dummy card with the ability
-    const dummyAbilityCard = {
-        id: 'hero_ability',
-        name: playerState.hero.ability.name,
-        abilities: [{ type: abilityType, value: 0 }] // Value configurable?
-    } as Card;
-
-    context.card = dummyAbilityCard;
-
     executeAbility(dummyAbilityCard.abilities[0], context);
 
-    // Set cooldown (e.g., once per game or per round? Config says 3? )
+    // Set cooldown to the hero's configured cooldown (resets each round)
     const newState = { ...state };
-    newState[player].hero.ability.currentCooldown = 99; // Used once per game usually? Or set to max.
+    newState[player].hero.ability.currentCooldown = playerState.hero.ability.cooldown;
 
     return { newState, success: true, message: "Hero ability used" };
 };
 
 // Setup next round
 export const startNextRound = (state: GameState): GameState => {
-    // Move all board cards to graveyard
+    // Move all board cards to graveyard and reset hero ability cooldown
     const moveToGraveyard = (player: PlayerState): PlayerState => {
         const allBoardCards = [...player.board];
 
@@ -412,6 +417,13 @@ export const startNextRound = (state: GameState): GameState => {
             graveyard: [...player.graveyard, ...allBoardCards],
             hasPassed: false,
             mana: player.maxMana, // Restore mana
+            hero: {
+                ...player.hero,
+                ability: {
+                    ...player.hero.ability,
+                    currentCooldown: 0, // Reset hero ability each round
+                },
+            },
         };
     };
 

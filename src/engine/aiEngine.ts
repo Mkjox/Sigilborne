@@ -3,9 +3,8 @@ import { Card } from '../types';
 
 // AI decision result
 export interface AIDecision {
-    action: 'play' | 'pass';
+    action: 'play' | 'pass' | 'ability';
     cardId?: string;
-    // targetRow removed
 }
 
 // Get total power on board for a player
@@ -38,6 +37,11 @@ const mediumAI = (state: GameState): AIDecision => {
 
     const aiPower = getTotalPower(state, 'ai');
     const playerPower = getTotalPower(state, 'player');
+
+    // Use hero ability if available and behind
+    if (state.ai.hero.ability.currentCooldown === 0 && aiPower < playerPower && state.ai.board.length > 0) {
+        return { action: 'ability' };
+    }
 
     // Strategic passing
     if (affordableCards.length === 0) {
@@ -79,7 +83,24 @@ const hardAI = (state: GameState): AIDecision => {
     // const aiRoundsWon = state.roundsWon.ai;
 
     if (affordableCards.length === 0) {
+        // Last resort: try hero ability before passing
+        if (state.ai.hero.ability.currentCooldown === 0 && state.ai.board.length > 0) {
+            return { action: 'ability' };
+        }
         return { action: 'pass' };
+    }
+
+    // Strategic hero ability usage
+    if (state.ai.hero.ability.currentCooldown === 0 && state.ai.board.length >= 3) {
+        const abilityType = state.ai.hero.ability.type;
+        // Rally (boost_all): Use when we have many units on board
+        if (abilityType === 'boost_all' || abilityType === 'boost_row') {
+            return { action: 'ability' };
+        }
+        // Dark Command (damage_strongest): Use when enemy has a strong unit
+        if (abilityType === 'damage_strongest' && playerPower > aiPower) {
+            return { action: 'ability' };
+        }
     }
 
     // 1. Victory Condition: If we can pass and win the round/game, do it.
