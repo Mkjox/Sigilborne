@@ -154,6 +154,8 @@ export const ShaderLibrary = {
     voidNebula: Skia.RuntimeEffect.Make(`
         uniform float u_time;
         uniform vec2 u_resolution;
+        uniform vec3 u_color_primary;
+        uniform vec3 u_color_secondary;
 
         // Standard hash/noise functions
         float hash(vec2 p) {
@@ -191,8 +193,8 @@ export const ShaderLibrary = {
             float n1 = fbm(p + vec2(t, t * 0.5));
             float n2 = fbm(p - n1 + t * 0.3);
             
-            vec3 darkSky = vec3(0.02, 0.03, 0.05);
-            vec3 emeraldGlow = vec3(0.02, 0.15, 0.1);
+            vec3 darkSky = u_color_secondary;
+            vec3 emeraldGlow = u_color_primary;
             
             vec3 color = mix(darkSky, emeraldGlow, n2 * 0.8);
             

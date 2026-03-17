@@ -10,6 +10,7 @@ import { GameBoardScreen } from '../screens/GameBoard';
 import { DeckBuilderScreen } from '../screens/DeckBuilder';
 import { CollectionScreen } from '../screens/Collection';
 import { SettingsScreen } from '../screens/Settings';
+import { CampaignMapScreen } from '../screens/Campaign/CampaignMapScreen';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -49,6 +50,13 @@ export const RootNavigator: React.FC = () => {
                 <Stack.Screen
                     name="GameBoard"
                     component={GameBoardScreen}
+                    options={{
+                        animationEnabled: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="CampaignMap"
+                    component={CampaignMapScreen}
                     options={{
                         animationEnabled: true,
                     }}

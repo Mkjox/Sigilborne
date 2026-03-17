@@ -68,7 +68,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
 
     const handleEnterVoid = () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        navigation.navigate('GameBoard', { difficulty: 'medium' });
+        navigation.navigate('CampaignMap');
     };
 
     return (

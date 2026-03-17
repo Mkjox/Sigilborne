@@ -63,6 +63,8 @@ export const MainMenuSkiaBackground: React.FC = () => {
     const nebulaUniforms = useDerivedValue(() => ({
         u_time: time.value * 0.5,
         u_resolution: [width, height],
+        u_color_primary: [0.02, 0.15, 0.1], // Original emerald glow
+        u_color_secondary: [0.02, 0.03, 0.05], // Original dark sky
     }), [width, height, time]);
 
     return (

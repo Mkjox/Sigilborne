@@ -120,7 +120,7 @@ export const GameBoardScreen: React.FC<Props> = (props) => {
 };
 
 const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
-    const difficulty = route.params?.difficulty || 'medium';
+    const { difficulty = 'medium', stageId } = route.params || {};
     const insets = useSafeAreaInsets();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
@@ -314,9 +314,17 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                             </View>
 
                             <View style={styles.scoreBoard}>
-                                <Text style={styles.scoreBoardText}>{roundsWon.ai}</Text>
-                                <Text style={styles.scoreBoardDivider}>:</Text>
-                                <Text style={styles.scoreBoardText}>{roundsWon.player}</Text>
+                                {stageId ? (
+                                    <Text variant="caption" color={colors.arcane.emerald} style={{ letterSpacing: 2, fontWeight: '900' }}>
+                                        STAGE {stageId}
+                                    </Text>
+                                ) : (
+                                    <>
+                                        <Text style={styles.scoreBoardText}>{roundsWon.ai}</Text>
+                                        <Text style={styles.scoreBoardDivider}>:</Text>
+                                        <Text style={styles.scoreBoardText}>{roundsWon.player}</Text>
+                                    </>
+                                )}
                             </View>
 
                             {/* Player Gems */}
