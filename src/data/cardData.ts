@@ -169,23 +169,23 @@ export const SPELL_CARDS: Card[] = [
     createCard("Commander's Horn", 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Double the power of a row', require('../../assets/units/commanders_horn.jpg')),
     createCard('Decoy', 'spell', 'common', 1, undefined, [], 'Return a unit to your hand', require('../../assets/units/decoy.jpg')),
     createCard('Scorch', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Destroy the strongest units', require('../../assets/units/scorch.jpg')),
-    createCard('Resurrection', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Revive a unit from graveyard'),
+    createCard('Resurrection', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Revive a unit from graveyard', require('../../assets/units/resurrection.jpg')),
     // Sinister Expansion
-    createCard('Dark Pact', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Sacrifice essence to revive a unit'),
-    createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Obliterate the strongest units'),
-    createCard('Life Drain', 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Siphon power to boost allies'),
-    createCard('Raise Dead', 'spell', 'common', 2, undefined, [ABILITIES.MEDIC()], 'The dead obey their master.'),
+    createCard('Dark Pact', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Sacrifice essence to revive a unit', require('../../assets/units/dark_pact.jpg')),
+    createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Obliterate the strongest units', require('../../assets/units/void_bolt.jpg')),
+    createCard('Life Drain', 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Siphon power to boost allies', require('../../assets/units/life_drain.jpg')),
+    createCard('Raise Dead', 'spell', 'common', 2, undefined, [ABILITIES.MEDIC()], 'The dead obey their master.', require('../../assets/units/raise_dead.jpg')),
 ];
 
 // ============ WEATHER CARDS ============
 
 export const WEATHER_CARDS: Card[] = [
-    createCard('Biting Frost', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Sets melee units to 1 power'),
-    createCard('Impenetrable Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Sets ranged units to 1 power'),
-    createCard('Clear Skies', 'weather', 'common', 0, undefined, [ABILITIES.CLEAR_WEATHER()], 'Removes all weather effects'),
+    createCard('Biting Frost', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Sets melee units to 1 power', require('../../assets/units/biting_frost.jpg')),
+    createCard('Impenetrable Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Sets ranged units to 1 power', require('../../assets/units/impenetrable_fog.jpg')),
+    createCard('Clear Skies', 'weather', 'common', 0, undefined, [ABILITIES.CLEAR_WEATHER()], 'Removes all weather effects', require('../../assets/units/clear_skies.jpg')),
     // Sinister Expansion
-    createCard('Corrupt Ground', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Melee units lose their resolve'),
-    createCard('Wailing Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Ranged units lose their sight'),
+    createCard('Corrupt Ground', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Melee units lose their resolve', require('../../assets/units/corrupt_ground.jpg')),
+    createCard('Wailing Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Ranged units lose their sight', require('../../assets/units/wailing_fog.jpg')),
 ];
 
 // ============ HEROES ============
@@ -206,7 +206,7 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 3,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/hero_commander.jpg'),
+        artwork: require('../../assets/heroes/hero_commander.jpg'),
         className: 'Warrior',
     },
     {
@@ -224,7 +224,7 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 3,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/hero_darklord.jpg'),
+        artwork: require('../../assets/heroes/hero_darklord.jpg'),
         className: 'Warlock',
     },
     {
