@@ -27,12 +27,15 @@ import Animated, {
     runOnJS,
     SharedValue,
 } from 'react-native-reanimated';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { RootStackParamList, Difficulty } from '../../types';
 import { Text } from '../../components/ui';
 import { colors, spacing, borderRadius, shadows } from '../../theme';
 import { CampaignMapSkiaBackground } from './components/CampaignMapSkiaBackground';
 import { MapParallaxLayers } from './components/MapParallaxLayers';
-import { TOTAL_STAGES, Stage, MAP_BIOMES } from './constants';
+import { TOTAL_STAGES, MAP_BIOMES } from './constants';
+import { generateCampaignMap, MapNode as MapNodeTypeData } from '../../data/campaignData';
+import { useCampaignStore } from '../../store/campaignStore';
 
 type CampaignMapNavigationProp = StackNavigationProp<RootStackParamList, 'CampaignMap'>;
 
@@ -58,29 +61,11 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
     const [stageModalVisible, setStageModalVisible] = useState(false);
     const [visibleRange, setVisibleRange] = useState({ start: 0, end: 30 }); // Initial window
 
-    // Generate 200 stages with centered zigzag + branching
-    const stages = useMemo(() => {
-        const items: Stage[] = [];
-        // We generate from 1 to 200
-        for (let i = 1; i <= TOTAL_STAGES; i++) {
-            const isBranchPoint = i % 15 === 0 && i < TOTAL_STAGES - 10;
-            const basePos = 50 + (Math.sin(i * 0.5) * 22);
-            
-            if (isBranchPoint) {
-                // Point where road splits
-                items.push({ id: i, x: 50, connections: [i + 1, i + 2] });
-                // Add two parallel nodes
-                items.push({ id: i + 1, x: 25, branch: 'left', connections: [i + 3] });
-                items.push({ id: i + 2, x: 75, branch: 'right', connections: [i + 3] });
-                i += 2;
-            } else {
-                items.push({ id: i, x: basePos, connections: [i + 1] });
-            }
-        }
-        // To keep Level 1 at the bottom of the ScrollView, 
-        // we'll render them in reverse order of "logical rows"
-        return items;
-    }, []);
+    // Use deterministic generation
+    const stages = useMemo(() => generateCampaignMap(TOTAL_STAGES), []);
+    
+    // Campaign State
+    const { currentNodeId, completedNodes, advanceToNode } = useCampaignStore();
 
     // Calculate logical row for each stage to determine vertical position
     const stageLayouts = useMemo(() => {
@@ -158,8 +143,20 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
     const handlePlayStage = () => {
         if (selectedStage) {
             setStageModalVisible(false);
+            const stageData = stages.find(s => s.id === selectedStage);
+            
+            // Actually advance the node in the store when they press play
+            // In a real flow, this might happen AFTER winning.
+            advanceToNode(selectedStage);
+
+            if (stageData?.type === 'shop' || stageData?.type === 'event' || stageData?.type === 'rest') {
+                // Placeholder for non-battle nodes
+                console.log(`Entered ${stageData.type} node`);
+                return;
+            }
+
             navigation.navigate('GameBoard', { 
-                difficulty: selectedDifficulty,
+                difficulty: stageData?.difficulty || selectedDifficulty,
                 stageId: selectedStage 
             });
         }
@@ -242,12 +239,20 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                     );
                                 })}
 
-                                <MapNode 
+                                <MapNodeComponent 
                                     stage={stage}
                                     isBoss={isBoss}
                                     layout={layout}
                                     isActive={selectedStage === stage.id}
-                                    onPress={handleStagePress}
+                                    isCurrent={currentNodeId === stage.id}
+                                    isCompleted={completedNodes.includes(stage.id)}
+                                    isLocked={stage.id > currentNodeId}
+                                    onPress={() => {
+                                        if (stage.id > currentNodeId) {
+                                            return; // Locked!
+                                        }
+                                        handleStagePress(stage.id);
+                                    }}
                                 />
                             </React.Fragment>
                         );
@@ -379,18 +384,21 @@ const BiomeHeader: React.FC<{ scrollY: SharedValue<number>, totalHeight: number 
     );
 };
 
-const MapNode = React.memo<{
-    stage: Stage;
+const MapNodeComponent = React.memo<{
+    stage: MapNodeTypeData;
     isBoss: boolean;
     layout: { top: number; left: number };
     isActive: boolean;
+    isCurrent: boolean;
+    isCompleted: boolean;
+    isLocked: boolean;
     onPress: (id: number) => void;
-}>(({ stage, isBoss, layout, isActive, onPress }) => {
+}>(({ stage, isBoss, layout, isActive, isCurrent, isCompleted, isLocked, onPress }) => {
     const NODE_SIZE = isBoss ? 70 : 54;
     const pulse = useSharedValue(1);
 
     React.useEffect(() => {
-        if (isActive || isBoss) {
+        if (isCurrent || isActive) {
             pulse.value = withRepeat(
                 withTiming(1.15, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
                 -1,
@@ -399,7 +407,7 @@ const MapNode = React.memo<{
         } else {
             pulse.value = 1;
         }
-    }, [isActive, isBoss]);
+    }, [isActive, isCurrent]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
@@ -407,6 +415,18 @@ const MapNode = React.memo<{
             { scale: pulse.value }
         ]
     }));
+
+    const getIcon = () => {
+        const color = isLocked ? colors.text.disabled : (isCurrent || isActive ? colors.arcane.obsidian : isBoss ? colors.arcane.white : colors.arcane.emerald);
+        const size = isBoss ? 28 : 20;
+        
+        if (stage.type === 'shop') return <MaterialCommunityIcons name="diamond-stone" size={size} color={color} />;
+        if (stage.type === 'rest') return <MaterialCommunityIcons name="tent" size={size} color={color} />;
+        if (stage.type === 'event') return <MaterialCommunityIcons name="map-marker-question" size={size} color={color} />;
+        if (stage.type === 'elite') return <MaterialCommunityIcons name="star-shooting" size={size} color={color} />;
+        if (stage.type === 'boss') return <MaterialCommunityIcons name="skull" size={size} color={color} />;
+        return <MaterialCommunityIcons name="shield-sword" size={size} color={color} />;
+    };
 
     return (
         <AnimatedPressable
@@ -419,6 +439,7 @@ const MapNode = React.memo<{
                     top: layout.top,
                     left: layout.left,
                     zIndex: isBoss ? 5 : 2,
+                    opacity: isLocked ? 0.4 : 1,
                 },
                 animatedStyle
             ]}
@@ -435,9 +456,9 @@ const MapNode = React.memo<{
 
             <LinearGradient
                 colors={
-                    isActive 
+                    isCurrent || isActive
                         ? [colors.arcane.emerald, colors.arcane.emeraldDark] 
-                        : isBoss 
+                        : isBoss && !isLocked
                             ? ['#f59e0b', '#78350f'] 
                             : [colors.arcane.graphite, colors.arcane.obsidian]
                 }
@@ -449,7 +470,7 @@ const MapNode = React.memo<{
                 ]}
             >
                 <Text variant={isBoss ? "body" : "caption"} color={isActive ? colors.arcane.obsidian : isBoss ? colors.arcane.white : colors.arcane.emerald} style={styles.nodeText}>
-                    {stage.id}
+                    {getIcon()}
                 </Text>
             </LinearGradient>
         </AnimatedPressable>

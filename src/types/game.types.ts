@@ -1,8 +1,12 @@
 import { Card } from './card.types';
 import { Hero } from './hero.types';
 
-// Game phases
+// Game phases (round-level)
 export type GamePhase = 'mulligan' | 'draw' | 'main' | 'combat' | 'round_end' | 'end';
+
+// Turn phases (within a single turn — finer granularity)
+export type TurnPhase = 'start_of_turn' | 'main' | 'combat' | 'end_of_turn';
+
 export type PlayerType = 'player' | 'ai';
 
 // Board structure (Single Zone)
@@ -39,6 +43,7 @@ export interface GameState {
     };
     currentTurn: PlayerType;
     phase: GamePhase;
+    turnPhase?: TurnPhase;
     player: PlayerState;
     ai: PlayerState;
     weather: {

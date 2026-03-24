@@ -2,8 +2,11 @@ import { colors } from '../../theme';
 
 export const TOTAL_STAGES = 200;
 
+export type MapNodeType = 'battle' | 'elite' | 'boss' | 'shop' | 'event' | 'rest';
+
 export interface Stage {
     id: number;
+    type: MapNodeType;
     x: number;
     branch?: 'left' | 'right';
     connections: number[];

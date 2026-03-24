@@ -1,5 +1,6 @@
 import { Card } from '../types';
 import { GameState, PlayerType, BoardState } from '../types';
+import { BOND_MULTIPLIER, STARTING_HEALTH } from './rules';
 
 // Game context passed to ability effects
 export interface AbilityContext {
@@ -33,7 +34,7 @@ export const calculateBoardPower = (
         // Bond (Tight Bond) - Check only within own board
         const count = board.filter(c => c.name === card.name).length;
         if (count > 1 && card.abilities.some(a => a.type === 'bond')) {
-            power *= 2;
+            power *= BOND_MULTIPLIER;
         }
 
         totalPower += power;
@@ -98,7 +99,7 @@ export const abilityEffects = {
         // Double all cards with same name if there are multiples
         if (sameNameCards.length > 1) {
             sameNameCards.forEach(c => {
-                c.power = (c.power || 0) * 2;
+                c.power = (c.power || 0) * BOND_MULTIPLIER;
             });
         }
     },
@@ -282,7 +283,7 @@ export const abilityEffects = {
         
         state[currentPlayer].health = Math.min(
             state[currentPlayer].health + healValue,
-            2 // Baseline max lives
+            STARTING_HEALTH
         );
     },
 
@@ -334,11 +335,183 @@ export const abilityEffects = {
     },
 };
 
-// Execute an ability
-export const executeAbility = (
-    ability: { type: string },
+// ─── Effect Graph Resolution ────────────────────────────────────
+import { TargetSelector, OperationType, EffectGraph, Ability } from '../types';
+
+/**
+ * Resolve targets based on a TargetSelector.
+ * Returns an array of card references that the operation should apply to.
+ */
+const resolveTargets = (
+    selector: TargetSelector,
+    context: AbilityContext
+): Card[] => {
+    const { state, card, player } = context;
+    const currentPlayer = player === 'player' ? 'player' : 'ai';
+    const enemyPlayer = player === 'player' ? 'ai' : 'player';
+    const allyBoard = state[currentPlayer].board;
+    const enemyBoard = state[enemyPlayer].board;
+
+    switch (selector.type) {
+        case 'self':
+            return [card];
+
+        case 'adjacent': {
+            const idx = allyBoard.findIndex(c => c.id === card.id);
+            const targets: Card[] = [];
+            if (idx > 0) targets.push(allyBoard[idx - 1]);
+            if (idx < allyBoard.length - 1) targets.push(allyBoard[idx + 1]);
+            return targets;
+        }
+
+        case 'all_allies':
+            return [...allyBoard];
+
+        case 'all_enemies':
+            return [...enemyBoard];
+
+        case 'strongest_enemy': {
+            if (enemyBoard.length === 0) return [];
+            const maxPower = Math.max(...enemyBoard.map(c => c.power || 0));
+            return enemyBoard.filter(c => c.power === maxPower).slice(0, 1);
+        }
+
+        case 'weakest_enemy': {
+            if (enemyBoard.length === 0) return [];
+            const minPower = Math.min(...enemyBoard.map(c => c.power || 0));
+            return enemyBoard.filter(c => c.power === minPower).slice(0, 1);
+        }
+
+        case 'random_enemy': {
+            if (enemyBoard.length === 0) return [];
+            return [enemyBoard[Math.floor(Math.random() * enemyBoard.length)]];
+        }
+
+        case 'random_ally': {
+            if (allyBoard.length === 0) return [];
+            return [allyBoard[Math.floor(Math.random() * allyBoard.length)]];
+        }
+
+        case 'all_units':
+            return [...allyBoard, ...enemyBoard];
+
+        default:
+            return [];
+    }
+};
+
+/**
+ * Apply an operation to a set of resolved targets.
+ */
+const applyOperation = (
+    operation: OperationType,
+    targets: Card[],
     context: AbilityContext
 ): void => {
+    const { state, player } = context;
+    const currentPlayer = player === 'player' ? 'player' : 'ai';
+    const enemyPlayer = player === 'player' ? 'ai' : 'player';
+
+    switch (operation.type) {
+        case 'boost':
+            targets.forEach(t => {
+                t.power = (t.power || 0) + operation.value;
+            });
+            break;
+
+        case 'damage':
+            targets.forEach(t => {
+                t.power = (t.power || 0) - operation.value;
+                if (t.power <= 0) {
+                    // Move to graveyard
+                    const owner = state[currentPlayer].board.includes(t) ? currentPlayer : enemyPlayer;
+                    const board = state[owner].board;
+                    const idx = board.findIndex(c => c.id === t.id);
+                    if (idx !== -1) {
+                        const [dead] = board.splice(idx, 1);
+                        state[owner].graveyard.push(dead);
+                    }
+                }
+            });
+            break;
+
+        case 'destroy':
+            targets.forEach(t => {
+                const owner = state[currentPlayer].board.includes(t) ? currentPlayer : enemyPlayer;
+                const board = state[owner].board;
+                const idx = board.findIndex(c => c.id === t.id);
+                if (idx !== -1) {
+                    const [removed] = board.splice(idx, 1);
+                    state[owner].graveyard.push(removed);
+                }
+            });
+            break;
+
+        case 'revive': {
+            const graveyard = state[currentPlayer].graveyard;
+            const unitIdx = graveyard.findIndex(c => c.type === 'unit');
+            if (unitIdx !== -1) {
+                const revived = graveyard.splice(unitIdx, 1)[0];
+                state[currentPlayer].board.push(revived);
+            }
+            break;
+        }
+
+        case 'draw': {
+            const { newDeck, newHand } = drawCards(
+                state[currentPlayer].deck,
+                state[currentPlayer].hand,
+                operation.value
+            );
+            state[currentPlayer].deck = newDeck;
+            state[currentPlayer].hand = newHand;
+            break;
+        }
+
+        case 'heal': {
+            const { STARTING_HEALTH: maxHealth } = require('./rules');
+            state[currentPlayer].health = Math.min(
+                state[currentPlayer].health + operation.value,
+                maxHealth
+            );
+            break;
+        }
+
+        case 'multiply':
+            targets.forEach(t => {
+                t.power = (t.power || 0) * operation.value;
+            });
+            break;
+    }
+};
+
+/**
+ * Execute an EffectGraph: resolve targets → apply operation.
+ */
+export const resolveEffectGraph = (
+    graph: EffectGraph,
+    context: AbilityContext
+): void => {
+    const targets = resolveTargets(graph.target, context);
+    applyOperation(graph.operation, targets, context);
+};
+
+// ─── Main Entry Point ───────────────────────────────────────────
+/**
+ * Execute an ability. Prefers the new EffectGraph when present,
+ * falls back to legacy type-string handlers for backward compatibility.
+ */
+export const executeAbility = (
+    ability: { type: string; effectGraph?: EffectGraph },
+    context: AbilityContext
+): void => {
+    // Prefer EffectGraph if available
+    if (ability.effectGraph) {
+        resolveEffectGraph(ability.effectGraph, context);
+        return;
+    }
+
+    // Legacy fallback
     const effect = abilityEffects[ability.type as keyof typeof abilityEffects];
     if (effect) {
         effect(context);

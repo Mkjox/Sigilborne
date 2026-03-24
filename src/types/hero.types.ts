@@ -1,4 +1,4 @@
-import { Ability } from './card.types';
+import { Ability, Faction } from './card.types';
 
 export interface HeroAbility extends Ability {
     cooldown: number;
@@ -11,6 +11,7 @@ export interface Hero {
     name: string;
     health: number;
     maxHealth: number;
+    faction: Faction;
     ability: HeroAbility;
     artwork: any;
     className: string; // e.g., "Warrior", "Mage", "Ranger"

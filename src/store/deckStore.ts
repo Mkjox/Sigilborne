@@ -2,7 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Card } from '../types';
-import { getAllCards } from '../data/cardData';
+import { getAllCards, AVAILABLE_HEROES } from '../data/cardData';
+import { MAX_DECK_SIZE, MAX_COPIES_PER_CARD } from '../engine/rules';
 
 // Helper to create unique IDs
 const createId = () => Math.random().toString(36).substring(2, 11);
@@ -72,10 +73,16 @@ export const useDeckStore = create<DeckStore>()(
                 set(state => ({
                     decks: state.decks.map(d => {
                         if (d.id !== deckId) return d;
-                        // Max 25 cards, max 2 copies of same card
-                        if (d.cards.length >= 25) return d;
+                        if (d.cards.length >= MAX_DECK_SIZE) return d;
+                        
+                        // Enforce faction constraint
+                        const hero = AVAILABLE_HEROES.find(h => h.id === d.heroId);
+                        if (card.faction && card.faction !== 'neutral' && hero && card.faction !== hero.faction) {
+                            return d; // Invalid faction
+                        }
+                        
                         const copies = d.cards.filter(c => c.name === card.name).length;
-                        if (copies >= 2) return d;
+                        if (copies >= MAX_COPIES_PER_CARD) return d;
                         return { ...d, cards: [...d.cards, { ...card, id: createId() }] };
                     }),
                 }));

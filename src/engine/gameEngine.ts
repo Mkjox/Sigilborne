@@ -1,9 +1,11 @@
-import { GameState, PlayerType, PlayerState, BoardState, Difficulty, RoundInfo } from '../types';
+import { GameState, PlayerType, PlayerState, BoardState, Difficulty, RoundInfo, TurnPhase } from '../types';
 import { Card } from '../types';
 import { createStarterDeck, createAIDeck } from '../data/cardData';
 import { shuffleArray, drawCards, calculateBoardPower, executeAbility, AbilityContext } from './abilitySystem';
 import { Hero } from '../types/hero.types';
 import { AVAILABLE_HEROES } from '../data/cardData';
+import { STARTING_HAND_SIZE, MAX_ROUNDS, ROUNDS_TO_WIN, MANA_PER_ROUND, STARTING_HEALTH, DRAW_PER_ROUND } from './rules';
+import { EventBus } from './eventBus';
 
 // Weather state tracking
 export interface WeatherState {
@@ -12,10 +14,35 @@ export interface WeatherState {
     siege: boolean;
 }
 
-// Constants
-const STARTING_HAND_SIZE = 10;
-const MAX_ROUNDS = 3;
-const ROUNDS_TO_WIN = 2;
+// ─── Turn Phase Helpers ─────────────────────────────────────────
+export const advanceTurnPhase = (state: GameState, eventBus?: EventBus): GameState => {
+    if (state.gameOver || state[state.currentTurn].hasPassed) return state;
+
+    const newState = { ...state };
+    const current = state.currentTurn;
+
+    switch (state.turnPhase) {
+        case 'start_of_turn':
+            newState.turnPhase = 'main';
+            // Here is where 'passive' start_of_turn abilities would fire
+            break;
+        case 'main':
+            newState.turnPhase = 'combat';
+            break;
+        case 'combat':
+            newState.turnPhase = 'end_of_turn';
+            // Auto-advance to next player's start_of_turn
+            return endTurn(newState, eventBus);
+        case 'end_of_turn':
+        default:
+            newState.turnPhase = 'start_of_turn';
+            eventBus?.emit('TURN_STARTED', { player: current });
+            break;
+    }
+    return newState;
+};
+
+// Constants are now imported from './rules'
 
 // Create initial player state
 const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: Hero): PlayerState => {
@@ -25,9 +52,9 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: He
     return {
         id,
         type,
-        health: 2, // 2 "lives" for best of 3
-        mana: 10, // Simplified: fixed mana per round
-        maxMana: 10,
+        health: STARTING_HEALTH,
+        mana: MANA_PER_ROUND,
+        maxMana: MANA_PER_ROUND,
         deck: newDeck,
         hand: newHand,
         board: [], // Single zone board
@@ -47,8 +74,8 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: He
                 currentCooldown: 0,
             },
             artwork: type === 'player'
-                ? require('../../assets/units/hero_commander.jpg')
-                : require('../../assets/units/hero_darklord.jpg'),
+                ? require('../../assets/heroes/hero_commander.jpg')
+                : require('../../assets/heroes/hero_darklord.jpg'),
             className: type === 'player' ? 'Warrior' : 'Warlock',
         },
         hasPassed: false,
@@ -62,10 +89,13 @@ export const playCard = (
     state: GameState,
     cardId: string,
     // targetRow: RowType, // REMOVED
-    weather: WeatherState
+    weather: WeatherState,
+    eventBus?: EventBus
 ): { newState: GameState; success: boolean; message?: string } => {
     const currentPlayer = state.currentTurn;
     const playerState = state[currentPlayer];
+
+    // phase check removed to allow playing cards without a UI phase-advance button
 
     // Find card in hand
     const cardIndex = playerState.hand.findIndex(c => c.id === cardId);
@@ -140,6 +170,9 @@ export const playCard = (
         newState[currentPlayer].graveyard.push(card);
     }
 
+    // Emit event
+    eventBus?.emit('CARD_PLAYED', { cardId, cardName: card.name, cardType: card.type, player: currentPlayer });
+
     return { newState, success: true };
 };
 
@@ -155,17 +188,19 @@ export const createInitialGameState = (playerDeck: Card[] = [], aiDeck: Card[] =
         weather: { melee: false, ranged: false, siege: false },
         roundHistory: [],
         gameOver: false,
+        turnPhase: 'start_of_turn',
     };
 };
 
 // Pass turn
-export const passTurn = (state: GameState, playerType: PlayerType): GameState => {
+export const passTurn = (state: GameState, playerType: PlayerType, eventBus?: EventBus): GameState => {
     const newState = { ...state };
     newState[playerType].hasPassed = true;
+    eventBus?.emit('PLAYER_PASSED', { player: playerType });
 
     // Round resolution is now handled by the store (orchestrator)
     // to allow for UI pauses/transitions.
-    
+
     // Switch turn logic handled in endTurn usually, but if passed, we just give control to other
     return endTurn(newState);
 };
@@ -194,7 +229,8 @@ const checkDeaths = (state: GameState): GameState => {
 export const attackUnit = (
     state: GameState,
     attackerId: string,
-    targetId: string
+    targetId: string,
+    eventBus?: EventBus
 ): { newState: GameState; success: boolean; message?: string } => {
     const currentPlayer = state.currentTurn;
     const opponent = currentPlayer === 'player' ? 'ai' : 'player';
@@ -206,6 +242,8 @@ export const attackUnit = (
     if (!attackerRef || !targetRef) {
         return { newState: state, success: false, message: "Unit not found" };
     }
+
+    // phase check removed to allow attacking without a UI phase-advance button
 
     // 2. Validation
     if (attackerRef.isExhausted) {
@@ -242,11 +280,21 @@ export const attackUnit = (
     // 4. Death processing
     const finalState = checkDeaths(newState);
 
+    // Emit events
+    eventBus?.emit('UNIT_DAMAGED', { targetId, damage: newAttacker.attack, player: opponent });
+    eventBus?.emit('UNIT_DAMAGED', { targetId: attackerId, damage: newTarget.attack, player: currentPlayer });
+    if ((newTarget.power || 0) <= 0) {
+        eventBus?.emit('CARD_DESTROYED', { cardId: targetId, player: opponent });
+    }
+    if ((newAttacker.power || 0) <= 0) {
+        eventBus?.emit('CARD_DESTROYED', { cardId: attackerId, player: currentPlayer });
+    }
+
     return { newState: finalState, success: true, message: "Attack successful" };
 };
 
 // End turn and switch active player
-export const endTurn = (state: GameState): GameState => {
+export const endTurn = (state: GameState, eventBus?: EventBus): GameState => {
     // If game over, do nothing
     if (state.gameOver) return state;
 
@@ -255,6 +303,7 @@ export const endTurn = (state: GameState): GameState => {
 
     // If opponent has passed, stay on current player
     if (state[opponent].hasPassed) {
+        eventBus?.emit('TURN_ENDED', { player: current });
         if (state[current].hasPassed) {
             // Both passed. We return the state as-is.
             // The Store (orchestrator) will detect both passed and call resolveRound.
@@ -269,10 +318,13 @@ export const endTurn = (state: GameState): GameState => {
             ...state[current],
             board: state[current].board.map(c => ({ ...c, isExhausted: false }))
         };
-        const newState = { ...state };
+        const newState = { ...state, turnPhase: 'start_of_turn' as TurnPhase };
         newState[current] = refreshedPlayer;
+        eventBus?.emit('TURN_STARTED', { player: current });
         return newState;
     }
+
+    eventBus?.emit('TURN_ENDED', { player: current });
 
     // Switch turn
     // Ready up the NEXT player's units
@@ -281,8 +333,10 @@ export const endTurn = (state: GameState): GameState => {
         board: state[opponent].board.map(c => ({ ...c, isExhausted: false }))
     };
 
-    const newState = { ...state, currentTurn: opponent as PlayerType };
+    const newState = { ...state, currentTurn: opponent as PlayerType, turnPhase: 'start_of_turn' as TurnPhase };
     newState[opponent] = refreshedOpponent;
+
+    eventBus?.emit('TURN_STARTED', { player: opponent });
 
     return newState;
 };
@@ -293,7 +347,7 @@ export const shouldEndRound = (state: GameState): boolean => {
 };
 
 // Resolve round winner
-export const resolveRound = (state: GameState): GameState => {
+export const resolveRound = (state: GameState, eventBus?: EventBus): GameState => {
     const weather = { melee: false, ranged: false, siege: false }; // Weather removed/simplified
     const playerPower = calculateBoardPower(state.player.board, weather);
     const aiPower = calculateBoardPower(state.ai.board, weather);
@@ -349,6 +403,7 @@ export const resolveRound = (state: GameState): GameState => {
         else if (newAIHealth > 0 && newPlayerHealth <= 0) gameWinner = 'ai';
         else gameWinner = 'draw'; // Both died same turn
 
+        eventBus?.emit('GAME_OVER', { winner: gameWinner });
         return {
             ...newState,
             gameOver: true,
@@ -356,13 +411,16 @@ export const resolveRound = (state: GameState): GameState => {
         };
     }
 
+    // Emit round end
+    eventBus?.emit('ROUND_ENDED', { round: state.currentRound, playerPower, aiPower, winner });
+
     // Return the state showing the final scores and reduced health, 
     // but before the board is cleared for the next round.
     return newState;
 };
 
 // Use Hero Ability
-export const useHeroAbility = (state: GameState): { newState: GameState, success: boolean, message?: string } => {
+export const useHeroAbility = (state: GameState, eventBus?: EventBus): { newState: GameState, success: boolean, message?: string } => {
     const player = state.currentTurn;
     const playerState = state[player];
 
@@ -401,6 +459,8 @@ export const useHeroAbility = (state: GameState): { newState: GameState, success
     const newState = { ...state };
     newState[player].hero.ability.currentCooldown = playerState.hero.ability.cooldown;
 
+    eventBus?.emit('HERO_ABILITY_USED', { player, abilityType, abilityName: playerState.hero.ability.name });
+
     return { newState, success: true, message: "Hero ability used" };
 };
 
@@ -430,7 +490,7 @@ export const startNextRound = (state: GameState): GameState => {
 
     // Draw 2 cards for new round
     const drawForRound = (player: PlayerState): PlayerState => {
-        const { newDeck, newHand } = drawCards(player.deck, player.hand, 2);
+        const { newDeck, newHand } = drawCards(player.deck, player.hand, DRAW_PER_ROUND);
         return {
             ...player,
             deck: newDeck,
@@ -456,6 +516,7 @@ export const startNextRound = (state: GameState): GameState => {
         currentRound: state.currentRound + 1,
         currentTurn: nextStarter,
         phase: 'main',
+        turnPhase: 'start_of_turn',
         player: newPlayer,
         ai: newAI,
     };

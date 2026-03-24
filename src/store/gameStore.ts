@@ -12,10 +12,17 @@ import {
     WeatherState,
     useHeroAbility as engineUseHeroAbility,
     attackUnit,
+    getGlobalEventBus,
+    resetGlobalEventBus,
+    resolveEffectGraph,
+    AbilityContext,
 } from '../engine';
 import { makeAIDecision, getAIDelay } from '../engine/aiEngine';
 import { useDeckStore } from './deckStore';
+import { useCampaignStore } from './campaignStore';
 import { createStarterDeck, AVAILABLE_HEROES } from '../data/cardData';
+import { getRelicById } from '../data/relicData';
+import { Card } from '../types';
 
 interface GameStore extends GameState {
     // Game settings
@@ -78,6 +85,7 @@ const createEmptyState = (): GameState => ({
             },
             artwork: '',
             className: 'Warrior',
+            faction: 'order',
         },
         hasPassed: false,
     },
@@ -105,8 +113,9 @@ const createEmptyState = (): GameState => ({
                 cooldown: 0,
                 currentCooldown: 0,
             },
-            artwork: require('../../assets/units/hero_darklord.jpg'),
-            className: 'Dummy'
+            artwork: require('../../assets/heroes/hero_darklord.jpg'),
+            className: 'Dummy',
+            faction: 'shadow'
         },
         hasPassed: false,
     },
@@ -140,6 +149,39 @@ export const useGameStore = create<GameStore>((set, get) => ({
             : undefined;
 
         const initialState = createInitialGameState(playerDeck, [], playerHero);
+
+        // Reset EventBus and subscribe relics
+        resetGlobalEventBus();
+        const bus = getGlobalEventBus();
+        const activeRelics = useCampaignStore.getState().relics.map(id => getRelicById(id)).filter(r => r !== undefined);
+
+        activeRelics.forEach(relic => {
+            if (!relic || !relic.isActive) return;
+            bus.subscribe(relic.trigger, (event) => {
+                const currentGameState = get();
+                // Create a dummy card context for the relic
+                const dummyCard: Card = {
+                    id: relic.id,
+                    name: relic.name,
+                    type: 'spell', // Closest equivalent
+                    rarity: relic.rarity === 'boss' ? 'legendary' : relic.rarity as any,
+                    manaCost: 0, power: 0, attack: 0, artwork: null, description: relic.description,
+                    abilities: []
+                };
+
+                const context: AbilityContext = {
+                    state: currentGameState,
+                    card: dummyCard,
+                    player: 'player', // Relics are player-owned currently
+                    updateState: () => { }, // Not used by generic effect resolving
+                };
+
+                resolveEffectGraph(relic.effect, context);
+                // Effect graph mutates the state directly, we just force an update
+                set({ ...currentGameState });
+            });
+        });
+
         set({
             ...initialState,
             difficulty,
@@ -177,10 +219,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
             attackingCardId: state.attackingCardId,
         };
 
+        const bus = getGlobalEventBus();
         const { newState, success, message } = enginePlayCard(
             gameState,
             cardId,
-            state.weather
+            state.weather,
+            bus
         );
 
         if (!success) {
@@ -228,7 +272,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return;
         }
 
-        const { newState, success, message } = engineUseHeroAbility(state);
+        const bus = getGlobalEventBus();
+        const { newState, success, message } = engineUseHeroAbility(state, bus);
 
         if (success) {
             set({
@@ -264,10 +309,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             attackingCardId: state.attackingCardId,
         };
 
-        const passedState = enginePassTurn(gameState, 'player');
+        const bus = getGlobalEventBus();
+        const passedState = enginePassTurn(gameState, 'player', bus);
 
         if (shouldEndRound(passedState)) {
-            const resolvedState = resolveRound(passedState);
+            const resolvedState = resolveRound(passedState, bus);
 
             if (resolvedState.gameOver) {
                 set({
@@ -300,7 +346,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (state.phase !== 'round_end') return;
 
         const nextRoundState = startNextRound(state);
-        
+
         set({
             ...nextRoundState,
             weather: { melee: false, ranged: false, siege: false },
@@ -330,7 +376,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             attackingCardId: state.attackingCardId,
         };
 
-        const nextTurnState = engineEndTurn(gameState);
+        const bus = getGlobalEventBus();
+        const nextTurnState = engineEndTurn(gameState, bus);
         let finalTurnState = nextTurnState;
 
         // Recursively skip if the next player has turned (passed)
@@ -385,7 +432,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
             attackingCardId: state.attackingCardId,
         };
 
-        const { newState, success, message } = attackUnit(gameState, attackerId, targetId);
+        const bus = getGlobalEventBus();
+        const { newState, success, message } = attackUnit(gameState, attackerId, targetId, bus);
 
         if (success) {
             set({
@@ -408,29 +456,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
             const delay = getAIDelay(state.difficulty);
 
-        // Wait for AI decision
-        setTimeout(() => {
-            const currentState = get();
-            if (currentState.gameOver || currentState.currentTurn !== 'ai') {
-                set({ isAIThinking: false });
-                return;
-            }
+            // Wait for AI decision
+            setTimeout(() => {
+                const currentState = get();
+                if (currentState.gameOver || currentState.currentTurn !== 'ai') {
+                    set({ isAIThinking: false });
+                    return;
+                }
 
-            const gameState: GameState = {
-                currentRound: currentState.currentRound,
-                roundsWon: currentState.roundsWon,
-                currentTurn: currentState.currentTurn,
-                phase: currentState.phase,
-                player: currentState.player,
-                ai: currentState.ai,
-                weather: currentState.weather,
-                roundHistory: currentState.roundHistory,
-                gameOver: currentState.gameOver,
-                winner: currentState.winner,
-                attackingCardId: currentState.attackingCardId,
-            };
+                const gameState: GameState = {
+                    currentRound: currentState.currentRound,
+                    roundsWon: currentState.roundsWon,
+                    currentTurn: currentState.currentTurn,
+                    phase: currentState.phase,
+                    player: currentState.player,
+                    ai: currentState.ai,
+                    weather: currentState.weather,
+                    roundHistory: currentState.roundHistory,
+                    gameOver: currentState.gameOver,
+                    winner: currentState.winner,
+                    attackingCardId: currentState.attackingCardId,
+                };
 
-            const decision = makeAIDecision(gameState, currentState.difficulty);
+                const decision = makeAIDecision(gameState, currentState.difficulty);
 
                 if (decision.action === 'pass') {
                     // AI passes
@@ -448,14 +496,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         attackingCardId: currentState.attackingCardId,
                     };
 
-                    const aiPassedState = enginePassTurn(aiGameState, 'ai');
+                    const bus = getGlobalEventBus();
+                    const aiPassedState = enginePassTurn(aiGameState, 'ai', bus);
                     // Swap currentTurn back to ai before checking
                     aiPassedState.currentTurn = 'ai';
 
                     // Check if round ends
                     if (currentState.player.hasPassed) {
                         const resolvedState = resolveRound(
-                            { ...aiPassedState, ai: { ...aiPassedState.ai, hasPassed: true } }
+                            { ...aiPassedState, ai: { ...aiPassedState.ai, hasPassed: true } },
+                            bus
                         );
 
                         if (resolvedState.gameOver) {
@@ -468,7 +518,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         } else {
                             const lastRound = resolvedState.roundHistory[resolvedState.roundHistory.length - 1];
                             const roundWinner = lastRound.playerScore > lastRound.aiScore ? 'You Won' : (lastRound.aiScore > lastRound.playerScore ? 'AI Won' : 'Draw');
-                            
+
                             set({
                                 ...resolvedState,
                                 phase: 'round_end',
@@ -478,30 +528,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         }
                     } else {
                         // Player's turn
-                        set({ 
+                        set({
                             ...aiPassedState,
                             ai: { ...aiPassedState.ai, hasPassed: true },
-                            currentTurn: 'player', 
+                            currentTurn: 'player',
                             isAIThinking: false,
                             message: 'AI passed',
                         });
                     }
                 } else if (decision.action === 'ability') {
-                const abilityGameState: GameState = {
-                    currentRound: currentState.currentRound,
-                    roundsWon: currentState.roundsWon,
-                    currentTurn: currentState.currentTurn,
-                    phase: currentState.phase,
-                    player: currentState.player,
-                    ai: currentState.ai,
-                    weather: currentState.weather,
-                    roundHistory: currentState.roundHistory,
-                    gameOver: currentState.gameOver,
-                    winner: currentState.winner,
-                    attackingCardId: currentState.attackingCardId,
-                };
+                    const abilityGameState: GameState = {
+                        currentRound: currentState.currentRound,
+                        roundsWon: currentState.roundsWon,
+                        currentTurn: currentState.currentTurn,
+                        phase: currentState.phase,
+                        player: currentState.player,
+                        ai: currentState.ai,
+                        weather: currentState.weather,
+                        roundHistory: currentState.roundHistory,
+                        gameOver: currentState.gameOver,
+                        winner: currentState.winner,
+                        attackingCardId: currentState.attackingCardId,
+                    };
 
-                    const { newState, success, message: abilityMsg } = engineUseHeroAbility(abilityGameState);
+                    const bus = getGlobalEventBus();
+                    const { newState, success, message: abilityMsg } = engineUseHeroAbility(abilityGameState, bus);
 
                     if (success) {
                         set({
@@ -517,26 +568,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     }
                 } else if (decision.cardId) {
                     // AI plays a card
-                const playGameState: GameState = {
-                    currentRound: currentState.currentRound,
-                    roundsWon: currentState.roundsWon,
-                    currentTurn: currentState.currentTurn,
-                    phase: currentState.phase,
-                    player: currentState.player,
-                    ai: currentState.ai,
-                    weather: currentState.weather,
-                    roundHistory: currentState.roundHistory,
-                    gameOver: currentState.gameOver,
-                    winner: currentState.winner,
-                    attackingCardId: currentState.attackingCardId,
-                };
+                    const playGameState: GameState = {
+                        currentRound: currentState.currentRound,
+                        roundsWon: currentState.roundsWon,
+                        currentTurn: currentState.currentTurn,
+                        phase: currentState.phase,
+                        player: currentState.player,
+                        ai: currentState.ai,
+                        weather: currentState.weather,
+                        roundHistory: currentState.roundHistory,
+                        gameOver: currentState.gameOver,
+                        winner: currentState.winner,
+                        attackingCardId: currentState.attackingCardId,
+                    };
 
                     const card = currentState.ai.hand.find(c => c.id === decision.cardId);
 
+                    const bus = getGlobalEventBus();
                     const { newState } = enginePlayCard(
                         playGameState,
                         decision.cardId,
-                        currentState.weather
+                        currentState.weather,
+                        bus
                     );
 
                     // Handle weather effects if AI played a weather card (Simplified)
@@ -548,7 +601,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                     }
 
                     set({
-                        ai: newState.ai,
+                        ...newState,
                         weather: newWeather,
                         isAIThinking: false,
                         message: card ? `AI played ${card.name}` : 'AI played a card',

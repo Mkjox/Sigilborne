@@ -1,4 +1,4 @@
-import { Card, CardType, CardRarity, Ability } from '../types';
+import { Card, CardType, CardRarity, Ability, Faction } from '../types';
 import { Hero } from '../types/hero.types';
 
 // Helper to create unique IDs
@@ -116,7 +116,7 @@ export const MELEE_UNITS: Card[] = [
     createCard('Berserker', 'unit', 'rare', 3, 7, [ABILITIES.MORALE_BOOST(1)], 'Fierce warrior that inspires allies', 'His rage is legendary.', require('../../assets/units/berserker.jpg')),
     createCard('Shield Captain', 'unit', 'rare', 3, 4, [ABILITIES.TIGHT_BOND()], 'Stronger with fellow captains', 'Unity is strength.', require('../../assets/units/shield_captain.jpg')),
     createCard('Champion', 'unit', 'epic', 4, 9, [], 'Elite warrior of the realm', 'Undefeated in single combat.', require('../../assets/units/champion.jpg')),
-    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'Commands respect on the battlefield', 'All bow before the warlord.', require('../../assets/units/hero_commander.jpg')),
+    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'Commands respect on the battlefield', 'All bow before the warlord.', require('../../assets/heroes/hero_commander.jpg')),
     // Sinister Expansion
     createCard('Lich King', 'unit', 'legendary', 10, 12, [ABILITIES.MORALE_BOOST(2)], 'Lord of the frozen dead', 'Death is but a new beginning.', require('../../assets/units/lich_king.jpg')),
     createCard('Grave Ghoul', 'unit', 'common', 1, 3, [], 'Feasts on the remains of battle', 'Always hungry.', require('../../assets/units/grave_ghoul.jpg')),
@@ -125,7 +125,7 @@ export const MELEE_UNITS: Card[] = [
     createCard('Death Knight', 'unit', 'epic', 5, 10, [], 'A fallen hero serving the void', 'Honor died long ago.', require('../../assets/units/death_knight.jpg')),
     createCard('Zombie Horde', 'unit', 'common', 2, 1, [ABILITIES.MUSTER('Zombie Horde')], 'They keep coming...', 'Strength in numbers.', require('../../assets/units/zombie_horde.jpg')),
     createCard('Crypt Guard', 'unit', 'rare', 3, 6, [], 'Eternal protectors of the tomb', 'None shall pass.', require('../../assets/units/crypt_guard.jpg')),
-];
+].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction }));
 
 // Ranged Units
 export const RANGED_UNITS: Card[] = [
@@ -143,7 +143,7 @@ export const RANGED_UNITS: Card[] = [
     createCard('Shadow Assassin', 'unit', 'epic', 4, 8, [], 'Master of the silent kill', 'Gone before the body hits the floor.', require('../../assets/units/shadow_assassin.jpg')),
     createCard('Necromancer', 'unit', 'legendary', 6, 6, [ABILITIES.MEDIC()], 'Conduit for the afterlife', 'The grave is merely a door.', require('../../assets/units/necromancer.jpg')),
     createCard('Dark Elf Matriarch', 'unit', 'rare', 5, 7, [], 'Leader of the obsidian spire', 'Power is the only currency.', require('../../assets/units/dark_elf_matriarch.jpg')),
-];
+].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction }));
 
 // Siege Units
 export const SIEGE_UNITS: Card[] = [
@@ -161,7 +161,7 @@ export const SIEGE_UNITS: Card[] = [
     createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'Firespitting beast of the abyss', 'The jaws that bite.', require('../../assets/units/hellhound.jpg')),
     createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'Stone turned flesh and malice', 'Watch the skies.', require('../../assets/units/gargoyle.jpg')),
     createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'Enchanted bolts of shadow', 'Pierce the soul.', require('../../assets/units/cursed_ballista.jpg')),
-];
+].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction }));
 
 // ============ SPELL CARDS ============
 
@@ -175,7 +175,7 @@ export const SPELL_CARDS: Card[] = [
     createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Obliterate the strongest units', require('../../assets/units/void_bolt.jpg')),
     createCard('Life Drain', 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Siphon power to boost allies', require('../../assets/units/life_drain.jpg')),
     createCard('Raise Dead', 'spell', 'common', 2, undefined, [ABILITIES.MEDIC()], 'The dead obey their master.', require('../../assets/units/raise_dead.jpg')),
-];
+].map((c, i) => ({ ...c, faction: (i < 4 ? 'neutral' : 'shadow') as Faction }));
 
 // ============ WEATHER CARDS ============
 
@@ -186,7 +186,7 @@ export const WEATHER_CARDS: Card[] = [
     // Sinister Expansion
     createCard('Corrupt Ground', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Melee units lose their resolve', require('../../assets/units/corrupt_ground.jpg')),
     createCard('Wailing Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Ranged units lose their sight', require('../../assets/units/wailing_fog.jpg')),
-];
+].map((c, i) => ({ ...c, faction: (i < 3 ? 'neutral' : 'shadow') as Faction }));
 
 // ============ HEROES ============
 
@@ -208,6 +208,7 @@ export const AVAILABLE_HEROES: Hero[] = [
         },
         artwork: require('../../assets/heroes/hero_commander.jpg'),
         className: 'Warrior',
+        faction: 'order',
     },
     {
         id: 'hero_darklord',
@@ -226,6 +227,7 @@ export const AVAILABLE_HEROES: Hero[] = [
         },
         artwork: require('../../assets/heroes/hero_darklord.jpg'),
         className: 'Warlock',
+        faction: 'shadow',
     },
     {
         id: 'hero_archmage',
@@ -242,8 +244,9 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 4,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/lich_king.jpg'), // Placeholder artwork
+        artwork: require('../../assets/heroes/hero_archmage.jpg'),
         className: 'Mage',
+        faction: 'arcane',
     },
     {
         id: 'hero_ranger',
@@ -260,8 +263,9 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 4,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/elven_marksman.jpg'), // Placeholder artwork
+        artwork: require('../../assets/heroes/hero_ranger.jpg'),
         className: 'Hunter',
+        faction: 'nature',
     },
     {
         id: 'hero_paladin',
@@ -278,8 +282,9 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 3,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/elven_marksman.jpg'), // Placeholder ../../assets/styles/light.jpg
+        artwork: require('../../assets/heroes/hero_paladin.jpg'),
         className: 'Cleric',
+        faction: 'order',
     },
     {
         id: 'hero_rogue',
@@ -296,8 +301,9 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 4,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/champion.jpg'), // Placeholder ../../assets/units/assassin.jpg
+        artwork: require('../../assets/units/champion.jpg'),
         className: 'Rogue',
+        faction: 'neutral',
     },
     {
         id: 'hero_berserker',
@@ -314,8 +320,9 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 2,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/champion.jpg'), // Placeholder ../../assets/styles/fire.jpg
+        artwork: require('../../assets/units/champion.jpg'),
         className: 'Fighter',
+        faction: 'order',
     },
     {
         id: 'hero_druid',
@@ -332,8 +339,9 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 3,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/champion.jpg'), // Placeholder ../../assets/styles/nature.jpg
+        artwork: require('../../assets/units/champion.jpg'),
         className: 'Shaman',
+        faction: 'nature',
     }
 ];
 
