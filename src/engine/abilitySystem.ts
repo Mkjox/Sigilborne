@@ -1,12 +1,21 @@
-import { Card } from '../types';
+import { 
+    Card, 
+    Ability, 
+    TargetSelector, 
+    OperationType, 
+    EffectGraph,
+    Talent 
+} from '../types';
 import { GameState, PlayerType, BoardState } from '../types';
 import { BOND_MULTIPLIER, STARTING_HEALTH } from './rules';
+import { EventBus } from './eventBus';
 
 // Game context passed to ability effects
 export interface AbilityContext {
     state: GameState;
     card: Card;
     player: PlayerType;
+    eventBus?: EventBus;
     // targetRow removed
     updateState: (updates: Partial<GameState>) => void;
 }
@@ -21,12 +30,26 @@ export const getBoardCards = (state: GameState): { player: Card[]; ai: Card[] } 
 export const calculateBoardPower = (
     board: BoardState,
     activeWeather: { melee: boolean; ranged: boolean; siege: boolean },
-    opponentBoard?: BoardState
+    opponentBoard?: BoardState,
+    talents: Talent[] = []
 ): number => {
     let totalPower = 0;
 
+    // Collect faction boosts from talents
+    const factionBoosts: Record<string, number> = {};
+    talents.forEach(t => {
+        if (t.effect.type === 'faction_bonus') {
+            factionBoosts[t.effect.faction] = (factionBoosts[t.effect.faction] || 0) + t.effect.attackBoost;
+        }
+    });
+
     board.forEach(card => {
         let power = card.power || 0;
+
+        // Apply Faction Bonus from Talents
+        if (card.faction && factionBoosts[card.faction]) {
+            power += factionBoosts[card.faction];
+        }
 
         // Apply global weather/debuffs if needed here
         // For now, simple sum
@@ -81,10 +104,12 @@ export const abilityEffects = {
         if (cardIndex > 0) {
             const left = board[cardIndex - 1];
             left.power = (left.power || 0) + boostValue;
+            context.eventBus?.emit('UNIT_BOOSTED', { targetId: left.id, amount: boostValue, player });
         }
         if (cardIndex < board.length - 1) {
             const right = board[cardIndex + 1];
             right.power = (right.power || 0) + boostValue;
+            context.eventBus?.emit('UNIT_BOOSTED', { targetId: right.id, amount: boostValue, player });
         }
     },
 
@@ -99,7 +124,9 @@ export const abilityEffects = {
         // Double all cards with same name if there are multiples
         if (sameNameCards.length > 1) {
             sameNameCards.forEach(c => {
-                c.power = (c.power || 0) * BOND_MULTIPLIER;
+                const oldPower = c.power || 0;
+                c.power = oldPower * BOND_MULTIPLIER;
+                context.eventBus?.emit('UNIT_BOOSTED', { targetId: c.id, amount: c.power - oldPower, player });
             });
         }
     },
@@ -139,6 +166,7 @@ export const abilityEffects = {
         if (unitIndex !== -1) {
             const revived = graveyard.splice(unitIndex, 1)[0];
             state[currentPlayer].board.push(revived);
+            context.eventBus?.emit('ABILITY_TRIGGERED', { type: 'revive', cardId: revived.id, player: currentPlayer });
         }
     },
 
@@ -170,6 +198,7 @@ export const abilityEffects = {
             if (index !== -1) {
                 const [removed] = board.splice(index, 1);
                 state[owner].graveyard.push(removed);
+                context.eventBus?.emit('CARD_DESTROYED', { cardId: targetCard.id, player: owner });
             }
         });
     },
@@ -336,7 +365,6 @@ export const abilityEffects = {
 };
 
 // ─── Effect Graph Resolution ────────────────────────────────────
-import { TargetSelector, OperationType, EffectGraph, Ability } from '../types';
 
 /**
  * Resolve targets based on a TargetSelector.
@@ -416,12 +444,15 @@ const applyOperation = (
         case 'boost':
             targets.forEach(t => {
                 t.power = (t.power || 0) + operation.value;
+                context.eventBus?.emit('UNIT_BOOSTED', { targetId: t.id, amount: operation.value, player });
             });
             break;
 
         case 'damage':
             targets.forEach(t => {
                 t.power = (t.power || 0) - operation.value;
+                context.eventBus?.emit('UNIT_DAMAGED', { targetId: t.id, damage: operation.value, player: context.player === 'player' ? 'ai' : 'player' });
+                
                 if (t.power <= 0) {
                     // Move to graveyard
                     const owner = state[currentPlayer].board.includes(t) ? currentPlayer : enemyPlayer;
@@ -430,6 +461,7 @@ const applyOperation = (
                     if (idx !== -1) {
                         const [dead] = board.splice(idx, 1);
                         state[owner].graveyard.push(dead);
+                        context.eventBus?.emit('CARD_DESTROYED', { cardId: dead.id, player: owner });
                     }
                 }
             });
@@ -443,6 +475,7 @@ const applyOperation = (
                 if (idx !== -1) {
                     const [removed] = board.splice(idx, 1);
                     state[owner].graveyard.push(removed);
+                    context.eventBus?.emit('CARD_DESTROYED', { cardId: removed.id, player: owner });
                 }
             });
             break;
@@ -453,6 +486,7 @@ const applyOperation = (
             if (unitIdx !== -1) {
                 const revived = graveyard.splice(unitIdx, 1)[0];
                 state[currentPlayer].board.push(revived);
+                context.eventBus?.emit('ABILITY_TRIGGERED', { type: 'revive', cardId: revived.id, player: currentPlayer });
             }
             break;
         }
@@ -465,6 +499,7 @@ const applyOperation = (
             );
             state[currentPlayer].deck = newDeck;
             state[currentPlayer].hand = newHand;
+            context.eventBus?.emit('CARD_DRAWN', { count: operation.value, player: currentPlayer });
             break;
         }
 
@@ -474,12 +509,19 @@ const applyOperation = (
                 state[currentPlayer].health + operation.value,
                 maxHealth
             );
+            context.eventBus?.emit('UNIT_HEALED', { targetId: state[currentPlayer].hero.id, amount: operation.value, player: currentPlayer });
             break;
         }
 
         case 'multiply':
             targets.forEach(t => {
-                t.power = (t.power || 0) * operation.value;
+                const old = t.power || 0;
+                t.power = old * operation.value;
+                if (t.power > old) {
+                    context.eventBus?.emit('UNIT_BOOSTED', { targetId: t.id, amount: t.power - old, player });
+                } else if (t.power < old) {
+                     context.eventBus?.emit('UNIT_DAMAGED', { targetId: t.id, damage: old - t.power, player: context.player === 'player' ? 'ai' : 'player' });
+                }
             });
             break;
     }
@@ -505,6 +547,13 @@ export const executeAbility = (
     ability: { type: string; effectGraph?: EffectGraph },
     context: AbilityContext
 ): void => {
+    // Emit general trigger event for all abilities
+    context.eventBus?.emit('ABILITY_TRIGGERED', { 
+        type: ability.type, 
+        cardId: context.card.id, 
+        player: context.player 
+    });
+
     // Prefer EffectGraph if available
     if (ability.effectGraph) {
         resolveEffectGraph(ability.effectGraph, context);

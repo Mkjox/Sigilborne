@@ -20,18 +20,16 @@ import {
 import { makeAIDecision, getAIDelay } from '../engine/aiEngine';
 import { useDeckStore } from './deckStore';
 import { useCampaignStore } from './campaignStore';
-import { createStarterDeck, AVAILABLE_HEROES } from '../data/cardData';
+import { createStarterDeck, AVAILABLE_HEROES, getTalentTreeForHero } from '../data/cardData';
 import { getRelicById } from '../data/relicData';
 import { Card } from '../types';
 
 interface GameStore extends GameState {
     // Game settings
     difficulty: Difficulty;
-    weather: WeatherState;
     isAIThinking: boolean;
     selectedCardId: string | null;
     message: string | null;
-    currentVFX: 'scorch' | 'boost' | 'revive' | 'frost' | 'fog' | 'none';
 
     // Actions
     startGame: (difficulty: Difficulty) => void;
@@ -46,7 +44,6 @@ interface GameStore extends GameState {
     continueToNextRound: () => void;
     setAttackingCard: (cardId: string | null) => void;
     attackCard: (targetId: string) => void;
-    setVFX: (vfx: 'scorch' | 'boost' | 'revive' | 'frost' | 'fog' | 'none') => void;
 
     // Computed
     getPlayerPower: () => number;
@@ -148,7 +145,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ? AVAILABLE_HEROES.find(h => h.id === activeDeck.heroId)
             : undefined;
 
-        const initialState = createInitialGameState(playerDeck, [], playerHero);
+        // Get unlocked talents from campaign
+        const campaignState = useCampaignStore.getState();
+        const unlockedTalentIds = campaignState.unlockedTalentIds;
+        const heroTalentTree = playerHero ? getTalentTreeForHero(playerHero.id) : undefined;
+        const playerTalents = heroTalentTree 
+            ? heroTalentTree.talents.filter(t => unlockedTalentIds.includes(t.id)) 
+            : [];
+
+        const initialState = createInitialGameState(playerDeck, [], playerHero, undefined, playerTalents);
 
         // Reset EventBus and subscribe relics
         resetGlobalEventBus();
@@ -258,7 +263,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
             ...newState,
             selectedCardId: null,
             message: `Played ${card.name}`,
-            currentVFX: vfx,
         });
 
         // End turn after playing
@@ -279,7 +283,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set({
                 ...newState,
                 message: message || 'Used Hero Ability',
-                currentVFX: 'boost' as const,
             });
             // Hero ability is a FREE ACTION — does not end the turn.
             // Player can still play a card or pass after using it.
@@ -659,6 +662,4 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const state = get();
         return getTotalPower(state.ai.board, state.weather, state.player.board);
     },
-
-    setVFX: (vfx) => set({ currentVFX: vfx }),
 }));

@@ -38,3 +38,10 @@ export const MAX_BOOST_STACK = 99; // Safety cap to prevent infinite loops
 export const MAX_OFF_FACTION_CARDS = 5;
 export const FACTION_SYNERGY_THRESHOLD = 3;
 export const FACTION_SYNERGY_BOOST = 1;
+// ─── Shop Prices ────────────────────────────────────────────────
+export const PRICE_COMMON = 50;
+export const PRICE_RARE = 120;
+export const PRICE_EPIC = 250;
+export const PRICE_LEGENDARY = 500;
+export const PRICE_RELIC = 350;
+export const PRICE_REMOVE_CARD = 100;

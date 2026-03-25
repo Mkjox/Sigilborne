@@ -1,5 +1,5 @@
 import { Card } from './card.types';
-import { Hero } from './hero.types';
+import { Hero, Talent } from './hero.types';
 
 // Game phases (round-level)
 export type GamePhase = 'mulligan' | 'draw' | 'main' | 'combat' | 'round_end' | 'end';
@@ -25,6 +25,7 @@ export interface PlayerState {
     graveyard: Card[];
     hero: Hero;
     hasPassed: boolean;
+    unlockedTalents?: Talent[];
 }
 
 // Round information

@@ -10,7 +10,7 @@ import { GameBoardScreen } from '../screens/GameBoard';
 import { DeckBuilderScreen } from '../screens/DeckBuilder';
 import { CollectionScreen } from '../screens/Collection';
 import { SettingsScreen } from '../screens/Settings';
-import { CampaignMapScreen } from '../screens/Campaign/CampaignMapScreen';
+import { CampaignMapScreen, ShopScreen, TalentTreeScreen } from '../screens/Campaign';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -80,6 +80,24 @@ export const RootNavigator: React.FC = () => {
                     component={SettingsScreen}
                     options={{
                         animationEnabled: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="Shop"
+                    component={ShopScreen}
+                    options={{
+                        animationEnabled: true,
+                        presentation: 'modal',
+                        cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+                    }}
+                />
+                <Stack.Screen
+                    name="TalentTree"
+                    component={TalentTreeScreen}
+                    options={{
+                        animationEnabled: true,
+                        presentation: 'modal',
+                        cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
                     }}
                 />
             </Stack.Navigator>

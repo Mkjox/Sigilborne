@@ -8,6 +8,8 @@ export type RootStackParamList = {
     DeckBuilder: undefined;
     Collection: undefined;
     Settings: undefined;
+    Shop: undefined;
+    TalentTree: undefined;
     Victory: { rewards: any }; // Will be properly typed in Phase 8
     Defeat: undefined;
 };

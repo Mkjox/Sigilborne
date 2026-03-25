@@ -1,8 +1,8 @@
-import { GameState, PlayerType, PlayerState, BoardState, Difficulty, RoundInfo, TurnPhase } from '../types';
+import { GameState, PlayerType, PlayerState, BoardState, Difficulty, RoundInfo, TurnPhase, Faction } from '../types';
 import { Card } from '../types';
 import { createStarterDeck, createAIDeck } from '../data/cardData';
 import { shuffleArray, drawCards, calculateBoardPower, executeAbility, AbilityContext } from './abilitySystem';
-import { Hero } from '../types/hero.types';
+import { Hero, Talent } from '../types/hero.types';
 import { AVAILABLE_HEROES } from '../data/cardData';
 import { STARTING_HAND_SIZE, MAX_ROUNDS, ROUNDS_TO_WIN, MANA_PER_ROUND, STARTING_HEALTH, DRAW_PER_ROUND } from './rules';
 import { EventBus } from './eventBus';
@@ -45,40 +45,68 @@ export const advanceTurnPhase = (state: GameState, eventBus?: EventBus): GameSta
 // Constants are now imported from './rules'
 
 // Create initial player state
-const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: Hero): PlayerState => {
+const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: Hero, talents: Talent[] = []): PlayerState => {
     const shuffledDeck = shuffleArray(deck);
     const { newDeck, newHand } = drawCards(shuffledDeck, [], STARTING_HAND_SIZE);
+
+    // Apply Talent Stat Boosts
+    let healthBonus = 0;
+    let manaBonus = 0;
+    let cooldownReduction = 0;
+
+    talents.forEach(talent => {
+        if (talent.effect.type === 'stat_boost') {
+            if (talent.effect.target === 'hero_health') healthBonus += talent.effect.value;
+            if (talent.effect.target === 'starting_mana') manaBonus += talent.effect.value;
+            if (talent.effect.target === 'hero_power_cooldown') cooldownReduction += talent.effect.value;
+        }
+    });
+
+    const baseHealth = STARTING_HEALTH + healthBonus;
+    const baseMana = MANA_PER_ROUND + manaBonus;
+
+    const heroState: Hero = hero ? { 
+        ...hero, 
+        id: `hero_${id}`, 
+        ability: { 
+            ...hero.ability, 
+            cooldown: Math.max(1, hero.ability.cooldown - cooldownReduction),
+            currentCooldown: 0 
+        } 
+    } : {
+        id: `hero_${id}`,
+        name: type === 'player' ? 'Commander' : 'Dark Lord',
+        health: 2 + healthBonus,
+        maxHealth: 2 + healthBonus,
+        faction: (type === 'player' ? 'order' : 'shadow') as Faction,
+        ability: {
+            id: `ability_${id}`,
+            name: type === 'player' ? 'Rally' : 'Dark Command',
+            type: type === 'player' ? 'boost_all' : 'damage_strongest',
+            trigger: 'activate',
+            description: type === 'player' ? 'Boost all units by 1' : 'Deal 2 damage to strongest enemy',
+            cooldown: Math.max(1, 3 - cooldownReduction),
+            currentCooldown: 0,
+        },
+        artwork: type === 'player'
+            ? require('../../assets/heroes/hero_commander.jpg')
+            : require('../../assets/heroes/hero_darklord.jpg'),
+        className: type === 'player' ? 'Warrior' : 'Warlock',
+    };
 
     return {
         id,
         type,
-        health: STARTING_HEALTH,
-        mana: MANA_PER_ROUND,
-        maxMana: MANA_PER_ROUND,
+        health: baseHealth,
+        mana: baseMana,
+        maxMana: baseMana,
         deck: newDeck,
         hand: newHand,
-        board: [], // Single zone board
+        board: [],
         graveyard: [],
-        hero: hero ? { ...hero, id: `hero_${id}`, ability: { ...hero.ability, currentCooldown: 0 } } : {
-            id: `hero_${id}`,
-            name: type === 'player' ? 'Commander' : 'Dark Lord',
-            health: 2,
-            maxHealth: 2,
-            ability: {
-                id: `ability_${id}`,
-                name: type === 'player' ? 'Rally' : 'Dark Command',
-                type: type === 'player' ? 'boost_all' : 'damage_strongest',
-                trigger: 'activate',
-                description: type === 'player' ? 'Boost all units by 1' : 'Deal 2 damage to strongest enemy',
-                cooldown: 3,
-                currentCooldown: 0,
-            },
-            artwork: type === 'player'
-                ? require('../../assets/heroes/hero_commander.jpg')
-                : require('../../assets/heroes/hero_darklord.jpg'),
-            className: type === 'player' ? 'Warrior' : 'Warlock',
-        },
+        hero: heroState,
         hasPassed: false,
+        unlockedTalents: talents,
     };
 };
 
@@ -139,7 +167,7 @@ export const playCard = (
                     state: newState,
                     card,
                     player: currentPlayer,
-                    // targetRow: row, // REMOVED
+                    eventBus,
                     updateState: () => { },
                 };
                 executeAbility(ability, context);
@@ -153,7 +181,7 @@ export const playCard = (
                     state: newState,
                     card,
                     player: currentPlayer,
-                    // targetRow, // REMOVED
+                    eventBus,
                     updateState: () => { },
                 };
                 executeAbility(ability, context);
@@ -177,14 +205,21 @@ export const playCard = (
 };
 
 // Initialize a new game state
-export const createInitialGameState = (playerDeck: Card[] = [], aiDeck: Card[] = [], playerHero?: Hero, aiHero?: Hero): GameState => {
+export const createInitialGameState = (
+    playerDeck: Card[] = [], 
+    aiDeck: Card[] = [], 
+    playerHero?: Hero, 
+    aiHero?: Hero,
+    playerTalents: Talent[] = [],
+    aiTalents: Talent[] = []
+): GameState => {
     return {
         currentRound: 1,
         roundsWon: { player: 0, ai: 0 },
         currentTurn: 'player', // Player always starts first round
         phase: 'mulligan',
-        player: createPlayerState('player', 'player', playerDeck.length > 0 ? playerDeck : createStarterDeck(), playerHero),
-        ai: createPlayerState('ai', 'ai', aiDeck.length > 0 ? aiDeck : createAIDeck(), aiHero),
+        player: createPlayerState('player', 'player', playerDeck.length > 0 ? playerDeck : createStarterDeck(), playerHero, playerTalents),
+        ai: createPlayerState('ai', 'ai', aiDeck.length > 0 ? aiDeck : createAIDeck(), aiHero, aiTalents),
         weather: { melee: false, ranged: false, siege: false },
         roundHistory: [],
         gameOver: false,
@@ -349,8 +384,8 @@ export const shouldEndRound = (state: GameState): boolean => {
 // Resolve round winner
 export const resolveRound = (state: GameState, eventBus?: EventBus): GameState => {
     const weather = { melee: false, ranged: false, siege: false }; // Weather removed/simplified
-    const playerPower = calculateBoardPower(state.player.board, weather);
-    const aiPower = calculateBoardPower(state.ai.board, weather);
+    const playerPower = calculateBoardPower(state.player.board, weather, state.ai.board, state.player.unlockedTalents);
+    const aiPower = calculateBoardPower(state.ai.board, weather, state.player.board, state.ai.unlockedTalents);
 
     let winner: PlayerType | 'draw' = 'draw';
     if (playerPower > aiPower) winner = 'player';
@@ -450,6 +485,7 @@ export const useHeroAbility = (state: GameState, eventBus?: EventBus): { newStat
         state: state,
         card: dummyAbilityCard,
         player: player,
+        eventBus: eventBus,
         updateState: () => { },
     };
 

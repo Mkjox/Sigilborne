@@ -91,14 +91,14 @@ const styles = StyleSheet.create({
     element: {
         position: 'absolute',
         borderWidth: 1,
-        borderRadius: 4,
+        borderRadius: 50, // Pure circle
         justifyContent: 'center',
         alignItems: 'center',
     },
     elementInner: {
-        width: '40%',
-        height: '40%',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        transform: [{ rotate: '45deg' }],
+        width: '30%',
+        height: '30%',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 50, // Internal glow circle
     }
 });

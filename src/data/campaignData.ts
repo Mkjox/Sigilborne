@@ -44,9 +44,9 @@ export const generateCampaignMap = (totalStages: number = TOTAL_STAGES): MapNode
             return;
         }
 
-        // Rest or Shop before Boss
+        // Event or Elite before Boss
         if (node.id % 20 === 19) {
-            node.type = node.id % 40 === 19 ? 'rest' : 'shop'; // Alternate shop and rest before bosses
+            node.type = node.id % 40 === 19 ? 'rest' : 'event';
             return;
         }
 
@@ -67,7 +67,7 @@ export const generateCampaignMap = (totalStages: number = TOTAL_STAGES): MapNode
         if (node.id % 7 === 0 && node.type === 'battle') {
             node.type = 'event';
         } else if (node.id % 13 === 0 && node.type === 'battle') {
-            node.type = 'shop';
+            node.type = 'event';
         } else if (node.type === 'battle') {
             // Default battle rewards
             node.difficulty = node.id > 100 ? 'medium' : 'easy';

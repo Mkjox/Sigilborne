@@ -28,6 +28,7 @@ import Animated, {
     SharedValue,
 } from 'react-native-reanimated';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList, Difficulty } from '../../types';
 import { Text } from '../../components/ui';
 import { colors, spacing, borderRadius, shadows } from '../../theme';
@@ -65,7 +66,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
     const stages = useMemo(() => generateCampaignMap(TOTAL_STAGES), []);
     
     // Campaign State
-    const { currentNodeId, completedNodes, advanceToNode } = useCampaignStore();
+    const { currentNodeId, completedNodes, advanceToNode, gold, talentPoints } = useCampaignStore();
 
     // Calculate logical row for each stage to determine vertical position
     const stageLayouts = useMemo(() => {
@@ -149,9 +150,18 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
             // In a real flow, this might happen AFTER winning.
             advanceToNode(selectedStage);
 
-            if (stageData?.type === 'shop' || stageData?.type === 'event' || stageData?.type === 'rest') {
+            if (stageData?.type === 'shop') {
+                setStageModalVisible(false);
+                advanceToNode(selectedStage);
+                navigation.navigate('Shop');
+                return;
+            }
+
+            if (stageData?.type === 'event' || stageData?.type === 'rest') {
                 // Placeholder for non-battle nodes
                 console.log(`Entered ${stageData.type} node`);
+                advanceToNode(selectedStage);
+                setStageModalVisible(false);
                 return;
             }
 
@@ -178,12 +188,33 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
 
                 <BiomeHeader scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
                 
-                <Pressable
-                    onPress={() => setDifficultyModalVisible(true)}
-                    style={[styles.headerButton, styles.difficultyBtn]}
-                >
-                    <Text variant="caption" color={colors.arcane.cyan}>{selectedDifficulty.toUpperCase()}</Text>
-                </Pressable>
+                <View style={styles.headerRight}>
+                    <Pressable 
+                        style={styles.heroButton}
+                        onPress={() => navigation.navigate('Shop')}
+                    >
+                        <MaterialCommunityIcons name="cart" size={20} color={colors.arcane.emerald} />
+                    </Pressable>
+
+                    <Pressable 
+                        style={styles.heroButton}
+                        onPress={() => navigation.navigate('TalentTree')}
+                    >
+                        <Ionicons name="sparkles" size={20} color={colors.arcane.emerald} />
+                        {talentPoints > 0 && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>{talentPoints}</Text>
+                            </View>
+                        )}
+                    </Pressable>
+
+                    <Pressable
+                        onPress={() => setDifficultyModalVisible(true)}
+                        style={[styles.headerButton, styles.difficultyBtn]}
+                    >
+                        <Text variant="caption" color={colors.arcane.cyan}>{selectedDifficulty.toUpperCase()}</Text>
+                    </Pressable>
+                </View>
             </View>
 
 
@@ -202,59 +233,22 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                         if (!layout) return null;
                         
                         return (
-                            <React.Fragment key={stage.id}>
-                                {stage.connections.map(nextId => {
-                                    const nextStage = stages.find(s => s.id === nextId);
-                                    if (!nextStage) return null;
-                                    
-                                    const nextLayout = stageLayouts.layouts[nextId];
-                                    if (!nextLayout) return null;
-
-                                    const vDist = nextLayout.top - layout.top;
-                                    const hDist = nextLayout.left - layout.left;
-                                    const distance = Math.sqrt(hDist * hDist + vDist * vDist);
-                                    
-                                    return (
-                                        <View 
-                                            key={`road-${stage.id}-${nextId}`}
-                                            style={[
-                                                styles.roadSegment,
-                                                {
-                                                    left: (layout.left + nextLayout.left) / 2,
-                                                    top: layout.top + (54 / 2),
-                                                    height: distance,
-                                                    transform: [
-                                                        { translateX: -1.5 },
-                                                        { rotate: `${Math.atan2(-hDist, -vDist) * (180 / Math.PI)}deg` },
-                                                        { translateY: distance / 2 }
-                                                    ]
-                                                }
-                                            ]}
-                                        >
-                                            <LinearGradient
-                                                colors={[colors.arcane.emerald, 'transparent']}
-                                                style={StyleSheet.absoluteFill}
-                                            />
-                                        </View>
-                                    );
-                                })}
-
-                                <MapNodeComponent 
-                                    stage={stage}
-                                    isBoss={isBoss}
-                                    layout={layout}
-                                    isActive={selectedStage === stage.id}
-                                    isCurrent={currentNodeId === stage.id}
-                                    isCompleted={completedNodes.includes(stage.id)}
-                                    isLocked={stage.id > currentNodeId}
-                                    onPress={() => {
-                                        if (stage.id > currentNodeId) {
-                                            return; // Locked!
-                                        }
-                                        handleStagePress(stage.id);
-                                    }}
-                                />
-                            </React.Fragment>
+                            <MapNodeComponent 
+                                key={stage.id}
+                                stage={stage}
+                                isBoss={isBoss}
+                                layout={layout}
+                                isActive={selectedStage === stage.id}
+                                isCurrent={currentNodeId === stage.id}
+                                isCompleted={completedNodes.includes(stage.id)}
+                                isLocked={stage.id > currentNodeId}
+                                onPress={() => {
+                                    if (stage.id > currentNodeId) {
+                                        return; // Locked!
+                                    }
+                                    handleStagePress(stage.id);
+                                }}
+                            />
                         );
                     })}
                 </View>
@@ -313,9 +307,13 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                         exiting={FadeOut}
                         style={styles.stageModalContent}
                     >
-                        <Text variant="h3" style={styles.stageLevelName}>LEVEL {selectedStage}</Text>
+                        <Text variant="h3" style={styles.stageLevelName}>
+                            {stages.find(s => s.id === selectedStage)?.type?.toUpperCase() || 'LEVEL'} {selectedStage}
+                        </Text>
                         <Text variant="caption" color={colors.arcane.emerald} style={styles.stageInfo}>
-                            DIFFICULTY: {selectedDifficulty.toUpperCase()}
+                            {stages.find(s => s.id === selectedStage)?.type === 'shop' 
+                                ? 'RESTOCK AND REFINE' 
+                                : `DIFFICULTY: ${selectedDifficulty.toUpperCase()}`}
                         </Text>
                         
                         <Pressable 
@@ -326,7 +324,9 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                 colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
                                 style={styles.playButtonGradient}
                             >
-                                <Text style={styles.playButtonText}>ENTER VOID</Text>
+                                <Text style={styles.playButtonText}>
+                                    {stages.find(s => s.id === selectedStage)?.type === 'shop' ? 'VISIT MERCHANT' : 'ENTER VOID'}
+                                </Text>
                             </LinearGradient>
                         </Pressable>
                     </Animated.View>
@@ -485,6 +485,10 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -492,6 +496,38 @@ const styles = StyleSheet.create({
         zIndex: 20,
         backgroundColor: 'rgba(0,0,0,0.5)',
         paddingBottom: spacing.md,
+    },
+    headerRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    heroButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: spacing.sm,
+        borderWidth: 1,
+        borderColor: colors.arcane.emerald,
+    },
+    badge: {
+        position: 'absolute',
+        top: -4,
+        right: -4,
+        backgroundColor: '#ef4444',
+        borderRadius: 8,
+        minWidth: 16,
+        height: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 2,
+    },
+    badgeText: {
+        color: 'white',
+        fontSize: 10,
+        fontWeight: 'bold',
     },
     headerButton: {
         padding: spacing.sm,
@@ -541,17 +577,6 @@ const styles = StyleSheet.create({
     },
     roadContainer: {
         width: '100%',
-    },
-    roadSegment: {
-        position: 'absolute',
-        width: 3,
-        backgroundColor: colors.arcane.emerald,
-        opacity: 0.15,
-        borderRadius: 2,
-        shadowColor: colors.arcane.emerald,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.5,
-        shadowRadius: 5,
     },
     stageNode: {
         justifyContent: 'center',

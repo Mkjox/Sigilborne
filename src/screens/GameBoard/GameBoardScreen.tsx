@@ -130,7 +130,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
         selectedCardId, roundsWon, currentRound,
         getPlayerPower, getAIPower, useHeroAbility, message,
         attackingCardId, setAttackingCard, attackCard,
-        currentVFX, setVFX, weather, phase, continueToNextRound
+        weather, phase, continueToNextRound
     } = useGameStore();
 
     // Advanced VFX & Shake
@@ -153,19 +153,8 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
         transform: [{ translateY: boardShake.value }],
     }));
 
-    // Sync Weather System with Game State
-    useEffect(() => {
-        if (currentVFX === 'frost') {
-            setWeather('frost');
-            setVFX('none');
-        } else if (currentVFX === 'fog') {
-            setWeather('fog');
-            setVFX('none');
-        } else if (currentVFX !== 'none') {
-            triggerVFX(currentVFX as any, screenWidth / 2, screenHeight / 2);
-            setVFX('none');
-        }
-    }, [currentVFX]);
+    // Weather System is now driven by card ability side-effects and event bus
+    // (Manual triggers for local shake still use triggerVFX)
 
     // Handle clearing weather if game state dictates (e.g., Clear Skies card played)
     // For now, we'll keep it simple: weather persists until cleared explicitly.
