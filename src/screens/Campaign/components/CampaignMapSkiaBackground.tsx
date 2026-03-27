@@ -77,16 +77,40 @@ export const CampaignMapSkiaBackground: React.FC<Props> = ({ scrollY, totalHeigh
         }));
     }, [width, height]);
 
-    // Derived dust points (Slow downward drift)
+    // Derived dust points driven by biome physics
     const points = useDerivedValue(() => {
+        // Calculate current biome progress (approximate)
+        const progress = scrollY.value / (totalHeight || 1);
+        const biomeIndex = Math.min(4, Math.floor(progress * 5));
+        
         return dust.map(d => {
             const t = time.value * d.speed;
-            const x = d.x + Math.sin(t * 0.1 + d.offset) * 20; 
-            const y = (d.y + t * 30) % (height + 200); 
-            const wrappedY = y < 0 ? y + (height + 200) : y;
+            let x = d.x;
+            let y = d.y;
+            
+            // Apply unique physics based on active biome
+            switch(biomeIndex) {
+                case 0: // Verdant Echo: Organic sway
+                    x += Math.sin(t * 0.1 + d.offset) * 15;
+                    y = (d.y + t * 20) % (height + 200);
+                    break;
+                case 1: // Azure Spire: Falling frost
+                    y = (d.y + t * 45) % (height + 200);
+                    break;
+                case 3: // Crimson Wake: Rising heat
+                case 4: // Obsidian Heart: Rising embers
+                    y = (d.y - t * 40) % (height + 200);
+                    if (y < -100) y += (height + 300);
+                    break;
+                default: // Twilight Rift: Arcane turbulence
+                    x += Math.cos(t * 0.2 + d.offset) * 25;
+                    y = (d.y + Math.sin(t * 0.15) * 50) % (height + 200);
+            }
+
+            const wrappedY = y < -100 ? y + (height + 300) : y;
             return vec(x, wrappedY - 100);
         });
-    }, [time, width, height]);
+    }, [time, width, height, totalHeight]);
 
     // Global Time Clock
     React.useEffect(() => {
@@ -114,7 +138,7 @@ export const CampaignMapSkiaBackground: React.FC<Props> = ({ scrollY, totalHeigh
     }));
 
     return (
-        <View style={StyleSheet.absoluteFill}>
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
             <Canvas style={StyleSheet.absoluteFill}>
                 {/* 1. Deep Void Nebula backdrop */}
                 <Fill>

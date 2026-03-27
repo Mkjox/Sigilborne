@@ -64,7 +64,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
 
     // Use deterministic generation
     const stages = useMemo(() => generateCampaignMap(TOTAL_STAGES), []);
-    
+
     // Campaign State
     const { currentNodeId, completedNodes, advanceToNode, gold, talentPoints } = useCampaignStore();
 
@@ -73,18 +73,18 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
         const layouts: Record<number, { top: number, left: number }> = {};
         const NODE_DISTANCE = 114;
         let currentRow = 0;
-        
+
         stages.forEach((stage, idx) => {
             if (stage.branch === 'right') {
                 // Shares row with previous 'left' branch
-                layouts[stage.id] = { 
-                    top: (currentRow - 1) * NODE_DISTANCE, 
-                    left: (stage.x / 100) * screenWidth 
+                layouts[stage.id] = {
+                    top: (currentRow - 1) * NODE_DISTANCE,
+                    left: (stage.x / 100) * screenWidth
                 };
             } else {
-                layouts[stage.id] = { 
-                    top: currentRow * NODE_DISTANCE, 
-                    left: (stage.x / 100) * screenWidth 
+                layouts[stage.id] = {
+                    top: currentRow * NODE_DISTANCE,
+                    left: (stage.x / 100) * screenWidth
                 };
                 currentRow++;
             }
@@ -93,7 +93,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
         // We want Level 1 to be at the bottom, and Level 200 at the top.
         // ScrollView content flows from top (0) to bottom (totalHeight).
         const maxTop = (currentRow - 1) * NODE_DISTANCE;
-        
+
         // Offset everything so Level 200 is at top: 0
         stages.forEach(s => {
             const l = layouts[s.id];
@@ -111,14 +111,14 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
         (currentScroll) => {
             if (!stageLayouts.totalHeight) return;
             const maxTop = stageLayouts.totalHeight - 200;
-            
+
             // Inverted logic: Level 1 is at scrollY = maxTop
             const topRow = (maxTop - currentScroll) / 114;
             const bottomRow = (maxTop - (currentScroll + viewportHeight)) / 114;
 
             const startIdx = Math.max(0, Math.floor(Math.min(topRow, bottomRow)) - 10);
             const endIdx = Math.min(stages.length, Math.ceil(Math.max(topRow, bottomRow)) + 15);
-            
+
             runOnJS(setVisibleRange)({ start: startIdx, end: endIdx });
         },
         [stageLayouts.totalHeight, stages.length, viewportHeight]
@@ -145,7 +145,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
         if (selectedStage) {
             setStageModalVisible(false);
             const stageData = stages.find(s => s.id === selectedStage);
-            
+
             // Actually advance the node in the store when they press play
             // In a real flow, this might happen AFTER winning.
             advanceToNode(selectedStage);
@@ -165,9 +165,9 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                 return;
             }
 
-            navigation.navigate('GameBoard', { 
+            navigation.navigate('GameBoard', {
                 difficulty: stageData?.difficulty || selectedDifficulty,
-                stageId: selectedStage 
+                stageId: selectedStage
             });
         }
     };
@@ -176,50 +176,9 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.container}>
             <CampaignMapSkiaBackground scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
             <MapParallaxLayers scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
-            
-            {/* Map Header */}
-            <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-                <Pressable
-                    onPress={() => navigation.goBack()}
-                    style={styles.headerButton}
-                >
-                    <Text variant="body" color={colors.arcane.emerald}>← MENU</Text>
-                </Pressable>
-
-                <BiomeHeader scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
-                
-                <View style={styles.headerRight}>
-                    <Pressable 
-                        style={styles.heroButton}
-                        onPress={() => navigation.navigate('Shop')}
-                    >
-                        <MaterialCommunityIcons name="cart" size={20} color={colors.arcane.emerald} />
-                    </Pressable>
-
-                    <Pressable 
-                        style={styles.heroButton}
-                        onPress={() => navigation.navigate('TalentTree')}
-                    >
-                        <Ionicons name="sparkles" size={20} color={colors.arcane.emerald} />
-                        {talentPoints > 0 && (
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>{talentPoints}</Text>
-                            </View>
-                        )}
-                    </Pressable>
-
-                    <Pressable
-                        onPress={() => setDifficultyModalVisible(true)}
-                        style={[styles.headerButton, styles.difficultyBtn]}
-                    >
-                        <Text variant="caption" color={colors.arcane.cyan}>{selectedDifficulty.toUpperCase()}</Text>
-                    </Pressable>
-                </View>
-            </View>
-
 
             {/* Scrollable Map */}
-            <Animated.ScrollView 
+            <Animated.ScrollView
                 ref={mapRef as any}
                 contentContainerStyle={[styles.mapContent, { height: stageLayouts.totalHeight }]}
                 showsVerticalScrollIndicator={false}
@@ -231,9 +190,9 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                         const isBoss = stage.id % 20 === 0;
                         const layout = stageLayouts.layouts[stage.id];
                         if (!layout) return null;
-                        
+
                         return (
-                            <MapNodeComponent 
+                            <MapNodeComponent
                                 key={stage.id}
                                 stage={stage}
                                 isBoss={isBoss}
@@ -254,9 +213,47 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
             </Animated.ScrollView>
 
-            {/* Difficulty Modal */}
+            {/* Map Header - Moved to bottom to ensure it's on top of ScrollView */}
+            <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
+                <Pressable
+                    onPress={() => navigation.goBack()}
+                    style={styles.headerButton}
+                >
+                    <Text variant="body" color={colors.arcane.emerald}>← MENU</Text>
+                </Pressable>
 
-            {/* Difficulty Modal */}
+                <BiomeHeader scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
+
+                <View style={styles.headerRight}>
+                    <Pressable
+                        style={styles.heroButton}
+                        onPress={() => navigation.navigate('Shop')}
+                    >
+                        <MaterialCommunityIcons name="cart" size={20} color={colors.arcane.emerald} />
+                    </Pressable>
+
+                    <Pressable
+                        style={styles.heroButton}
+                        onPress={() => navigation.navigate('TalentTree')}
+                    >
+                        <Ionicons name="sparkles" size={20} color={colors.arcane.emerald} />
+                        {talentPoints > 0 && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>{talentPoints}</Text>
+                            </View>
+                        )}
+                    </Pressable>
+
+                    <Pressable
+                        onPress={() => setDifficultyModalVisible(true)}
+                        style={[styles.headerButton, styles.difficultyBtn]}
+                    >
+                        <Text variant="caption" color={colors.arcane.cyan}>{selectedDifficulty.toUpperCase()}</Text>
+                    </Pressable>
+                </View>
+            </View>
+
+            {/* Modals */}
             <Modal
                 transparent
                 visible={difficultyModalVisible}
@@ -264,7 +261,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                 onRequestClose={() => setDifficultyModalVisible(false)}
             >
                 <Pressable style={styles.modalBackdrop} onPress={() => setDifficultyModalVisible(false)}>
-                    <Animated.View 
+                    <Animated.View
                         entering={SlideInDown}
                         exiting={SlideOutDown}
                         style={styles.modalContent}
@@ -282,8 +279,8 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                     setDifficultyModalVisible(false);
                                 }}
                             >
-                                <Text 
-                                    variant="body" 
+                                <Text
+                                    variant="body"
                                     color={selectedDifficulty === diff ? colors.arcane.obsidian : colors.arcane.white}
                                 >
                                     {diff.toUpperCase()}
@@ -302,7 +299,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                 onRequestClose={() => setStageModalVisible(false)}
             >
                 <Pressable style={styles.modalBackdrop} onPress={() => setStageModalVisible(false)}>
-                    <Animated.View 
+                    <Animated.View
                         entering={FadeIn}
                         exiting={FadeOut}
                         style={styles.stageModalContent}
@@ -311,12 +308,12 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                             {stages.find(s => s.id === selectedStage)?.type?.toUpperCase() || 'LEVEL'} {selectedStage}
                         </Text>
                         <Text variant="caption" color={colors.arcane.emerald} style={styles.stageInfo}>
-                            {stages.find(s => s.id === selectedStage)?.type === 'shop' 
-                                ? 'RESTOCK AND REFINE' 
+                            {stages.find(s => s.id === selectedStage)?.type === 'shop'
+                                ? 'RESTOCK AND REFINE'
                                 : `DIFFICULTY: ${selectedDifficulty.toUpperCase()}`}
                         </Text>
-                        
-                        <Pressable 
+
+                        <Pressable
                             style={styles.playButton}
                             onPress={handlePlayStage}
                         >
@@ -419,7 +416,7 @@ const MapNodeComponent = React.memo<{
     const getIcon = () => {
         const color = isLocked ? colors.text.disabled : (isCurrent || isActive ? colors.arcane.obsidian : isBoss ? colors.arcane.white : colors.arcane.emerald);
         const size = isBoss ? 28 : 20;
-        
+
         if (stage.type === 'shop') return <MaterialCommunityIcons name="diamond-stone" size={size} color={color} />;
         if (stage.type === 'rest') return <MaterialCommunityIcons name="tent" size={size} color={color} />;
         if (stage.type === 'event') return <MaterialCommunityIcons name="map-marker-question" size={size} color={color} />;
@@ -451,15 +448,15 @@ const MapNodeComponent = React.memo<{
                 isActive && styles.nodeGlowActive,
                 isBoss && { width: NODE_SIZE + 10, height: NODE_SIZE + 10, borderRadius: (NODE_SIZE + 10) / 2 }
             ]} />
-            
+
             {isBoss && <View style={styles.bossRing} />}
 
             <LinearGradient
                 colors={
                     isCurrent || isActive
-                        ? [colors.arcane.emerald, colors.arcane.emeraldDark] 
+                        ? [colors.arcane.emerald, colors.arcane.emeraldDark]
                         : isBoss && !isLocked
-                            ? ['#f59e0b', '#78350f'] 
+                            ? ['#f59e0b', '#78350f']
                             : [colors.arcane.graphite, colors.arcane.obsidian]
                 }
                 style={[
@@ -636,25 +633,25 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     modalContent: {
-        width: '80%',
+        width: '65%', // Reduced by approx 20%
         backgroundColor: colors.arcane.obsidian,
         borderRadius: borderRadius.lg,
-        padding: spacing.xl,
+        padding: spacing.lg, // Reduced from xl
         borderWidth: 1,
         borderColor: colors.arcane.emerald,
         alignItems: 'center',
     },
     modalTitle: {
-        marginBottom: spacing.xl,
+        marginBottom: spacing.lg, // Reduced from xl
         letterSpacing: 2,
     },
     modalOption: {
         width: '100%',
-        padding: spacing.lg,
+        padding: spacing.md, // Reduced from lg
         borderRadius: borderRadius.md,
         borderWidth: 1,
         borderColor: 'rgba(16, 185, 129, 0.2)',
-        marginBottom: spacing.md,
+        marginBottom: spacing.sm, // Reduced from md
         alignItems: 'center',
     },
     modalOptionActive: {

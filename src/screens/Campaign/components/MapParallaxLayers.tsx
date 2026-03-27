@@ -38,14 +38,35 @@ export const MapParallaxLayers: React.FC<ParallaxProps> = ({ scrollY, totalHeigh
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
             {elements.map((el) => {
                 const animatedStyle = useAnimatedStyle(() => {
-                    // Elements move relative to scroll but at different speeds
-                    const translateY = -scrollY.value * el.speed;
+                    // Biome Progress
+                    const progress = scrollY.value / (totalHeight || 1);
+                    const biomeIndex = Math.min(4, Math.floor(progress * 5));
+
+                    // Base Parallax motion
+                    let translateY = -scrollY.value * el.speed;
+                    let translateX = el.x - el.size / 2;
+                    let scale = 1;
+
+                    // Biome-specific behavior overrides
+                    if (biomeIndex === 0) { // Verdant Echo: Sway
+                        translateX += Math.sin(scrollY.value * 0.002 + el.id) * 10;
+                    } else if (biomeIndex === 1) { // Azure Spire: Faster downward
+                        translateY -= scrollY.value * 0.1;
+                    } else if (biomeIndex === 2) { // Twilight Rift: Pulse
+                        scale = interpolate(
+                            Math.sin(scrollY.value * 0.005 + el.id),
+                            [-1, 1],
+                            [0.8, 1.2]
+                        );
+                    } else if (biomeIndex >= 3) { // Ember Zones: Rising tension
+                        translateY -= scrollY.value * 0.2;
+                    }
                     
                     // Fade out when far from center height
                     const currentY = el.y + translateY;
                     const opacity = interpolate(
                         currentY,
-                        [-100, height/2, height + 100],
+                        [-200, height/2, height + 200],
                         [0, el.opacity, 0],
                         'clamp'
                     );
@@ -59,8 +80,9 @@ export const MapParallaxLayers: React.FC<ParallaxProps> = ({ scrollY, totalHeigh
                     return {
                         transform: [
                             { translateY: el.y + translateY },
-                            { translateX: el.x - el.size / 2 },
-                            { rotate: `${el.rotation + (scrollY.value * 0.05)}deg` }
+                            { translateX },
+                            { rotate: `${el.rotation + (scrollY.value * 0.05)}deg` },
+                            { scale }
                         ],
                         opacity,
                         borderColor: color,

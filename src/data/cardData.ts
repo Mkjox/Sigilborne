@@ -116,7 +116,7 @@ export const MELEE_UNITS: Card[] = [
     createCard('Berserker', 'unit', 'rare', 3, 7, [ABILITIES.MORALE_BOOST(1)], 'Fierce warrior that inspires allies', 'His rage is legendary.', require('../../assets/units/berserker.jpg')),
     createCard('Shield Captain', 'unit', 'rare', 3, 4, [ABILITIES.TIGHT_BOND()], 'Stronger with fellow captains', 'Unity is strength.', require('../../assets/units/shield_captain.jpg')),
     createCard('Champion', 'unit', 'epic', 4, 9, [], 'Elite warrior of the realm', 'Undefeated in single combat.', require('../../assets/units/champion.jpg')),
-    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'Commands respect on the battlefield', 'All bow before the warlord.', require('../../assets/heroes/hero_commander.jpg')),
+    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'Commands respect on the battlefield', 'All bow before the warlord.'),
     // Sinister Expansion
     createCard('Lich King', 'unit', 'legendary', 10, 12, [ABILITIES.MORALE_BOOST(2)], 'Lord of the frozen dead', 'Death is but a new beginning.', require('../../assets/units/lich_king.jpg')),
     createCard('Grave Ghoul', 'unit', 'common', 1, 3, [], 'Feasts on the remains of battle', 'Always hungry.', require('../../assets/units/grave_ghoul.jpg')),
@@ -304,7 +304,7 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 4,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/champion.jpg'),
+        artwork: require('../../assets/heroes/hero_rogue.jpg'),
         className: 'Rogue',
         faction: 'neutral',
         flavorText: 'Why fight for a throne when you can steal the crown? He plays every side to ensure his own victory.',
@@ -324,7 +324,7 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 2,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/champion.jpg'),
+        artwork: require('../../assets/heroes/hero_berserker.jpg'),
         className: 'Fighter',
         faction: 'order',
         flavorText: 'Reason died long ago in the heat of the pit. Now, there is only the rhythm of the axe.',
@@ -344,7 +344,7 @@ export const AVAILABLE_HEROES: Hero[] = [
             cooldown: 3,
             currentCooldown: 0,
         },
-        artwork: require('../../assets/units/champion.jpg'),
+        artwork: require('../../assets/heroes/hero_druid.jpg'),
         className: 'Shaman',
         faction: 'nature',
         flavorText: 'The trees remember what the stone has forgotten. He is the voice of the awakening earth.',
@@ -456,141 +456,141 @@ export const TALENT_TREES: Record<string, TalentTree> = {
     hero_commander: {
         heroId: 'hero_commander',
         talents: [
-            { 
-                id: 't_cmd_1', 
-                name: 'Vanguard Spirit', 
-                description: '+1 Hero Health', 
-                icon: 'heart', 
-                effect: { type: 'stat_boost', target: 'hero_health', value: 1 }, 
-                position: { x: 100, y: 100 } 
+            {
+                id: 't_cmd_1',
+                name: 'Vanguard Spirit',
+                description: '+1 Hero Health',
+                icon: 'heart',
+                effect: { type: 'stat_boost', target: 'hero_health', value: 1 },
+                position: { x: 100, y: 100 }
             },
-            { 
-                id: 't_cmd_2', 
-                name: 'Inspiration', 
-                description: 'Start with +2 Mana', 
-                icon: 'flash', 
-                effect: { type: 'stat_boost', target: 'starting_mana', value: 2 }, 
-                requirements: ['t_cmd_1'], 
-                position: { x: 100, y: 250 } 
+            {
+                id: 't_cmd_2',
+                name: 'Inspiration',
+                description: 'Start with +2 Mana',
+                icon: 'flash',
+                effect: { type: 'stat_boost', target: 'starting_mana', value: 2 },
+                requirements: ['t_cmd_1'],
+                position: { x: 100, y: 250 }
             },
-            { 
-                id: 't_cmd_3', 
-                name: 'Order Mastery', 
-                description: 'Order units get +1 Attack', 
-                icon: 'shield', 
-                effect: { type: 'faction_bonus', faction: 'order', attackBoost: 1 }, 
-                requirements: ['t_cmd_2'], 
-                position: { x: 100, y: 400 } 
+            {
+                id: 't_cmd_3',
+                name: 'Order Mastery',
+                description: 'Order units get +1 Attack',
+                icon: 'shield',
+                effect: { type: 'faction_bonus', faction: 'order', attackBoost: 1 },
+                requirements: ['t_cmd_2'],
+                position: { x: 100, y: 400 }
             },
         ]
     },
     hero_darklord: {
         heroId: 'hero_darklord',
         talents: [
-            { 
-                id: 't_dark_1', 
-                name: 'Void Reach', 
-                description: 'Hero Power cooldown -1', 
-                icon: 'stopwatch', 
-                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 }, 
-                position: { x: 100, y: 100 } 
+            {
+                id: 't_dark_1',
+                name: 'Void Reach',
+                description: 'Hero Power cooldown -1',
+                icon: 'stopwatch',
+                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
+                position: { x: 100, y: 100 }
             },
-            { 
-                id: 't_dark_2', 
-                name: 'Dark Ritual', 
-                description: 'Start with +3 Mana', 
-                icon: 'flash', 
-                effect: { type: 'stat_boost', target: 'starting_mana', value: 3 }, 
-                requirements: ['t_dark_1'], 
-                position: { x: 100, y: 250 } 
+            {
+                id: 't_dark_2',
+                name: 'Dark Ritual',
+                description: 'Start with +3 Mana',
+                icon: 'flash',
+                effect: { type: 'stat_boost', target: 'starting_mana', value: 3 },
+                requirements: ['t_dark_1'],
+                position: { x: 100, y: 250 }
             },
         ]
     },
     hero_archmage: {
         heroId: 'hero_archmage',
         talents: [
-            { 
-                id: 't_mage_1', 
-                name: 'Arcane Focus', 
-                description: 'Start with +3 Mana', 
-                icon: 'flash', 
-                effect: { type: 'stat_boost', target: 'starting_mana', value: 3 }, 
-                position: { x: 100, y: 100 } 
+            {
+                id: 't_mage_1',
+                name: 'Arcane Focus',
+                description: 'Start with +3 Mana',
+                icon: 'flash',
+                effect: { type: 'stat_boost', target: 'starting_mana', value: 3 },
+                position: { x: 100, y: 100 }
             },
-            { 
-                id: 't_mage_2', 
-                name: 'Mana Overflow', 
-                description: 'Card draw +1 at start of game', 
-                icon: 'documents', 
+            {
+                id: 't_mage_2',
+                name: 'Mana Overflow',
+                description: 'Card draw +1 at start of game',
+                icon: 'documents',
                 effect: { type: 'stat_boost', target: 'starting_mana', value: 2 }, // Placeholder
-                requirements: ['t_mage_1'], 
-                position: { x: 100, y: 250 } 
+                requirements: ['t_mage_1'],
+                position: { x: 100, y: 250 }
             },
         ]
     },
     hero_ranger: {
         heroId: 'hero_ranger',
         talents: [
-            { 
-                id: 't_rng_1', 
-                name: 'Steady Aim', 
-                description: 'Nature units get +1 Attack', 
-                icon: 'leaf', 
-                effect: { type: 'faction_bonus', faction: 'nature', attackBoost: 1 }, 
-                position: { x: 100, y: 100 } 
+            {
+                id: 't_rng_1',
+                name: 'Steady Aim',
+                description: 'Nature units get +1 Attack',
+                icon: 'leaf',
+                effect: { type: 'faction_bonus', faction: 'nature', attackBoost: 1 },
+                position: { x: 100, y: 100 }
             },
-            { 
-                id: 't_rng_2', 
-                name: 'Eagle Eye', 
-                description: 'Hero Power cooldown -1', 
-                icon: 'stopwatch', 
-                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 }, 
-                requirements: ['t_rng_1'], 
-                position: { x: 100, y: 250 } 
+            {
+                id: 't_rng_2',
+                name: 'Eagle Eye',
+                description: 'Hero Power cooldown -1',
+                icon: 'stopwatch',
+                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
+                requirements: ['t_rng_1'],
+                position: { x: 100, y: 250 }
             },
         ]
     },
     hero_paladin: {
         heroId: 'hero_paladin',
         talents: [
-            { 
-                id: 't_pal_1', 
-                name: 'Holy Devotion', 
-                description: '+2 Hero Health', 
-                icon: 'heart', 
-                effect: { type: 'stat_boost', target: 'hero_health', value: 2 }, 
-                position: { x: 100, y: 100 } 
+            {
+                id: 't_pal_1',
+                name: 'Holy Devotion',
+                description: '+2 Hero Health',
+                icon: 'heart',
+                effect: { type: 'stat_boost', target: 'hero_health', value: 2 },
+                position: { x: 100, y: 100 }
             },
-            { 
-                id: 't_pal_2', 
-                name: 'Aura of Guarding', 
-                description: 'Order units get +1 Attack', 
-                icon: 'shield', 
-                effect: { type: 'faction_bonus', faction: 'order', attackBoost: 1 }, 
-                requirements: ['t_pal_1'], 
-                position: { x: 100, y: 250 } 
+            {
+                id: 't_pal_2',
+                name: 'Aura of Guarding',
+                description: 'Order units get +1 Attack',
+                icon: 'shield',
+                effect: { type: 'faction_bonus', faction: 'order', attackBoost: 1 },
+                requirements: ['t_pal_1'],
+                position: { x: 100, y: 250 }
             },
         ]
     },
     hero_druid: {
         heroId: 'hero_druid',
         talents: [
-            { 
-                id: 't_dru_1', 
-                name: 'Forest bond', 
-                description: 'Nature units get +1 Attack', 
-                icon: 'leaf', 
-                effect: { type: 'faction_bonus', faction: 'nature', attackBoost: 1 }, 
-                position: { x: 100, y: 100 } 
+            {
+                id: 't_dru_1',
+                name: 'Forest bond',
+                description: 'Nature units get +1 Attack',
+                icon: 'leaf',
+                effect: { type: 'faction_bonus', faction: 'nature', attackBoost: 1 },
+                position: { x: 100, y: 100 }
             },
-            { 
-                id: 't_dru_2', 
-                name: 'Ancient Growth', 
-                description: 'Start with +2 Mana', 
-                icon: 'flash', 
-                effect: { type: 'stat_boost', target: 'starting_mana', value: 2 }, 
-                requirements: ['t_dru_1'], 
-                position: { x: 100, y: 250 } 
+            {
+                id: 't_dru_2',
+                name: 'Ancient Growth',
+                description: 'Start with +2 Mana',
+                icon: 'flash',
+                effect: { type: 'stat_boost', target: 'starting_mana', value: 2 },
+                requirements: ['t_dru_1'],
+                position: { x: 100, y: 250 }
             },
         ]
     }
