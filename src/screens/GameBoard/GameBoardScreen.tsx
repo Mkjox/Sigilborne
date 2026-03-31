@@ -23,6 +23,8 @@ import { WeatherProvider, useWeather } from '../../context/WeatherContext';
 import { SpectralEffectType } from '../../components/game/vfx/SpectralEffect';
 import { UnifiedVFXManager } from '../../components/game';
 import { GameBoardSkiaBackground } from './components/GameBoardSkiaBackground';
+import { useCampaignStore } from '../../store/campaignStore';
+import { generateCampaignMap } from '../../data/campaignData';
 
 type GameBoardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameBoard'>;
 type GameBoardScreenRouteProp = RouteProp<RootStackParamList, 'GameBoard'>;
@@ -132,6 +134,25 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
         attackingCardId, setAttackingCard, attackCard,
         weather, phase, continueToNextRound
     } = useGameStore();
+
+    // Campaign integration
+    const completeNode = useCampaignStore(state => state.completeNode);
+    const hasCompletedCurrent = React.useRef(false);
+
+    // Find current stage data for rewards and connections
+    const stageData = React.useMemo(() => {
+        if (!stageId) return null;
+        const stages = generateCampaignMap();
+        return stages.find(s => s.id === stageId) || null;
+    }, [stageId]);
+
+    // Track level completion on victory
+    useEffect(() => {
+        if (gameOver && winner === 'player' && stageId && stageData && !hasCompletedCurrent.current) {
+            completeNode(stageId, stageData.rewards, stageData.connections);
+            hasCompletedCurrent.current = true;
+        }
+    }, [gameOver, winner, stageId, stageData, completeNode]);
 
     // Advanced VFX & Shake
     const boardShake = useSharedValue(0);
@@ -509,9 +530,20 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                 <Text variant="h2" style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: 'serif' }}>
                                     {winner === 'player' ? 'VICTORY' : (winner === 'draw' ? 'STALEMATE' : 'OBLIVION')}
                                 </Text>
-                                <Pressable onPress={() => startGame(difficulty)} style={styles.overlayBtn}>
-                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>REAWAKEN</Text>
+                                
+                                {winner === 'player' && (
+                                    <Pressable 
+                                        onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} 
+                                        style={[styles.overlayBtn, { backgroundColor: colors.arcane.emerald, marginBottom: 12 }]}
+                                    >
+                                        <Text variant="button" color={colors.arcane.obsidian} style={{ letterSpacing: 4, fontWeight: '900' }}>CONTINUE EXPEDITION</Text>
+                                    </Pressable>
+                                )}
+
+                                <Pressable onPress={() => startGame(difficulty)} style={[styles.overlayBtn, winner === 'player' && { backgroundColor: 'transparent', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }]}>
+                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>{winner === 'player' ? 'REPLAY' : 'REAWAKEN'}</Text>
                                 </Pressable>
+
                                 <Pressable onPress={() => { resetGame(); navigation.navigate('MainMenu'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald, marginTop: 16 }]}>
                                     <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>ABANDON</Text>
                                 </Pressable>

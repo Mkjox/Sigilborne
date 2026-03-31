@@ -30,7 +30,7 @@ export interface CampaignStore {
     
     // Actions
     advanceToNode: (nodeId: number) => void;
-    completeNode: (rewards?: NodeRewards) => void;
+    completeNode: (nodeId: number, rewards?: NodeRewards, nextNodeIds?: number[]) => void;
     addRelic: (relicId: string) => void;
     resetRun: () => void;
     
@@ -62,25 +62,39 @@ export const useCampaignStore = create<CampaignStore>()(
                     return { currentNodeId: nodeId };
                 }),
 
-            completeNode: (rewards) =>
+            completeNode: (nodeId, rewards, nextNodeIds = []) =>
                 set((state) => {
-                    if (state.completedNodes.includes(state.currentNodeId)) {
-                        return state; // Already complete
-                    }
-                    
+                    const alreadyCompleted = state.completedNodes.includes(nodeId);
                     const newGold = state.gold + (rewards?.gold || 0);
-                    const newCompletedNodes = [...state.completedNodes, state.currentNodeId];
+                    const newCompletedNodes = alreadyCompleted 
+                        ? state.completedNodes 
+                        : [...state.completedNodes, nodeId];
                     
-                    // Award talent point every 5 nodes
+                    // Award talent point every 5 UNIQUE nodes
                     let newPoints = state.talentPoints;
-                    if (newCompletedNodes.length % 5 === 0) {
+                    if (!alreadyCompleted && newCompletedNodes.length % 5 === 0) {
                         newPoints += 1;
+                    }
+
+                    // Unlock next nodes if we completed the current furthest node
+                    // or if the provided next nodes are further than current progress
+                    let newCurrentNodeId = state.currentNodeId;
+                    if (nextNodeIds.length > 0) {
+                        const maxNext = Math.max(...nextNodeIds);
+                        // Only advance if the next nodes are actually further than current
+                        if (maxNext > state.currentNodeId) {
+                            newCurrentNodeId = maxNext;
+                        }
+                    } else if (nodeId === state.currentNodeId) {
+                        // Fallback: simple linear increment if no specific connections provided
+                        newCurrentNodeId = state.currentNodeId + 1;
                     }
                     
                     return {
                         completedNodes: newCompletedNodes,
                         gold: newGold,
                         talentPoints: newPoints,
+                        currentNodeId: newCurrentNodeId,
                     };
                 }),
 

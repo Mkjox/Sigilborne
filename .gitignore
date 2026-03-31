@@ -41,3 +41,10 @@ yarn-error.*
 /android
 .vscode/settings.json
 build_release_log.txt
+
+# test coverage
+coverage/
+jest.setup.js.bak
+transform-test.js
+src/__tests__/react_only.test.tsx
+src/__tests__/CardComponent_smoke.test.tsx
