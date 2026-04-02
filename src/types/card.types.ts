@@ -67,6 +67,7 @@ export interface Card {
     basePower?: number; // Original/Max Health
     attack: number; // Damage dealt
     isExhausted?: boolean; // Cannot attack this turn
+    category?: 'melee' | 'ranged' | 'siege'; // Added back to track weather targets
     // row removed
     abilities: Ability[];
     artwork: any;

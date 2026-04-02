@@ -6,6 +6,7 @@ import {
     ScrollView,
     useWindowDimensions,
     FlatList,
+    Image,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -20,7 +21,7 @@ import Animated, {
     withTiming,
     Easing,
 } from 'react-native-reanimated';
-import { RootStackParamList, Card, CardType } from '../../types';
+import { RootStackParamList, Card, CardType, Faction } from '../../types';
 import { Text } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing } from '../../theme';
@@ -31,6 +32,13 @@ type DeckBuilderScreenNavigationProp = StackNavigationProp<RootStackParamList, '
 interface Props { navigation: DeckBuilderScreenNavigationProp; }
 
 const ALL_CARDS = getAllCards();
+
+const FactionIcons: Record<string, any> = {
+    order: require('../../../assets/factions/order.png'),
+    shadow: require('../../../assets/factions/shadow.png'),
+    nature: require('../../../assets/factions/nature.png'),
+    arcane: require('../../../assets/factions/arcane.png'),
+};
 
 // --- Components ---
 
@@ -112,12 +120,16 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                     <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
                         <Text style={styles.backText}>‹</Text>
                     </Pressable>
-                    <View style={styles.spacer} />
-                    <SigilIcon active={filter === 'hero'} label="HERO" icon="♆" onPress={() => setFilter('hero')} />
-                    <SigilIcon active={filter === 'all'} label="ALL" icon="◈" onPress={() => setFilter('all')} />
-                    <SigilIcon active={filter === 'unit'} label="UNITS" icon="⚔" onPress={() => setFilter('unit')} />
-                    <SigilIcon active={filter === 'spell'} label="SPELLS" icon="🝧" onPress={() => setFilter('spell')} />
-                    <View style={styles.spacer} />
+                    <ScrollView 
+                        showsVerticalScrollIndicator={false}
+                        style={{ flex: 1, width: '100%' }}
+                        contentContainerStyle={styles.sigilScrollContent}
+                    >
+                        <SigilIcon active={filter === 'hero'} label="HERO" icon="♆" onPress={() => setFilter('hero')} />
+                        <SigilIcon active={filter === 'all'} label="ALL" icon="◈" onPress={() => setFilter('all')} />
+                        <SigilIcon active={filter === 'unit'} label="UNITS" icon="⚔" onPress={() => setFilter('unit')} />
+                        <SigilIcon active={filter === 'spell'} label="SPELLS" icon="🝧" onPress={() => setFilter('spell')} />
+                    </ScrollView>
                 </View>
 
                 {/* Vertical Void Line */}
@@ -140,7 +152,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                             renderItem={({ item, index }) => {
                                 const isSelected = activeDeck?.heroId === item.id;
                                 return (
-                                    <Animated.View entering={FadeIn.delay(index * 10)} style={styles.vaultCardWrapper}>
+                                    <View style={styles.vaultCardWrapper}>
                                         <Pressable
                                             style={[styles.heroCardPreview, isSelected && styles.heroCardPreviewSelected]}
                                             onPress={() => activeDeckId && setDeckHero(activeDeckId, item.id)}
@@ -150,6 +162,11 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.heroGradient} />
 
                                             <Text style={styles.heroClassName}>{item.className.toUpperCase()}</Text>
+                                            
+                                            {item.faction && FactionIcons[item.faction] && (
+                                                <Image source={FactionIcons[item.faction]} style={styles.heroFactionIcon} />
+                                            )}
+
                                             <Text style={styles.heroNameTitle} numberOfLines={1}>{item.name.toUpperCase()}</Text>
 
                                             <View style={styles.heroAbilityStrip}>
@@ -165,7 +182,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                                 <Text style={styles.countBadgeText}>✓</Text>
                                             </View>
                                         )}
-                                    </Animated.View>
+                                    </View>
                                 );
                             }}
                             contentContainerStyle={styles.vaultList}
@@ -178,21 +195,25 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                             keyExtractor={item => item.id}
                             renderItem={({ item, index }) => {
                                 const count = cardCountInDeck(item.id);
+                                const isMaxCopies = count >= 2;
+                                const isFactionValid = !item.faction || item.faction === 'neutral' || !activeHero || item.faction === activeHero.faction;
+                                const isLinkable = !!activeDeckId && !isDeckFull && !isMaxCopies && isFactionValid;
+
                                 return (
-                                    <Animated.View entering={FadeIn.delay(index * 10)} style={styles.vaultCardWrapper}>
+                                    <View style={styles.vaultCardWrapper}>
                                         <CardComponent
                                             card={item}
                                             width={cardW}
                                             height={cardH}
-                                            onPress={() => activeDeckId && !isDeckFull && addCardToDeck(activeDeckId, item)}
-                                            isPlayable={!!activeDeckId && !isDeckFull}
+                                            onPress={isLinkable ? () => addCardToDeck(activeDeckId!, item) : undefined}
+                                            isPlayable={isLinkable}
                                         />
                                         {count > 0 && (
                                             <View style={styles.countBadge}>
                                                 <Text style={styles.countBadgeText}>{count}</Text>
                                             </View>
                                         )}
-                                    </Animated.View>
+                                    </View>
                                 );
                             }}
                             contentContainerStyle={styles.vaultList}
@@ -324,13 +345,19 @@ const styles = StyleSheet.create({
         color: colors.arcane.emerald,
         fontFamily: 'serif',
     },
+    sigilScrollContent: {
+        flexGrow: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingBottom: 20,
+    },
     sigilItem: {
         alignItems: 'center',
-        marginVertical: 15,
+        marginVertical: 10,
     },
     sigilHex: {
-        width: 44,
-        height: 44,
+        width: 38,
+        height: 38,
         borderWidth: 1,
         borderColor: 'rgba(16,185,129,0.2)',
         justifyContent: 'center',
@@ -343,7 +370,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(16,185,129,0.1)',
     },
     sigilIconText: {
-        fontSize: 18,
+        fontSize: 16,
         color: 'rgba(16,185,129,0.5)',
         transform: [{ rotate: '-45deg' }],
     },
@@ -583,6 +610,17 @@ const styles = StyleSheet.create({
         paddingHorizontal: 6,
         paddingVertical: 2,
         borderRadius: 2,
+    },
+    heroFactionIcon: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.3)',
+        backgroundColor: 'rgba(0,0,0,0.6)',
     },
     heroNameTitle: {
         position: 'absolute',

@@ -237,12 +237,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return;
         }
 
-        // Handle weather cards (Simplified/Disabled for now or needs update)
+        // Handle weather cards
         if (card.type === 'weather') {
-            // Weather logic needs refactor for single zone
-            // For now, doing nothing or simple clear
-            if (card.abilities[0]?.id === 'clear_weather') {
+            const weatherId = card.abilities[0]?.id;
+            if (weatherId === 'clear_weather') {
                 set({ weather: { melee: false, ranged: false, siege: false } });
+            } else if (weatherId === 'frost') {
+                set({ weather: { ...state.weather, melee: true } });
+            } else if (weatherId === 'fog') {
+                set({ weather: { ...state.weather, ranged: true } });
             }
         }
 
@@ -595,11 +598,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         bus
                     );
 
-                    // Handle weather effects if AI played a weather card (Simplified)
+                    // Handle weather effects if AI played a weather card
                     let newWeather = { ...currentState.weather };
                     if (card?.type === 'weather') {
-                        if (card.abilities[0]?.id === 'clear_weather') {
+                        const weatherId = card.abilities[0]?.id;
+                        if (weatherId === 'clear_weather') {
                             newWeather = { melee: false, ranged: false, siege: false };
+                        } else if (weatherId === 'frost') {
+                            newWeather.melee = true;
+                        } else if (weatherId === 'fog') {
+                            newWeather.ranged = true;
                         }
                     }
 

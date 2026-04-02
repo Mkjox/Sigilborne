@@ -46,13 +46,23 @@ export const calculateBoardPower = (
     board.forEach(card => {
         let power = card.power || 0;
 
+        // Apply global weather
+        const isWeatherAffected =
+            (card.category === 'melee' && activeWeather.melee) ||
+            (card.category === 'ranged' && activeWeather.ranged) ||
+            (card.category === 'siege' && activeWeather.siege);
+
+        if (isWeatherAffected) {
+            // Keep any boosts that were applied above the base power
+            const base = card.basePower || 0;
+            const boost = Math.max(0, power - base);
+            power = 1 + boost;
+        }
+
         // Apply Faction Bonus from Talents
         if (card.faction && factionBoosts[card.faction]) {
             power += factionBoosts[card.faction];
         }
-
-        // Apply global weather/debuffs if needed here
-        // For now, simple sum
 
         // Bond (Tight Bond) - Check only within own board
         const count = board.filter(c => c.name === card.name).length;
@@ -221,6 +231,30 @@ export const abilityEffects = {
 
     clear: (_context: AbilityContext): void => {
         // Clear weather is handled in game engine
+    },
+    
+    decoy: (context: AbilityContext): void => {
+        const { state, player } = context;
+        const currentPlayer = player === 'player' ? 'player' : 'ai';
+        const board = state[currentPlayer].board;
+
+        // Find non-hero units
+        const validUnits = board.filter(c => c.type === 'unit' && !c.isHero);
+        if (validUnits.length > 0) {
+            // Pick a random unit
+            const randomIndex = Math.floor(Math.random() * validUnits.length);
+            const target = validUnits[randomIndex];
+
+            // Remove from board
+            board.splice(randomIndex, 1);
+
+            // Re-add to hand
+            // Reset its power to basePower
+            target.power = target.basePower || 0;
+            state[currentPlayer].hand.push(target);
+
+            context.eventBus?.emit('ABILITY_TRIGGERED', { type: 'decoy', cardId: target.id, player: currentPlayer });
+        }
     },
 
     // Rally - boost all friendly units
