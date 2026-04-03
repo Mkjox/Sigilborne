@@ -118,81 +118,81 @@ const createCard = (
 
 // Melee Units
 export const MELEE_UNITS: Card[] = [
-    createCard('Swordsman', 'unit', 'common', 1, 3, [], 'A basic infantry soldier', 'The first line of defense.', require('../../assets/units/swordsman.jpg')),
-    createCard('Knight', 'unit', 'common', 2, 5, [], 'Armored cavalry unit', 'For honor and glory!', require('../../assets/units/knight.jpg')),
-    createCard('Berserker', 'unit', 'rare', 3, 7, [ABILITIES.MORALE_BOOST(1)], 'Fierce warrior that inspires allies', 'His rage is legendary.', require('../../assets/units/berserker.jpg')),
-    createCard('Shield Captain', 'unit', 'rare', 3, 4, [ABILITIES.TIGHT_BOND()], 'Stronger with fellow captains', 'Unity is strength.', require('../../assets/units/shield_captain.jpg')),
-    createCard('Champion', 'unit', 'epic', 4, 9, [], 'Elite warrior of the realm', 'Undefeated in single combat.', require('../../assets/units/champion.jpg')),
-    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'Commands respect on the battlefield', 'All bow before the warlord.', require('../../assets/units/warlord.jpg')),
+    createCard('Swordsman', 'unit', 'common', 1, 3, [], 'A basic infantry soldier', 'The first line of defense.', require('../../assets/units/melee/swordsman.jpg')),
+    createCard('Knight', 'unit', 'common', 2, 5, [], 'Armored cavalry unit', 'For honor and glory!', require('../../assets/units/melee/knight.jpg')),
+    createCard('Berserker', 'unit', 'rare', 3, 7, [ABILITIES.MORALE_BOOST(1)], 'Fierce warrior that inspires allies', 'His rage is legendary.', require('../../assets/units/melee/berserker.jpg')),
+    createCard('Shield Captain', 'unit', 'rare', 3, 4, [ABILITIES.TIGHT_BOND()], 'Stronger with fellow captains', 'Unity is strength.', require('../../assets/units/melee/shield_captain.jpg')),
+    createCard('Champion', 'unit', 'epic', 4, 9, [], 'Elite warrior of the realm', 'Undefeated in single combat.', require('../../assets/units/melee/champion.jpg')),
+    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'Commands respect on the battlefield', 'All bow before the warlord.', require('../../assets/units/melee/warlord.jpg')),
     // Sinister Expansion
-    createCard('Lich King', 'unit', 'legendary', 10, 12, [ABILITIES.MORALE_BOOST(2)], 'Lord of the frozen dead', 'Death is but a new beginning.', require('../../assets/units/lich_king.jpg')),
-    createCard('Grave Ghoul', 'unit', 'common', 1, 3, [], 'Feasts on the remains of battle', 'Always hungry.', require('../../assets/units/grave_ghoul.jpg')),
-    createCard('Wight', 'unit', 'rare', 3, 5, [ABILITIES.TIGHT_BOND()], 'Ancient spirits bound to armor', 'They remember nothing but hate.', require('../../assets/units/wight.jpg')),
-    createCard('Skeleton Warrior', 'unit', 'common', 1, 2, [ABILITIES.MUSTER('Skeleton Warrior')], 'Clattering bones that never tire', 'Rise and walk.', require('../../assets/units/skeleton_warrior.jpg')),
-    createCard('Death Knight', 'unit', 'epic', 5, 10, [], 'A fallen hero serving the void', 'Honor died long ago.', require('../../assets/units/death_knight.jpg')),
-    createCard('Zombie Horde', 'unit', 'common', 2, 1, [ABILITIES.MUSTER('Zombie Horde')], 'They keep coming...', 'Strength in numbers.', require('../../assets/units/zombie_horde.jpg')),
-    createCard('Crypt Guard', 'unit', 'rare', 3, 6, [], 'Eternal protectors of the tomb', 'None shall pass.', require('../../assets/units/crypt_guard.jpg')),
+    createCard('Lich King', 'unit', 'legendary', 10, 12, [ABILITIES.MORALE_BOOST(2)], 'Lord of the frozen dead', 'Death is but a new beginning.', require('../../assets/units/melee/lich_king.jpg')),
+    createCard('Grave Ghoul', 'unit', 'common', 1, 3, [], 'Feasts on the remains of battle', 'Always hungry.', require('../../assets/units/melee/grave_ghoul.jpg')),
+    createCard('Wight', 'unit', 'rare', 3, 5, [ABILITIES.TIGHT_BOND()], 'Ancient spirits bound to armor', 'They remember nothing but hate.', require('../../assets/units/melee/wight.jpg')),
+    createCard('Skeleton Warrior', 'unit', 'common', 1, 2, [ABILITIES.MUSTER('Skeleton Warrior')], 'Clattering bones that never tire', 'Rise and walk.', require('../../assets/units/melee/skeleton_warrior.jpg')),
+    createCard('Death Knight', 'unit', 'epic', 5, 10, [], 'A fallen hero serving the void', 'Honor died long ago.', require('../../assets/units/melee/death_knight.jpg')),
+    createCard('Zombie Horde', 'unit', 'common', 2, 1, [ABILITIES.MUSTER('Zombie Horde')], 'They keep coming...', 'Strength in numbers.', require('../../assets/units/melee/zombie_horde.jpg')),
+    createCard('Crypt Guard', 'unit', 'rare', 3, 6, [], 'Eternal protectors of the tomb', 'None shall pass.', require('../../assets/units/melee/crypt_guard.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction, category: 'melee' as const }));
 
 // Ranged Units
 export const RANGED_UNITS: Card[] = [
-    createCard('Archer', 'unit', 'common', 1, 2, [], 'Basic ranged attacker', 'Aim true.', require('../../assets/units/archer.jpg')),
-    createCard('Crossbowman', 'unit', 'common', 2, 4, [], 'Powerful ranged unit', 'One bolt, one kill.', require('../../assets/units/crossbowman.jpg')),
-    createCard('Elven Marksman', 'unit', 'rare', 3, 6, [ABILITIES.TIGHT_BOND()], 'Elven archer with deadly aim', 'Never misses.', require('../../assets/units/elven_marksman.jpg')),
-    createCard('Scout', 'unit', 'rare', 2, 1, [ABILITIES.SPY(2)], 'Infiltrates enemy lines', 'Information is power.', require('../../assets/units/scout.jpg')),
-    createCard('Sniper', 'unit', 'epic', 4, 8, [], 'Elite marksman', 'One shot is all it takes.', require('../../assets/units/sniper.jpg')),
-    createCard('Dragon Hunter', 'unit', 'legendary', 5, 10, [ABILITIES.SCORCH()], 'Slayer of the mightiest beasts', 'Fear the hunter.', require('../../assets/units/dragon_hunter.jpg')),
+    createCard('Archer', 'unit', 'common', 1, 2, [], 'Basic ranged attacker', 'Aim true.', require('../../assets/units/ranged/archer.jpg')),
+    createCard('Crossbowman', 'unit', 'common', 2, 4, [], 'Powerful ranged unit', 'One bolt, one kill.', require('../../assets/units/ranged/crossbowman.jpg')),
+    createCard('Elven Marksman', 'unit', 'rare', 3, 6, [ABILITIES.TIGHT_BOND()], 'Elven archer with deadly aim', 'Never misses.', require('../../assets/units/ranged/elven_marksman.jpg')),
+    createCard('Scout', 'unit', 'rare', 2, 1, [ABILITIES.SPY(2)], 'Infiltrates enemy lines', 'Information is power.', require('../../assets/units/ranged/scout.jpg')),
+    createCard('Sniper', 'unit', 'epic', 4, 8, [], 'Elite marksman', 'One shot is all it takes.', require('../../assets/units/ranged/sniper.jpg')),
+    createCard('Dragon Hunter', 'unit', 'legendary', 5, 10, [ABILITIES.SCORCH()], 'Slayer of the mightiest beasts', 'Fear the hunter.', require('../../assets/units/ranged/dragon_hunter.jpg')),
     // Sinister Expansion
-    createCard('Dark Elf Archer', 'unit', 'common', 1, 3, [], 'Deadly precision from the shadows', 'Two eyes, one target.', require('../../assets/units/dark_elf_archer.jpg')),
-    createCard('Soul Harvester', 'unit', 'rare', 4, 3, [ABILITIES.SPY(2)], 'Reaps the essence of the living', 'Your soul is forfeit.', require('../../assets/units/soul_harvester.jpg')),
-    createCard('Banshee', 'unit', 'epic', 4, 7, [ABILITIES.SCORCH()], 'Her scream is a death sentence', 'The last thing you hear.', require('../../assets/units/banshee.jpg')),
-    createCard('Void Wizard', 'unit', 'rare', 3, 5, [ABILITIES.MORALE_BOOST(1)], 'Wielder of unstable dark energy', 'The void calls to us all.', require('../../assets/units/void_wizard.jpg')),
-    createCard('Shadow Assassin', 'unit', 'epic', 4, 8, [], 'Master of the silent kill', 'Gone before the body hits the floor.', require('../../assets/units/shadow_assassin.jpg')),
-    createCard('Necromancer', 'unit', 'legendary', 6, 6, [ABILITIES.MEDIC()], 'Conduit for the afterlife', 'The grave is merely a door.', require('../../assets/units/necromancer.jpg')),
-    createCard('Dark Elf Matriarch', 'unit', 'rare', 5, 7, [], 'Leader of the obsidian spire', 'Power is the only currency.', require('../../assets/units/dark_elf_matriarch.jpg')),
+    createCard('Dark Elf Archer', 'unit', 'common', 1, 3, [], 'Deadly precision from the shadows', 'Two eyes, one target.', require('../../assets/units/ranged/dark_elf_archer.jpg')),
+    createCard('Soul Harvester', 'unit', 'rare', 4, 3, [ABILITIES.SPY(2)], 'Reaps the essence of the living', 'Your soul is forfeit.', require('../../assets/units/ranged/soul_harvester.jpg')),
+    createCard('Banshee', 'unit', 'epic', 4, 7, [ABILITIES.SCORCH()], 'Her scream is a death sentence', 'The last thing you hear.', require('../../assets/units/ranged/banshee.jpg')),
+    createCard('Void Wizard', 'unit', 'rare', 3, 5, [ABILITIES.MORALE_BOOST(1)], 'Wielder of unstable dark energy', 'The void calls to us all.', require('../../assets/units/ranged/void_wizard.jpg')),
+    createCard('Shadow Assassin', 'unit', 'epic', 4, 8, [], 'Master of the silent kill', 'Gone before the body hits the floor.', require('../../assets/units/ranged/shadow_assassin.jpg')),
+    createCard('Necromancer', 'unit', 'legendary', 6, 6, [ABILITIES.MEDIC()], 'Conduit for the afterlife', 'The grave is merely a door.', require('../../assets/units/ranged/necromancer.jpg')),
+    createCard('Dark Elf Matriarch', 'unit', 'rare', 5, 7, [], 'Leader of the obsidian spire', 'Power is the only currency.', require('../../assets/units/ranged/dark_elf_matriarch.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction, category: 'ranged' as const }));
 
 // Siege Units
 export const SIEGE_UNITS: Card[] = [
-    createCard('Catapult', 'unit', 'common', 2, 4, [], 'Basic siege weapon', 'Rocks incoming!', require('../../assets/units/catapult.jpg')),
-    createCard('Ballista', 'unit', 'common', 3, 6, [], 'Heavy siege weapon', 'Pierces any armor.', require('../../assets/units/ballista.jpg')),
+    createCard('Catapult', 'unit', 'common', 2, 4, [], 'Basic siege weapon', 'Rocks incoming!', require('../../assets/units/siege/catapult.jpg')),
+    createCard('Ballista', 'unit', 'common', 3, 6, [], 'Heavy siege weapon', 'Pierces any armor.', require('../../assets/units/siege/ballista.jpg')),
     createCard('Trebuchet', 'unit', 'rare', 4, 8, [], 'Massive siege engine', 'Walls crumble before it.', require('../../assets/units/trebutchet.jpg')),
-    createCard('War Elephant', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'Armored beast of war', 'Unstoppable force.', require('../../assets/units/war_elephant.jpg')),
-    createCard('Siege Tower', 'unit', 'epic', 5, 5, [ABILITIES.COMMANDER_HORN()], 'Mobile fortress', 'Brings victory closer.', require('../../assets/units/siege_tower.jpg')),
-    createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'The ultimate weapon', 'Fire and fury.', require('../../assets/units/dragon.jpg')),
+    createCard('War Elephant', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'Armored beast of war', 'Unstoppable force.', require('../../assets/units/siege/war_elephant.jpg')),
+    createCard('Siege Tower', 'unit', 'epic', 5, 5, [ABILITIES.COMMANDER_HORN()], 'Mobile fortress', 'Brings victory closer.', require('../../assets/units/siege/siege_tower.jpg')),
+    createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'The ultimate weapon', 'Fire and fury.', require('../../assets/units/siege/dragon.jpg')),
     // Sinister Expansion
-    createCard('Bone Catapult', 'unit', 'common', 2, 4, [], 'Siege engine made of remains', 'Fires more than just rocks.', require('../../assets/units/bone_catapult.jpg')),
-    createCard('Plague Spreader', 'unit', 'rare', 4, 6, [], 'Infects the battlefield', 'Let the sickness take them.', require('../../assets/units/plague_spreader.jpg')),
-    createCard('Abomination', 'unit', 'epic', 6, 12, [], 'Stitched together from titans', 'A masterpiece of gore.', require('../../assets/units/abomination.jpg')),
-    createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'Ruler of the burning planes', 'Kneel or burn.', require('../../assets/units/demon_prince.jpg')),
-    createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'Firespitting beast of the abyss', 'The jaws that bite.', require('../../assets/units/hellhound.jpg')),
-    createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'Stone turned flesh and malice', 'Watch the skies.', require('../../assets/units/gargoyle.jpg')),
-    createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'Enchanted bolts of shadow', 'Pierce the soul.', require('../../assets/units/cursed_ballista.jpg')),
+    createCard('Bone Catapult', 'unit', 'common', 2, 4, [], 'Siege engine made of remains', 'Fires more than just rocks.', require('../../assets/units/siege/bone_catapult.jpg')),
+    createCard('Plague Spreader', 'unit', 'rare', 4, 6, [], 'Infects the battlefield', 'Let the sickness take them.', require('../../assets/units/siege/plague_spreader.jpg')),
+    createCard('Abomination', 'unit', 'epic', 6, 12, [], 'Stitched together from titans', 'A masterpiece of gore.', require('../../assets/units/siege/abomination.jpg')),
+    createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'Ruler of the burning planes', 'Kneel or burn.', require('../../assets/units/siege/demon_prince.jpg')),
+    createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'Firespitting beast of the abyss', 'The jaws that bite.', require('../../assets/units/siege/hellhound.jpg')),
+    createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'Stone turned flesh and malice', 'Watch the skies.', require('../../assets/units/siege/gargoyle.jpg')),
+    createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'Enchanted bolts of shadow', 'Pierce the soul.', require('../../assets/units/siege/cursed_ballista.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction, category: 'siege' as const }));
 
 // ============ SPELL CARDS ============
 
 export const SPELL_CARDS: Card[] = [
-    createCard("Commander's Horn", 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Double the power of a row', undefined, require('../../assets/units/commanders_horn.jpg')),
-    createCard('Decoy', 'spell', 'common', 1, undefined, [ABILITIES.DECOY()], 'Return a random friendly unit to your hand', undefined, require('../../assets/units/decoy.jpg')),
-    createCard('Scorch', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Destroy the strongest units', undefined, require('../../assets/units/scorch.jpg')),
-    createCard('Resurrection', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Revive a unit from graveyard', undefined, require('../../assets/units/resurrection.jpg')),
+    createCard("Commander's Horn", 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Double the power of a row', undefined, require('../../assets/units/spell/commanders_horn.jpg')),
+    createCard('Decoy', 'spell', 'common', 1, undefined, [ABILITIES.DECOY()], 'Return a random friendly unit to your hand', undefined, require('../../assets/units/spell/decoy.jpg')),
+    createCard('Scorch', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Destroy the strongest units', undefined, require('../../assets/units/spell/scorch.jpg')),
+    createCard('Resurrection', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Revive a unit from graveyard', undefined, require('../../assets/units/spell/resurrection.jpg')),
     // Sinister Expansion
-    createCard('Dark Pact', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Sacrifice essence to revive a unit', undefined, require('../../assets/units/dark_pact.jpg')),
-    createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Obliterate the strongest units', undefined, require('../../assets/units/void_bolt.jpg')),
-    createCard('Life Drain', 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Siphon power to boost allies', undefined, require('../../assets/units/life_drain.jpg')),
-    createCard('Raise Dead', 'spell', 'common', 2, undefined, [ABILITIES.MEDIC()], 'The dead obey their master.', undefined, require('../../assets/units/raise_dead.jpg')),
+    createCard('Dark Pact', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Sacrifice essence to revive a unit', undefined, require('../../assets/units/spell/dark_pact.jpg')),
+    createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Obliterate the strongest units', undefined, require('../../assets/units/spell/void_bolt.jpg')),
+    createCard('Life Drain', 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Siphon power to boost allies', undefined, require('../../assets/units/spell/life_drain.jpg')),
+    createCard('Raise Dead', 'spell', 'common', 2, undefined, [ABILITIES.MEDIC()], 'The dead obey their master.', undefined, require('../../assets/units/spell/raise_dead.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 4 ? 'neutral' : 'shadow') as Faction }));
 
 // ============ WEATHER CARDS ============
 
 export const WEATHER_CARDS: Card[] = [
-    createCard('Biting Frost', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Sets melee units to 1 power', undefined, require('../../assets/units/biting_frost.jpg')),
-    createCard('Impenetrable Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Sets ranged units to 1 power', undefined, require('../../assets/units/impenetrable_fog.jpg')),
-    createCard('Clear Skies', 'weather', 'common', 0, undefined, [ABILITIES.CLEAR_WEATHER()], 'Removes all weather effects', undefined, require('../../assets/units/clear_skies.jpg')),
+    createCard('Biting Frost', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Sets melee units to 1 power', undefined, require('../../assets/units/weather/biting_frost.jpg')),
+    createCard('Impenetrable Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Sets ranged units to 1 power', undefined, require('../../assets/units/weather/impenetrable_fog.jpg')),
+    createCard('Clear Skies', 'weather', 'common', 0, undefined, [ABILITIES.CLEAR_WEATHER()], 'Removes all weather effects', undefined, require('../../assets/units/weather/clear_skies.jpg')),
     // Sinister Expansion
-    createCard('Corrupt Ground', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Melee units lose their resolve', undefined, require('../../assets/units/corrupt_ground.jpg')),
-    createCard('Wailing Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Ranged units lose their sight', undefined, require('../../assets/units/wailing_fog.jpg')),
+    createCard('Corrupt Ground', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Melee units lose their resolve', undefined, require('../../assets/units/weather/corrupt_ground.jpg')),
+    createCard('Wailing Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Ranged units lose their sight', undefined, require('../../assets/units/weather/wailing_fog.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 3 ? 'neutral' : 'shadow') as Faction }));
 
 // ============ HEROES ============
