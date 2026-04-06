@@ -8,6 +8,7 @@ import {
     FlatList,
     Image,
 } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -33,11 +34,14 @@ interface Props { navigation: DeckBuilderScreenNavigationProp; }
 
 const ALL_CARDS = getAllCards();
 
-const FactionIcons: Record<string, any> = {
-    order: require('../../../assets/factions/order.png'),
-    shadow: require('../../../assets/factions/shadow.png'),
-    nature: require('../../../assets/factions/nature.png'),
-    arcane: require('../../../assets/factions/arcane.png'),
+type ValidFaction = 'order' | 'shadow' | 'nature' | 'arcane' | 'neutral';
+
+const FactionSymbols: Record<ValidFaction, { icon: keyof typeof MaterialCommunityIcons.glyphMap, color: string }> = {
+    order: { icon: 'shield-sun', color: '#ffd700' }, // Gold Shield
+    shadow: { icon: 'moon-waning-crescent', color: '#a855f7' }, // Purple Moon
+    nature: { icon: 'leaf', color: '#10b981' }, // Emerald Leaf
+    arcane: { icon: 'star-four-points-outline', color: '#06b6d4' }, // Cyan Star
+    neutral: { icon: 'scale-balance', color: '#9ca3af' }, // Silver Scales
 };
 
 // --- Components ---
@@ -120,7 +124,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                     <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
                         <Text style={styles.backText}>‹</Text>
                     </Pressable>
-                    <ScrollView 
+                    <ScrollView
                         showsVerticalScrollIndicator={false}
                         style={{ flex: 1, width: '100%' }}
                         contentContainerStyle={styles.sigilScrollContent}
@@ -146,8 +150,9 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 
                     {filter === 'hero' ? (
                         <FlatList
+                            key="hero-list" // Helps React differentiate this list
                             data={AVAILABLE_HEROES}
-                            numColumns={4}
+                            numColumns={3} // Changed from 4 to 3 for larger hero cards
                             keyExtractor={item => item.id}
                             renderItem={({ item, index }) => {
                                 const isSelected = activeDeck?.heroId === item.id;
@@ -162,9 +167,15 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.heroGradient} />
 
                                             <Text style={styles.heroClassName}>{item.className.toUpperCase()}</Text>
-                                            
-                                            {item.faction && FactionIcons[item.faction] && (
-                                                <Image source={FactionIcons[item.faction]} style={styles.heroFactionIcon} />
+
+                                            {item.faction && FactionSymbols[item.faction as ValidFaction] && (
+                                                <View style={[styles.heroFactionBadge, { borderColor: FactionSymbols[item.faction as ValidFaction].color }]}>
+                                                    <MaterialCommunityIcons 
+                                                        name={FactionSymbols[item.faction as ValidFaction].icon} 
+                                                        size={14} 
+                                                        color={FactionSymbols[item.faction as ValidFaction].color} 
+                                                    />
+                                                </View>
                                             )}
 
                                             <Text style={styles.heroNameTitle} numberOfLines={1}>{item.name.toUpperCase()}</Text>
@@ -567,7 +578,6 @@ const styles = StyleSheet.create({
     heroCardPreview: {
         width: 140,
         height: 220, // Increased height to fit description
-        margin: 10,
         borderRadius: 4,
         overflow: 'hidden',
         borderWidth: 2,
@@ -611,7 +621,7 @@ const styles = StyleSheet.create({
         paddingVertical: 2,
         borderRadius: 2,
     },
-    heroFactionIcon: {
+    heroFactionBadge: {
         position: 'absolute',
         top: 8,
         right: 8,
@@ -619,8 +629,9 @@ const styles = StyleSheet.create({
         height: 24,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.3)',
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(0,0,0,0.85)',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     heroNameTitle: {
         position: 'absolute',

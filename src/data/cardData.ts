@@ -97,7 +97,8 @@ const createCard = (
     abilities: Ability[],
     description: string,
     flavorText?: string,
-    artwork: any = ''
+    artwork: any = '',
+    isLocked?: boolean
 ): Card => ({
     id: createId(),
     name,
@@ -112,6 +113,7 @@ const createCard = (
     artwork,
     description,
     flavorText,
+    isLocked: isLocked ?? (rarity === 'epic' || rarity === 'legendary'),
 });
 
 // ============ UNIT CARDS ============
@@ -156,7 +158,7 @@ export const RANGED_UNITS: Card[] = [
 export const SIEGE_UNITS: Card[] = [
     createCard('Catapult', 'unit', 'common', 2, 4, [], 'Basic siege weapon', 'Rocks incoming!', require('../../assets/units/siege/catapult.jpg')),
     createCard('Ballista', 'unit', 'common', 3, 6, [], 'Heavy siege weapon', 'Pierces any armor.', require('../../assets/units/siege/ballista.jpg')),
-    createCard('Trebuchet', 'unit', 'rare', 4, 8, [], 'Massive siege engine', 'Walls crumble before it.', require('../../assets/units/trebutchet.jpg')),
+    createCard('Trebuchet', 'unit', 'rare', 4, 8, [], 'Massive siege engine', 'Walls crumble before it.', require('../../assets/units/siege/trebutchet.jpg')),
     createCard('War Elephant', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'Armored beast of war', 'Unstoppable force.', require('../../assets/units/siege/war_elephant.jpg')),
     createCard('Siege Tower', 'unit', 'epic', 5, 5, [ABILITIES.COMMANDER_HORN()], 'Mobile fortress', 'Brings victory closer.', require('../../assets/units/siege/siege_tower.jpg')),
     createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'The ultimate weapon', 'Fire and fury.', require('../../assets/units/siege/dragon.jpg')),

@@ -74,4 +74,5 @@ export interface Card {
     description: string;
     flavorText?: string;
     isHero?: boolean;
+    isLocked?: boolean;
 }

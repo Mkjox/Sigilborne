@@ -27,6 +27,7 @@ export interface CampaignStore {
     shopStock: ShopItem[];
     talentPoints: number;
     unlockedTalentIds: string[];
+    unlockedCardIds: string[]; // List of card IDs that have been "found/unlocked"
     
     // Actions
     advanceToNode: (nodeId: number) => void;
@@ -40,6 +41,7 @@ export interface CampaignStore {
     removeCardFromDeck: (cardId: string) => { success: boolean, message: string };
 
     // Talent Actions
+    unlockCard: (cardId: string) => void;
     unlockTalent: (talentId: string) => { success: boolean, message: string };
 }
 
@@ -54,6 +56,7 @@ export const useCampaignStore = create<CampaignStore>()(
             shopStock: [],
             talentPoints: 0,
             unlockedTalentIds: [],
+            unlockedCardIds: [],
 
             advanceToNode: (nodeId) =>
                 set((state) => {
@@ -114,16 +117,19 @@ export const useCampaignStore = create<CampaignStore>()(
                     shopStock: [],
                     talentPoints: 0,
                     unlockedTalentIds: [],
+                    unlockedCardIds: [],
                 }),
 
             generateShopStock: () =>
                 set((state) => {
                     const allCards = getAllCards();
+                    const unlockedCardPool = allCards.filter(c => !c.isLocked || state.unlockedCardIds.includes(c.id));
                     const stock: ShopItem[] = [];
 
-                    // 1. Pick 3 random cards
-                    for (let i = 0; i < 3; i++) {
-                        const card = allCards[Math.floor(Math.random() * allCards.length)];
+                    // 1. Pick 6 random CARDS (up from 3)
+                    const count = 6;
+                    for (let i = 0; i < count; i++) {
+                        const card = unlockedCardPool[Math.floor(Math.random() * unlockedCardPool.length)];
                         let price = Rules.PRICE_COMMON;
                         if (card.rarity === 'rare') price = Rules.PRICE_RARE;
                         else if (card.rarity === 'epic') price = Rules.PRICE_EPIC;
@@ -141,19 +147,22 @@ export const useCampaignStore = create<CampaignStore>()(
                         });
                     }
 
-                    // 2. Pick 1 random relic (hardcoded for now, or use a list)
-                    const relicId = 'relic_war_banner'; // Example
-                    const relic = getRelicById(relicId);
-                    if (relic) {
-                        stock.push({
-                            id: `shop_relic_${Date.now()}`,
-                            type: 'relic',
-                            itemId: relic.id,
-                            name: relic.name,
-                            price: Rules.PRICE_RELIC,
-                            description: relic.description,
-                            purchased: false,
-                        });
+                    // 2. Add 2 random RELICS
+                    const potentialRelics = ['relic_war_banner', 'relic_lucky_coin']; // We can expand this list later
+                    for (let i = 0; i < 2; i++) {
+                        const relicId = potentialRelics[i % potentialRelics.length];
+                        const relic = getRelicById(relicId);
+                        if (relic) {
+                            stock.push({
+                                id: `shop_relic_${i}_${Date.now()}`,
+                                type: 'relic',
+                                itemId: relic.id,
+                                name: relic.name,
+                                price: Rules.PRICE_RELIC,
+                                description: relic.description,
+                                purchased: false,
+                            });
+                        }
                     }
 
                     // 3. Add removal service
@@ -161,9 +170,9 @@ export const useCampaignStore = create<CampaignStore>()(
                         id: 'shop_service_remove',
                         type: 'service',
                         itemId: 'remove_card',
-                        name: 'Deck Thinning',
+                        name: 'Amnesia Draught',
                         price: Rules.PRICE_REMOVE_CARD,
-                        description: 'Remove one card from your deck permanently.',
+                        description: 'Forget a weak or unwanted skill forever.',
                         purchased: false,
                     });
 
@@ -231,6 +240,12 @@ export const useCampaignStore = create<CampaignStore>()(
 
                 return { success, message };
             },
+
+            unlockCard: (cardId) =>
+                set((state) => {
+                    if (state.unlockedCardIds.includes(cardId)) return state;
+                    return { unlockedCardIds: [...state.unlockedCardIds, cardId] };
+                }),
 
             unlockTalent: (talentId) => {
                 let success = false;

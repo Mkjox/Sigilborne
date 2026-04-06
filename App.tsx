@@ -5,8 +5,10 @@ import { StyleSheet } from 'react-native';
 import { RootNavigator } from './src/navigation';
 import { SoundProvider } from './src/context/SoundContext';
 import 'react-native-reanimated';
+import { useKeepAwake } from 'expo-keep-awake';
 
 export default function App() {
+  useKeepAwake();
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaProvider>

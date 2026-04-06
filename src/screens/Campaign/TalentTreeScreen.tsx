@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
     View,
     Text,
@@ -16,31 +16,87 @@ import { useDeckStore } from '../../store/deckStore';
 import { getTalentTreeForHero } from '../../data/cardData';
 import { colors, spacing, typography, shadows, borderRadius } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Canvas, Path, LinearGradient, vec, Group, Circle, Shadow, Blur } from '@shopify/react-native-skia';
+import { Canvas, Path, vec, Group, Blur, DashPathEffect } from '@shopify/react-native-skia';
 import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
+import Animated, { FadeInUp, FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'TalentTree'>;
 
+const AnimatedPath = Animated.createAnimatedComponent(Path);
+
+const TalentNode = ({ talent, unlocked, selected, available, onPress, index }: any) => {
+    const pulse = useSharedValue(0);
+
+    useEffect(() => {
+        if (available && !unlocked) {
+            pulse.value = withRepeat(
+                withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+                -1,
+                true
+            );
+        } else {
+            pulse.value = 0;
+        }
+    }, [available, unlocked]);
+
+    const pulseStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: 1 + pulse.value * 0.3 }],
+        opacity: 0.8 - pulse.value * 0.6,
+    }));
+
+    return (
+        <Animated.View
+            entering={FadeInUp.delay(index * 30 + 100)}
+            style={{ position: 'absolute', left: talent.position.x, top: talent.position.y }}
+        >
+            {/* Pulsing Aura for Available Nodes */}
+            {available && !unlocked && (
+                <Animated.View style={[styles.pulseAura, pulseStyle]} pointerEvents="none" />
+            )}
+
+            <TouchableOpacity
+                style={[
+                    styles.talentNode,
+                    unlocked && styles.talentNodeUnlocked,
+                    selected && styles.talentNodeSelected,
+                    (!unlocked && !available) && styles.talentNodeLocked
+                ]}
+                onPress={onPress}
+                activeOpacity={0.7}
+            >
+                <Ionicons
+                    name={talent.icon as any}
+                    size={28}
+                    color={unlocked || selected ? colors.arcane.white : 'rgba(255,255,255,0.3)'}
+                />
+            </TouchableOpacity>
+        </Animated.View>
+    );
+};
+
 export const TalentTreeScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
+    const insets = useSafeAreaInsets();
     const { talentPoints, unlockedTalentIds, unlockTalent } = useCampaignStore();
     const { getActiveDeck } = useDeckStore();
-    
+
     const activeDeck = getActiveDeck();
     const heroId = activeDeck?.heroId || 'hero_commander';
     const tree = useMemo(() => getTalentTreeForHero(heroId), [heroId]);
-    
+
     const [selectedTalentId, setSelectedTalentId] = useState<string | null>(null);
 
-    const selectedTalent = useMemo(() => 
+    const selectedTalent = useMemo(() =>
         tree?.talents.find(t => t.id === selectedTalentId),
-    [tree, selectedTalentId]);
+        [tree, selectedTalentId]);
 
     const handleUnlock = () => {
         if (!selectedTalentId) return;
-        
+
         const res = unlockTalent(selectedTalentId);
         if (res.success) {
             // Success feedback
@@ -50,7 +106,7 @@ export const TalentTreeScreen: React.FC = () => {
     };
 
     const isUnlocked = (id: string) => unlockedTalentIds.includes(id);
-    
+
     const canUnlock = (talent: any) => {
         if (isUnlocked(talent.id)) return false;
         if (talentPoints < 1) return false;
@@ -60,57 +116,77 @@ export const TalentTreeScreen: React.FC = () => {
 
     return (
         <View style={styles.container}>
+            {/* Animated Void Background */}
+            <ExpoLinearGradient
+                colors={['#0f172a', '#1e1b4b', '#000000']}
+                locations={[0, 0.5, 1]}
+                style={StyleSheet.absoluteFillObject}
+            />
+
             {/* Header */}
             <ExpoLinearGradient
-                colors={[colors.arcane.obsidian, colors.arcane.void]}
-                style={styles.header}
+                colors={['rgba(0,0,0,0.8)', 'rgba(0,0,0,0)']}
+                style={[styles.header, { paddingTop: insets.top + spacing.sm }]}
             >
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Ionicons name="close" size={28} color={colors.text.primary} />
+                    <Ionicons name="chevron-back" size={28} color={colors.text.primary} />
                 </TouchableOpacity>
                 <View style={styles.headerTitleContainer}>
                     <Text style={styles.title}>Hero Ascension</Text>
-                    <Text style={styles.subtitle}>Unlock your true potential</Text>
+                    <Text style={styles.subtitle}>Awaken true power</Text>
                 </View>
                 <View style={styles.pointsDisplay}>
-                    <Text style={styles.pointsLabel}>POINTS</Text>
+                    <Ionicons name="sparkles" size={12} color={colors.arcane.emerald} style={{ marginRight: 4 }} />
                     <Text style={styles.pointsValue}>{talentPoints}</Text>
+                    <Text style={styles.pointsLabel}> PT{talentPoints !== 1 ? 'S' : ''}</Text>
                 </View>
             </ExpoLinearGradient>
 
-            <ScrollView 
+            <ScrollView
                 style={{ flex: 1 }}
                 contentContainerStyle={styles.verticalScrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                <ScrollView 
+                <ScrollView
                     horizontal
                     contentContainerStyle={styles.horizontalScrollContent}
                     showsHorizontalScrollIndicator={false}
                 >
                     <View style={styles.treeView}>
                         {/* Skia Connections */}
-                        <Canvas style={StyleSheet.absoluteFill}>
+                        <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
                             {tree?.talents.map(talent => {
                                 if (!talent.requirements) return null;
                                 return talent.requirements.map(reqId => {
                                     const reqTalent = tree.talents.find(t => t.id === reqId);
                                     if (!reqTalent) return null;
-                                    
+
+                                    // Base width of node is 60, offset path to center (30,30)
                                     const start = vec(reqTalent.position.x + 30, reqTalent.position.y + 30);
                                     const end = vec(talent.position.x + 30, talent.position.y + 30);
-                                    const active = isUnlocked(talent.id) && isUnlocked(reqId);
-                                    
+                                    const active = isUnlocked(talent.id) || (isUnlocked(reqId) && canUnlock(talent));
+                                    const fullyUnlocked = isUnlocked(talent.id) && isUnlocked(reqId);
+
                                     return (
                                         <Group key={`link-${reqId}-${talent.id}`}>
                                             <Path
                                                 path={`M ${start.x} ${start.y} L ${end.x} ${end.y}`}
-                                                strokeWidth={4}
+                                                strokeWidth={fullyUnlocked ? 4 : 2}
                                                 style="stroke"
-                                                color={active ? colors.arcane.emerald : 'rgba(255,255,255,0.1)'}
+                                                color={fullyUnlocked ? colors.arcane.emerald : (active ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.05)')}
                                             >
-                                                {active && <Blur blur={2} />}
+                                                {fullyUnlocked && <Blur blur={6} />}
+                                                {!active && <DashPathEffect intervals={[5, 10]} />}
                                             </Path>
+                                            {/* Core rigid line over the blur */}
+                                            {fullyUnlocked && (
+                                                <Path
+                                                    path={`M ${start.x} ${start.y} L ${end.x} ${end.y}`}
+                                                    strokeWidth={2}
+                                                    style="stroke"
+                                                    color="#fff"
+                                                />
+                                            )}
                                         </Group>
                                     );
                                 });
@@ -118,66 +194,65 @@ export const TalentTreeScreen: React.FC = () => {
                         </Canvas>
 
                         {/* Talent Nodes */}
-                        {tree?.talents.map(talent => {
-                            const unlocked = isUnlocked(talent.id);
-                            const selected = selectedTalentId === talent.id;
-                            const available = canUnlock(talent);
-
-                            return (
-                                <TouchableOpacity
-                                    key={talent.id}
-                                    style={[
-                                        styles.talentNode,
-                                        { 
-                                            left: talent.position.x, 
-                                            top: talent.position.y,
-                                            borderColor: selected ? colors.arcane.emerald : (unlocked ? colors.arcane.emeraldLight : 'rgba(255,255,255,0.2)')
-                                        },
-                                        unlocked && styles.talentNodeUnlocked,
-                                        selected && styles.talentNodeSelected,
-                                    ]}
-                                    onPress={() => setSelectedTalentId(talent.id)}
-                                >
-                                    <Ionicons 
-                                        name={talent.icon as any} 
-                                        size={30} 
-                                        color={unlocked || selected ? colors.arcane.white : 'rgba(255,255,255,0.4)'} 
-                                    />
-                                    {available && !unlocked && (
-                                        <View style={styles.availableIndicator} />
-                                    )}
-                                </TouchableOpacity>
-                            );
-                        })}
+                        {tree?.talents.map((talent, index) => (
+                            <TalentNode
+                                key={talent.id}
+                                talent={talent}
+                                index={index}
+                                unlocked={isUnlocked(talent.id)}
+                                selected={selectedTalentId === talent.id}
+                                available={canUnlock(talent)}
+                                onPress={() => setSelectedTalentId(talent.id)}
+                            />
+                        ))}
                     </View>
                 </ScrollView>
             </ScrollView>
 
-            {/* Info Panel */}
-            <View style={[styles.infoPanel, !selectedTalent && styles.infoPanelMinimized]}>
-                {selectedTalent ? (
-                    <>
+            {/* Info Panel - Glassmorphism */}
+            {selectedTalent && (
+                <Animated.View entering={FadeInDown.springify().damping(20)} style={styles.infoPanelWrapper}>
+                    <BlurView
+                        intensity={90}
+                        tint="dark"
+                        style={[styles.infoPanel, { paddingBottom: Math.max(insets.bottom, spacing.lg) }]}
+                    >
                         <View style={styles.talentInfoHeader}>
-                            <Text style={styles.talentTitle}>{selectedTalent.name}</Text>
+                            <View style={{ flex: 1, paddingRight: 20 }}>
+                                <Text style={styles.talentTitle}>{selectedTalent.name.toUpperCase()}</Text>
+                                <Text style={styles.talentDescription} numberOfLines={3}>{selectedTalent.description}</Text>
+                            </View>
+
                             <TouchableOpacity
                                 style={[
                                     styles.unlockButton,
-                                    !canUnlock(selectedTalent) && styles.unlockButtonDisabled
+                                    !canUnlock(selectedTalent) && styles.unlockButtonDisabled,
+                                    isUnlocked(selectedTalent.id) && styles.unlockButtonSuccess
                                 ]}
                                 disabled={!canUnlock(selectedTalent)}
                                 onPress={handleUnlock}
                             >
-                                <Text style={styles.unlockButtonText}>
-                                    {isUnlocked(selectedTalent.id) ? 'ASCENDED' : 'ASCEND (1 PT)'}
-                                </Text>
+                                <ExpoLinearGradient
+                                    colors={
+                                        isUnlocked(selectedTalent.id) ? ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.05)'] :
+                                            canUnlock(selectedTalent) ? [colors.arcane.emeraldDark, colors.arcane.emerald] :
+                                                ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)']
+                                    }
+                                    style={styles.unlockGradient}
+                                >
+                                    <Text style={[
+                                        styles.unlockButtonText,
+                                        isUnlocked(selectedTalent.id) && { color: colors.arcane.white, opacity: 0.7 },
+                                        !canUnlock(selectedTalent) && !isUnlocked(selectedTalent.id) && { color: 'rgba(255,255,255,0.3)' }
+                                    ]}>
+                                        {isUnlocked(selectedTalent.id) ? 'ASCENDED' : 'ASCEND (1 PT)'}
+                                    </Text>
+                                </ExpoLinearGradient>
                             </TouchableOpacity>
                         </View>
-                        <Text style={styles.talentDescription}>{selectedTalent.description}</Text>
-                    </>
-                ) : (
-                    <Text style={styles.placeholderText}>Select a talent to view details</Text>
-                )}
-            </View>
+                    </BlurView>
+                </Animated.View>
+            )}
         </View>
     );
 };
@@ -185,140 +260,177 @@ export const TalentTreeScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.arcane.void,
+        backgroundColor: colors.arcane.obsidian, // fallback
     },
     header: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingTop: spacing.lg,
-        paddingBottom: spacing.sm,
         paddingHorizontal: spacing.md,
-        borderBottomWidth:1,
-        borderBottomColor: 'rgba(16, 185, 129, 0.2)',
+        paddingBottom: spacing.lg,
+        zIndex: 10,
     },
     backButton: {
         padding: spacing.xs,
+        marginRight: spacing.sm,
     },
     headerTitleContainer: {
         flex: 1,
-        marginLeft: spacing.md,
     },
     title: {
-        fontSize: 18,
-        color: colors.text.primary,
+        fontSize: 22,
+        color: colors.arcane.white,
         fontFamily: typography.fonts.heading,
-        fontWeight: 'bold',
+        fontWeight: '900',
+        letterSpacing: 2,
     },
     subtitle: {
         fontSize: 10,
-        color: colors.arcane.emerald,
+        color: colors.arcane.cyan,
         textTransform: 'uppercase',
-        letterSpacing: 1,
+        letterSpacing: 3,
+        marginTop: 2,
     },
     pointsDisplay: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        paddingHorizontal: spacing.sm,
-        paddingVertical: spacing.xs,
-        borderRadius: borderRadius.md,
+        backgroundColor: 'rgba(16,185,129,0.1)',
+        paddingHorizontal: spacing.md,
+        paddingVertical: spacing.sm,
+        borderRadius: 20,
         borderWidth: 1,
-        borderColor: colors.arcane.emerald,
+        borderColor: 'rgba(16,185,129,0.3)',
     },
     pointsLabel: {
-        fontSize: 8,
+        fontSize: 10,
         color: colors.arcane.emerald,
-        fontWeight: 'bold',
-        marginRight: spacing.xs,
+        fontWeight: '700',
+        letterSpacing: 1,
     },
     pointsValue: {
-        fontSize: 14,
-        color: colors.text.primary,
-        fontWeight: 'bold',
+        fontSize: 16,
+        color: colors.arcane.white,
+        fontWeight: '900',
     },
     verticalScrollContent: {
         flexGrow: 1,
+        paddingTop: 80, // reduced to pull the whole tree upward
+        paddingBottom: 150, // accommodate absolute info panel
     },
     horizontalScrollContent: {
         flexGrow: 1,
-        padding: spacing['2xl'],
+        paddingHorizontal: spacing['2xl'], // removed vertical padding
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     treeView: {
-        width: 500,
+        width: 500, // Canvas fixed dimension wrapper
         height: 600,
+        alignSelf: 'center',
+        marginTop: -80, // Physically pull the entire tree up higher on the screen
     },
     talentNode: {
         width: 60,
         height: 60,
-        borderRadius: 30,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderWidth: 2,
+        borderRadius: 2,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.15)',
         justifyContent: 'center',
         alignItems: 'center',
-        position: 'absolute',
-        ...shadows.md,
+        transform: [{ rotate: '45deg' }],
+        overflow: 'hidden',
     },
     talentNodeUnlocked: {
-        backgroundColor: colors.arcane.emeraldDark,
+        borderColor: colors.arcane.emerald,
+        backgroundColor: 'rgba(16,185,129,0.15)',
+        shadowColor: colors.arcane.emeraldLight,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 10,
     },
     talentNodeSelected: {
-        backgroundColor: colors.arcane.emerald,
-        transform: [{ scale: 1.1 }],
-    },
-    availableIndicator: {
-        position: 'absolute',
-        top: -4,
-        right: -4,
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        backgroundColor: colors.arcane.emeraldLight,
+        borderColor: colors.arcane.cyan,
+        backgroundColor: 'rgba(6,182,212,0.2)',
+        shadowColor: colors.arcane.cyan,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 1,
+        shadowRadius: 15,
+        transform: [{ rotate: '45deg' }, { scale: 1.15 }],
         borderWidth: 2,
-        borderColor: colors.arcane.void,
+    },
+    talentNodeLocked: {
+        opacity: 0.6,
+    },
+    pulseAura: {
+        width: 60,
+        height: 60,
+        borderRadius: 30, // Circle behind the rotated quad
+        backgroundColor: colors.arcane.emerald,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+    },
+    infoPanelWrapper: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(16,185,129,0.3)',
+        overflow: 'hidden',
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
     },
     infoPanel: {
-        backgroundColor: colors.arcane.obsidian,
-        padding: spacing.lg,
-        borderTopWidth: 2,
-        borderTopColor: colors.arcane.emerald,
-    },
-    infoPanelMinimized: {
-        paddingVertical: spacing.sm,
+        paddingTop: spacing.lg,
+        paddingHorizontal: spacing.xl,
+        backgroundColor: 'rgba(0,0,0,0.4)',
     },
     talentInfoHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: spacing.xs,
     },
     talentTitle: {
         fontSize: 16,
-        color: colors.text.primary,
-        fontWeight: 'bold',
+        color: colors.arcane.white,
+        fontWeight: '900',
+        letterSpacing: 2,
+        fontFamily: typography.fonts.heading,
+        marginBottom: 8,
     },
     talentDescription: {
         fontSize: 12,
-        color: colors.text.secondary,
+        color: 'rgba(255,255,255,0.6)',
+        lineHeight: 18,
     },
     unlockButton: {
-        backgroundColor: colors.arcane.emerald,
-        paddingVertical: spacing.xs,
-        paddingHorizontal: spacing.md,
-        borderRadius: borderRadius.md,
-        alignItems: 'center',
+        borderRadius: 4,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: colors.arcane.emerald,
     },
     unlockButtonDisabled: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(255,255,255,0.1)',
+        opacity: 0.5,
+    },
+    unlockButtonSuccess: {
+        borderColor: 'transparent',
+    },
+    unlockGradient: {
+        paddingVertical: spacing.sm,
+        paddingHorizontal: spacing.lg,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     unlockButtonText: {
         color: colors.arcane.white,
         fontWeight: '900',
-        letterSpacing: 2,
-    },
-    placeholderText: {
-        color: colors.text.secondary,
-        textAlign: 'center',
-        marginTop: spacing.xl,
-        fontStyle: 'italic',
+        letterSpacing: 1.5,
+        fontSize: 12,
     },
 });

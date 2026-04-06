@@ -6,13 +6,16 @@ import {
     ScrollView,
     useWindowDimensions,
     Modal,
+    Dimensions,
+    TouchableOpacity,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient';
 import Animated, {
     FadeIn,
     FadeOut,
+    FadeInUp,
     SlideInDown,
     SlideOutDown,
     useSharedValue,
@@ -29,14 +32,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { RootStackParamList, Difficulty } from '../../types';
 import { Text } from '../../components/ui';
-import { colors, spacing, borderRadius, shadows } from '../../theme';
+import { colors, spacing, borderRadius, shadows, typography } from '../../theme';
 import { CampaignMapSkiaBackground } from './components/CampaignMapSkiaBackground';
 import { MapParallaxLayers } from './components/MapParallaxLayers';
 import { TOTAL_STAGES, MAP_BIOMES } from './constants';
 import { generateCampaignMap, MapNode as MapNodeTypeData } from '../../data/campaignData';
 import { useCampaignStore } from '../../store/campaignStore';
+import { useDeckStore } from '../../store/deckStore';
 
 type CampaignMapNavigationProp = StackNavigationProp<RootStackParamList, 'CampaignMap'>;
 
@@ -213,43 +218,53 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
             </Animated.ScrollView>
 
-            {/* Map Header - Moved to bottom to ensure it's on top of ScrollView */}
-            <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
-                <Pressable
+            {/* Map Header - Glassmorphism */}
+            <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+                <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
+                <ExpoLinearGradient
+                    colors={['rgba(0,0,0,0.8)', 'rgba(0,0,0,0)']}
+                    style={StyleSheet.absoluteFill}
+                />
+                
+                <TouchableOpacity
                     onPress={() => navigation.goBack()}
-                    style={styles.headerButton}
+                    style={styles.headerPill}
+                    activeOpacity={0.7}
                 >
-                    <Text variant="body" color={colors.arcane.emerald}>← MENU</Text>
-                </Pressable>
+                    <Ionicons name="chevron-back" size={20} color={colors.arcane.emerald} />
+                    <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText}>EXIT</Text>
+                </TouchableOpacity>
 
                 <BiomeHeader scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
 
                 <View style={styles.headerRight}>
-                    <Pressable
-                        style={styles.heroButton}
+                    <TouchableOpacity
+                        style={styles.headerPill}
                         onPress={() => navigation.navigate('Shop')}
                     >
-                        <MaterialCommunityIcons name="cart" size={20} color={colors.arcane.emerald} />
-                    </Pressable>
+                        <MaterialCommunityIcons name="cart" size={18} color="#FBBF24" />
+                        <Text style={styles.currencyText}>{gold}</Text>
+                    </TouchableOpacity>
 
-                    <Pressable
-                        style={styles.heroButton}
+                    <TouchableOpacity
+                        style={styles.headerPill}
                         onPress={() => navigation.navigate('TalentTree')}
                     >
-                        <Ionicons name="sparkles" size={20} color={colors.arcane.emerald} />
+                        <Ionicons name="sparkles" size={18} color={colors.arcane.emerald} />
                         {talentPoints > 0 && (
-                            <View style={styles.badge}>
-                                <Text style={styles.badgeText}>{talentPoints}</Text>
+                            <View style={styles.pillBadge}>
+                                <Text style={styles.pillBadgeText}>{talentPoints}</Text>
                             </View>
                         )}
-                    </Pressable>
+                        <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText}>ASCEND</Text>
+                    </TouchableOpacity>
 
-                    <Pressable
+                    <TouchableOpacity
                         onPress={() => setDifficultyModalVisible(true)}
-                        style={[styles.headerButton, styles.difficultyBtn]}
+                        style={[styles.headerPill, { borderColor: colors.arcane.cyan }]}
                     >
-                        <Text variant="caption" color={colors.arcane.cyan}>{selectedDifficulty.toUpperCase()}</Text>
-                    </Pressable>
+                        <Text variant="caption" color={colors.arcane.cyan} style={styles.pillText}>{selectedDifficulty.toUpperCase()}</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
 
@@ -257,77 +272,89 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
             <Modal
                 transparent
                 visible={difficultyModalVisible}
-                animationType="fade"
+                animationType="none"
                 onRequestClose={() => setDifficultyModalVisible(false)}
             >
-                <Pressable style={styles.modalBackdrop} onPress={() => setDifficultyModalVisible(false)}>
-                    <Animated.View
-                        entering={SlideInDown}
-                        exiting={SlideOutDown}
-                        style={styles.modalContent}
-                    >
-                        <Text variant="h3" style={styles.modalTitle}>SELECT DIFFICULTY</Text>
-                        {(['easy', 'medium', 'hard'] as Difficulty[]).map((diff) => (
-                            <Pressable
-                                key={diff}
-                                style={[
-                                    styles.modalOption,
-                                    selectedDifficulty === diff && styles.modalOptionActive
-                                ]}
-                                onPress={() => {
-                                    setSelectedDifficulty(diff);
-                                    setDifficultyModalVisible(false);
-                                }}
-                            >
-                                <Text
-                                    variant="body"
-                                    color={selectedDifficulty === diff ? colors.arcane.obsidian : colors.arcane.white}
-                                >
-                                    {diff.toUpperCase()}
-                                </Text>
-                            </Pressable>
-                        ))}
-                    </Animated.View>
-                </Pressable>
+                <Animated.View entering={FadeIn.duration(200)} style={styles.modalBackdropWrapper}>
+                    <BlurView intensity={40} tint="dark" style={styles.modalBackdrop}>
+                        <Pressable style={StyleSheet.absoluteFillObject} onPress={() => setDifficultyModalVisible(false)} />
+                        <Animated.View
+                            entering={SlideInDown.springify().damping(20)}
+                            style={styles.modalContent}
+                        >
+                            <ExpoLinearGradient colors={['rgba(20, 20, 40, 0.95)', 'rgba(0,0,0,0.95)']} style={styles.modalOptionGradient}>
+                                <Text style={styles.modalHead}>SELECT DIFFICULTY</Text>
+                                <View style={styles.difficultyGrid}>
+                                    {(['easy', 'medium', 'hard'] as Difficulty[]).map((diff) => (
+                                        <TouchableOpacity
+                                            key={diff}
+                                            style={[
+                                                styles.modalOption,
+                                                selectedDifficulty === diff && styles.modalOptionActive
+                                            ]}
+                                            onPress={() => {
+                                                setSelectedDifficulty(diff);
+                                                setDifficultyModalVisible(false);
+                                            }}
+                                        >
+                                            <Text
+                                                variant="body"
+                                                color={selectedDifficulty === diff ? colors.arcane.obsidian : colors.arcane.white}
+                                                style={styles.diffOptionText}
+                                            >
+                                                {diff.toUpperCase()}
+                                            </Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </ExpoLinearGradient>
+                        </Animated.View>
+                    </BlurView>
+                </Animated.View>
             </Modal>
 
             {/* Stage Preview Modal */}
             <Modal
                 transparent
                 visible={stageModalVisible}
-                animationType="fade"
+                animationType="none"
                 onRequestClose={() => setStageModalVisible(false)}
             >
-                <Pressable style={styles.modalBackdrop} onPress={() => setStageModalVisible(false)}>
-                    <Animated.View
-                        entering={FadeIn}
-                        exiting={FadeOut}
-                        style={styles.stageModalContent}
-                    >
-                        <Text variant="h3" style={styles.stageLevelName}>
-                            {stages.find(s => s.id === selectedStage)?.type?.toUpperCase() || 'LEVEL'} {selectedStage}
-                        </Text>
-                        <Text variant="caption" color={colors.arcane.emerald} style={styles.stageInfo}>
-                            {stages.find(s => s.id === selectedStage)?.type === 'shop'
-                                ? 'RESTOCK AND REFINE'
-                                : `DIFFICULTY: ${selectedDifficulty.toUpperCase()}`}
-                        </Text>
-
-                        <Pressable
-                            style={styles.playButton}
-                            onPress={handlePlayStage}
+                <Animated.View entering={FadeIn.duration(200)} style={styles.modalBackdropWrapper}>
+                    <BlurView intensity={60} tint="dark" style={styles.modalBackdrop}>
+                        <Pressable style={StyleSheet.absoluteFillObject} onPress={() => setStageModalVisible(false)} />
+                        <Animated.View
+                            entering={FadeInUp.springify()}
+                            style={styles.stageModalContent}
                         >
-                            <LinearGradient
-                                colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
-                                style={styles.playButtonGradient}
-                            >
-                                <Text style={styles.playButtonText}>
-                                    {stages.find(s => s.id === selectedStage)?.type === 'shop' ? 'VISIT MERCHANT' : 'ENTER VOID'}
+                            <ExpoLinearGradient colors={['rgba(16, 185, 129, 0.1)', 'rgba(0,0,0,0.85)']} style={styles.stageModalGradient}>
+                                <Text style={styles.stageLevelName}>
+                                    {stages.find(s => s.id === selectedStage)?.type?.toUpperCase() || 'LEVEL'} {selectedStage}
                                 </Text>
-                            </LinearGradient>
-                        </Pressable>
-                    </Animated.View>
-                </Pressable>
+                                <Text variant="caption" color={colors.arcane.emerald} style={styles.stagePortalSub}>
+                                    {stages.find(s => s.id === selectedStage)?.type === 'shop'
+                                        ? 'RESTOCK AND REFINE'
+                                        : `DIFFICULTY: ${selectedDifficulty.toUpperCase()}`}
+                                </Text>
+
+                                <TouchableOpacity
+                                    style={styles.playButton}
+                                    onPress={handlePlayStage}
+                                    activeOpacity={0.8}
+                                >
+                                    <ExpoLinearGradient
+                                        colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
+                                        style={styles.playButtonGradient}
+                                    >
+                                        <Text style={styles.playButtonText}>
+                                            {stages.find(s => s.id === selectedStage)?.type === 'shop' ? 'VISIT MERCHANT' : 'ENTER VOID'}
+                                        </Text>
+                                    </ExpoLinearGradient>
+                                </TouchableOpacity>
+                            </ExpoLinearGradient>
+                        </Animated.View>
+                    </BlurView>
+                </Animated.View>
             </Modal>
         </View>
     );
@@ -442,34 +469,35 @@ const MapNodeComponent = React.memo<{
             ]}
             onPress={() => onPress(stage.id)}
         >
-            <View style={[
+            <Animated.View style={[
                 styles.nodeGlow,
                 isBoss && styles.nodeGlowBoss,
+                isCurrent && styles.nodeGlowCurrent,
                 isActive && styles.nodeGlowActive,
-                isBoss && { width: NODE_SIZE + 10, height: NODE_SIZE + 10, borderRadius: (NODE_SIZE + 10) / 2 }
+                { width: NODE_SIZE + 20, height: NODE_SIZE + 20, borderRadius: (NODE_SIZE + 20) / 2 }
             ]} />
 
             {isBoss && <View style={styles.bossRing} />}
 
-            <LinearGradient
+            <ExpoLinearGradient
                 colors={
                     isCurrent || isActive
                         ? [colors.arcane.emerald, colors.arcane.emeraldDark]
                         : isBoss && !isLocked
                             ? ['#f59e0b', '#78350f']
-                            : [colors.arcane.graphite, colors.arcane.obsidian]
+                            : [colors.arcane.obsidian, 'rgba(20,20,20,0.8)']
                 }
                 style={[
-                    styles.nodeCircle,
-                    { width: NODE_SIZE - 4, height: NODE_SIZE - 4, borderRadius: (NODE_SIZE - 4) / 2 },
-                    isActive && styles.nodeCircleActive,
-                    isBoss && styles.nodeCircleBoss
+                    styles.nodeSigil,
+                    { width: NODE_SIZE - 4, height: NODE_SIZE - 4 },
+                    isActive && styles.nodeSigilActive,
+                    isBoss && styles.nodeSigilBoss
                 ]}
             >
-                <Text variant={isBoss ? "body" : "caption"} color={isActive ? colors.arcane.obsidian : isBoss ? colors.arcane.white : colors.arcane.emerald} style={styles.nodeText}>
+                <View style={[styles.nodeIconWrapper, { transform: [{ rotate: '-45deg' }] }]}>
                     {getIcon()}
-                </Text>
-            </LinearGradient>
+                </View>
+            </ExpoLinearGradient>
         </AnimatedPressable>
     );
 });
@@ -477,9 +505,12 @@ const MapNodeComponent = React.memo<{
 const AnimatedText = Animated.createAnimatedComponent(Text);
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+const { width, height } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: colors.arcane.obsidian,
     },
     header: {
         position: 'absolute',
@@ -489,63 +520,53 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: spacing.lg,
+        paddingHorizontal: spacing.xl,
         zIndex: 20,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        paddingBottom: spacing.md,
+        paddingBottom: spacing.sm,
     },
     headerRight: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    heroButton: {
-        width: 36,
-        height: 36,
-        borderRadius: 18,
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        justifyContent: 'center',
+    headerPill: {
+        flexDirection: 'row',
         alignItems: 'center',
-        marginRight: spacing.sm,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        paddingHorizontal: spacing.md,
+        paddingVertical: 6,
+        borderRadius: 20,
         borderWidth: 1,
-        borderColor: colors.arcane.emerald,
+        borderColor: 'rgba(255,255,255,0.1)',
+        marginLeft: spacing.sm,
     },
-    badge: {
+    pillText: {
+        fontSize: 10,
+        fontWeight: '900',
+        color: colors.arcane.white,
+        marginLeft: 6,
+        letterSpacing: 2,
+    },
+    currencyText: {
+        color: '#FBBF24',
+        fontWeight: '900',
+        marginLeft: 6,
+        fontSize: 12,
+    },
+    pillBadge: {
         position: 'absolute',
         top: -4,
         right: -4,
-        backgroundColor: '#ef4444',
+        backgroundColor: colors.arcane.emerald,
         borderRadius: 8,
         minWidth: 16,
         height: 16,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingHorizontal: 2,
     },
-    badgeText: {
-        color: 'white',
+    pillBadgeText: {
+        color: colors.arcane.obsidian,
         fontSize: 10,
         fontWeight: 'bold',
-    },
-    headerButton: {
-        padding: spacing.sm,
-        minWidth: 80,
-    },
-    difficultyBtn: {
-        alignItems: 'flex-end',
-    },
-    titleContainer: {
-        alignItems: 'center',
-    },
-    title: {
-        letterSpacing: 4,
-        color: colors.arcane.white,
-    },
-    titleUnderline: {
-        height: 2,
-        width: 60,
-        backgroundColor: colors.arcane.emerald,
-        marginTop: 4,
-        borderRadius: 1,
     },
     biomeHeaderContainer: {
         alignItems: 'center',
@@ -556,17 +577,16 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: '900',
         color: colors.arcane.white,
-        letterSpacing: 2,
-        textShadowColor: 'rgba(0,0,0,0.5)',
-        textShadowOffset: { width: 0, height: 1 },
-        textShadowRadius: 4,
+        letterSpacing: 3,
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowRadius: 10,
     },
     biomeHeaderLine: {
-        height: 1.5,
-        width: 40,
+        height: 1,
+        width: 30,
         backgroundColor: colors.arcane.emerald,
         marginTop: 4,
-        borderRadius: 1,
+        opacity: 0.6,
     },
     mapContent: {
         paddingTop: 120,
@@ -579,108 +599,130 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    nodeCircle: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+    nodeSigil: {
         justifyContent: 'center',
         alignItems: 'center',
+        borderRadius: 12,
+        transform: [{ rotate: '45deg' }],
         borderWidth: 1.5,
-        borderColor: colors.arcane.emerald,
+        borderColor: 'rgba(255,255,255,0.2)',
         ...shadows.md,
     },
-    nodeCircleActive: {
+    nodeSigilActive: {
         borderColor: '#fff',
         borderWidth: 2,
-        transform: [{ scale: 1.1 }],
     },
-    nodeGlow: {
-        position: 'absolute',
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: colors.arcane.emerald,
-        opacity: 0,
-    },
-    nodeGlowActive: {
-        opacity: 0.2,
-        transform: [{ scale: 1.2 }],
-    },
-    nodeGlowBoss: {
-        backgroundColor: '#f59e0b',
-        opacity: 0.3,
-    },
-    nodeCircleBoss: {
+    nodeSigilBoss: {
         borderColor: '#f59e0b',
         borderWidth: 2,
     },
+    nodeIconWrapper: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    nodeGlow: {
+        position: 'absolute',
+        backgroundColor: colors.arcane.emerald,
+        opacity: 0,
+    },
+    nodeGlowCurrent: {
+        opacity: 0.15,
+        backgroundColor: colors.arcane.emerald,
+    },
+    nodeGlowActive: {
+        opacity: 0.3,
+        transform: [{ scale: 1.3 }],
+    },
+    nodeGlowBoss: {
+        backgroundColor: '#f59e0b',
+        opacity: 0.25,
+    },
     bossRing: {
         position: 'absolute',
-        width: 84,
-        height: 84,
-        borderRadius: 42,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
         borderWidth: 1,
-        borderColor: 'rgba(245, 158, 11, 0.3)',
+        borderColor: 'rgba(245, 158, 11, 0.4)',
         borderStyle: 'dashed',
     },
-    nodeText: {
-        fontWeight: 'bold',
+    modalBackdropWrapper: {
+        flex: 1,
     },
     modalBackdrop: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.8)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalContent: {
-        width: '65%', // Reduced by approx 20%
-        backgroundColor: colors.arcane.obsidian,
-        borderRadius: borderRadius.lg,
-        padding: spacing.lg, // Reduced from xl
+        width: width * 0.7,
+        borderRadius: 24,
+        overflow: 'hidden',
         borderWidth: 1,
-        borderColor: colors.arcane.emerald,
+        borderColor: 'rgba(255,255,255,0.1)',
+        ...shadows.lg,
+    },
+    modalOptionGradient: {
+        padding: spacing.xl,
         alignItems: 'center',
     },
-    modalTitle: {
-        marginBottom: spacing.lg, // Reduced from xl
-        letterSpacing: 2,
+    modalHead: {
+        fontSize: 18,
+        fontWeight: '900',
+        color: colors.arcane.white,
+        letterSpacing: 3,
+        marginBottom: spacing.xl,
+    },
+    difficultyGrid: {
+        width: '100%',
     },
     modalOption: {
         width: '100%',
-        padding: spacing.md, // Reduced from lg
-        borderRadius: borderRadius.md,
+        padding: spacing.md,
+        borderRadius: 12,
         borderWidth: 1,
-        borderColor: 'rgba(16, 185, 129, 0.2)',
-        marginBottom: spacing.sm, // Reduced from md
+        borderColor: 'rgba(255,255,255,0.1)',
+        marginBottom: spacing.sm,
         alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.05)',
     },
     modalOptionActive: {
         backgroundColor: colors.arcane.emerald,
         borderColor: colors.arcane.emerald,
     },
+    diffOptionText: {
+        fontWeight: '900',
+        letterSpacing: 2,
+    },
     stageModalContent: {
-        width: '85%',
-        backgroundColor: colors.arcane.obsidian,
-        borderRadius: borderRadius.lg,
-        padding: spacing['2xl'],
+        width: width * 0.8,
+        borderRadius: 24,
+        overflow: 'hidden',
         borderWidth: 2,
         borderColor: colors.arcane.emerald,
-        alignItems: 'center',
         ...shadows.lg,
     },
+    stageModalGradient: {
+        padding: spacing['2xl'],
+        alignItems: 'center',
+    },
     stageLevelName: {
-        letterSpacing: 4,
+        fontSize: 24,
+        fontWeight: '900',
+        color: colors.arcane.white,
+        letterSpacing: 5,
         marginBottom: spacing.xs,
     },
-    stageInfo: {
-        letterSpacing: 2,
+    stagePortalSub: {
+        fontSize: 12,
+        letterSpacing: 3,
         marginBottom: spacing['2xl'],
-        opacity: 0.8,
+        opacity: 0.6,
     },
     playButton: {
         width: '100%',
-        height: 60,
-        borderRadius: borderRadius.md,
+        height: 56,
+        borderRadius: 14,
         overflow: 'hidden',
     },
     playButtonGradient: {
