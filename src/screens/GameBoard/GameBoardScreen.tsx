@@ -346,7 +346,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
 
                         {/* Right: Menu */}
                         <Pressable
-                            onPress={() => { resetGame(); navigation.navigate('MainMenu'); }}
+                            onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }}
                             style={styles.menuBtn}
                         >
                             <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '600' }}>ESCAPE</Text>
@@ -544,7 +544,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>{winner === 'player' ? 'REPLAY' : 'REAWAKEN'}</Text>
                                 </Pressable>
 
-                                <Pressable onPress={() => { resetGame(); navigation.navigate('MainMenu'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald, marginTop: 16 }]}>
+                                <Pressable onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald, marginTop: 16 }]}>
                                     <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>ABANDON</Text>
                                 </Pressable>
                             </View>

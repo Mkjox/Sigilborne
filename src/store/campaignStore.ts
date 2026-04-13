@@ -148,7 +148,7 @@ export const useCampaignStore = create<CampaignStore>()(
                     }
 
                     // 2. Add 2 random RELICS
-                    const potentialRelics = ['relic_war_banner', 'relic_lucky_coin']; // We can expand this list later
+                    const potentialRelics = ['war_banner', 'mana_crystal']; // We can expand this list later
                     for (let i = 0; i < 2; i++) {
                         const relicId = potentialRelics[i % potentialRelics.length];
                         const relic = getRelicById(relicId);

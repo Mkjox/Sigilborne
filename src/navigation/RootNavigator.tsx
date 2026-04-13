@@ -10,7 +10,7 @@ import { GameBoardScreen } from '../screens/GameBoard';
 import { DeckBuilderScreen } from '../screens/DeckBuilder';
 import { CollectionScreen } from '../screens/Collection';
 import { SettingsScreen } from '../screens/Settings';
-import { CampaignMapScreen, ShopScreen, TalentTreeScreen } from '../screens/Campaign';
+import { CampaignMapScreen, ShopScreen, TalentTreeScreen, EventScreen } from '../screens/Campaign';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -98,6 +98,13 @@ export const RootNavigator: React.FC = () => {
                         animationEnabled: true,
                         presentation: 'modal',
                         cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
+                    }}
+                />
+                <Stack.Screen
+                    name="Event"
+                    component={EventScreen}
+                    options={{
+                        animationEnabled: true,
                     }}
                 />
             </Stack.Navigator>

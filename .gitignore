@@ -48,3 +48,6 @@ jest.setup.js.bak
 transform-test.js
 src/__tests__/react_only.test.tsx
 src/__tests__/CardComponent_smoke.test.tsx
+check_results_ascii.txt
+doctor_results.txt
+install_check_results.txt

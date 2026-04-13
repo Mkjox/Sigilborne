@@ -1,0 +1,405 @@
+import React, { useState, useMemo } from 'react';
+import {
+    View,
+    StyleSheet,
+    TouchableOpacity,
+    Dimensions,
+    Image,
+} from 'react-native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../../types';
+import { useCampaignStore } from '../../store/campaignStore';
+import { useDeckStore } from '../../store/deckStore';
+import { colors, spacing, shadows, borderRadius, typography } from '../../theme';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient';
+import Animated, { FadeIn, FadeInDown, SlideInUp } from 'react-native-reanimated';
+import { BlurView } from 'expo-blur';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Text } from '../../components/ui';
+import { getAllCards } from '../../data/cardData';
+import { getRelicById } from '../../data/relicData';
+
+// Local Assets
+const voidRiftImg = require('../../../assets/events/void_rift.jpg');
+const willowTreeImg = require('../../../assets/events/willow_tree.jpg');
+const caravanWreckImg = require('../../../assets/events/caravan_wreck.jpg');
+
+const { width, height } = Dimensions.get('window');
+
+type NavigationProp = StackNavigationProp<RootStackParamList, 'Event'>;
+type EventRouteProp = RouteProp<RootStackParamList, 'Event'>;
+
+interface EventChoice {
+    id: string;
+    label: string;
+    description: string;
+    icon: string;
+    iconType: 'Ionicons' | 'MaterialCommunityIcons';
+    action: () => void;
+}
+
+export const EventScreen: React.FC = () => {
+    const navigation = useNavigation<NavigationProp>();
+    const route = useRoute<EventRouteProp>();
+    const { stageId } = route.params;
+    const insets = useSafeAreaInsets();
+
+    const { gold, advanceToNode, addRelic, completeNode } = useCampaignStore();
+    const { getActiveDeck, addCardToDeck } = useDeckStore();
+    const activeDeck = getActiveDeck();
+
+    const [resolved, setResolved] = useState(false);
+    const [resolutionText, setResolutionText] = useState('');
+
+    // Pre-defined events based on stageId or random
+    const eventData = useMemo(() => {
+        // Deterministic but feels random
+        const seed = stageId % 3;
+        
+        switch (seed) {
+            case 0:
+                return {
+                    title: 'The Whispering Void',
+                    description: 'A rift in reality hums with a low, vibrating frequency. It seems to react to your presence, offering a glimpse into another realm.',
+                    image: voidRiftImg,
+                    choices: [
+                        {
+                            id: 'gift_gold',
+                            label: 'Embrace the Echo',
+                            description: 'Accept the rift\'s blessing. Gain 50 Gold.',
+                            icon: 'cash',
+                            iconType: 'Ionicons' as const,
+                            action: () => {
+                                completeNode(stageId, { gold: 50 });
+                                setResolutionText('As you step into the rift, pocketfuls of ancient coins materialize. The void whispers its gratitude.');
+                            }
+                        },
+                        {
+                            id: 'gift_card',
+                            label: 'Siphon the Arcane',
+                            description: 'Draw power from the rift. Gain a random Card.',
+                            icon: 'card',
+                            iconType: 'Ionicons' as const,
+                            action: () => {
+                                const allCards = getAllCards();
+                                const randomCard = allCards[Math.floor(Math.random() * allCards.length)];
+                                if (activeDeck) {
+                                    addCardToDeck(activeDeck.id, randomCard);
+                                }
+                                completeNode(stageId);
+                                setResolutionText(`You reach into the shimmering energy and pull out a scroll: ${randomCard.name}. Your deck grows stronger.`);
+                            }
+                        }
+                    ]
+                };
+            case 1:
+                return {
+                    title: 'The Weeping Willow',
+                    description: 'An ancient, crystalline tree stands alone in a clearing. Its sap glows with a soft, azure light. Legend says it grants wisdom to those who offer a sacrifice.',
+                    image: willowTreeImg,
+                    choices: [
+                        {
+                            id: 'offer_gold',
+                            label: 'Make an Offering',
+                            description: 'Lose 25 Gold to find a hidden Relic.',
+                            icon: 'diamond',
+                            iconType: 'Ionicons' as const,
+                            action: () => {
+                                if (gold < 25) {
+                                    setResolutionText('You don\'t have enough gold. The tree seems disappointed.');
+                                    return;
+                                }
+                                const relicId = Math.random() > 0.5 ? 'war_banner' : 'mana_crystal';
+                                addRelic(relicId);
+                                completeNode(stageId, { gold: -25 });
+                                setResolutionText(`The tree accepts your tribute. A hidden chamber opens at its roots, revealing a ${getRelicById(relicId)?.name || 'Relic'}.`);
+                            }
+                        },
+                        {
+                            id: 'ignore',
+                            label: 'Leave it Be',
+                            description: 'Don\'t risk it. Proceed carefully.',
+                            icon: 'walk',
+                            iconType: 'Ionicons' as const,
+                            action: () => {
+                                completeNode(stageId);
+                                setResolutionText('You walk away, feeling the tree\'s cold gaze on your back. Safety is its own reward.');
+                            }
+                        }
+                    ]
+                };
+            default:
+                return {
+                    title: 'Abandoned Caravan',
+                    description: 'You stumble upon a wrecked merchant wagon. Most of the goods are ruined, but something might still be salvageable among the wreckage.',
+                    image: caravanWreckImg,
+                    choices: [
+                        {
+                            id: 'scavenge',
+                            label: 'Scavenge',
+                            description: 'Look for valuables. Gain 30 Gold.',
+                            icon: 'search',
+                            iconType: 'Ionicons' as const,
+                            action: () => {
+                                completeNode(stageId, { gold: 30 });
+                                setResolutionText('You dig through the debris and find a hidden stash of coins. Victory belongs to the observant.');
+                            }
+                        },
+                        {
+                            id: 'search_carefully',
+                            label: 'Search Deeply',
+                            description: 'Risk a trap for a better reward. 50% chance for 60 Gold or 0.',
+                            icon: 'alert-circle',
+                            iconType: 'Ionicons' as const,
+                            action: () => {
+                                if (Math.random() > 0.5) {
+                                    completeNode(stageId, { gold: 60 });
+                                    setResolutionText('Persistence pays off! You find a heavy chest of gold hidden beneath the floorboards.');
+                                } else {
+                                    completeNode(stageId);
+                                    setResolutionText('A trap springs! You narrowly escape, but the remaining valuables are destroyed in the process.');
+                                }
+                            }
+                        }
+                    ]
+                };
+        }
+    }, [stageId, gold, activeDeck]);
+
+    const handleChoice = (choice: EventChoice) => {
+        choice.action();
+        setResolved(true);
+    };
+
+    const handleContinue = () => {
+        navigation.goBack();
+    };
+
+    return (
+        <View style={styles.container}>
+            {/* Background */}
+            <ExpoLinearGradient
+                colors={['#0f172a', '#1e1b4b', '#000000']}
+                style={StyleSheet.absoluteFillObject}
+            />
+
+            <Animated.ScrollView 
+                entering={FadeIn.duration(800)} 
+                style={styles.content}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                {/* Event Image / Visual */}
+                <View style={styles.imageContainer}>
+                    <Image source={eventData.image} style={styles.eventImage} resizeMode="cover" />
+                    <ExpoLinearGradient
+                        colors={['transparent', 'rgba(0,0,0,0.8)']}
+                        style={styles.imageOverlay}
+                    />
+                </View>
+
+                {/* Narrative Section */}
+                <View style={styles.narrativeContainer}>
+                    <Text variant="h2" style={styles.title}>{eventData.title.toUpperCase()}</Text>
+                    <View style={styles.divider} />
+                    <Text style={styles.description}>
+                        {resolved ? resolutionText : eventData.description}
+                    </Text>
+                </View>
+
+                {/* Choices Section */}
+                <View style={styles.choicesContainer}>
+                    {!resolved ? (
+                        eventData.choices.map((choice, index) => (
+                            <Animated.View 
+                                key={choice.id}
+                                entering={FadeInDown.delay(400 + index * 100).springify()}
+                            >
+                                <TouchableOpacity
+                                    style={styles.choiceButton}
+                                    onPress={() => handleChoice(choice)}
+                                    activeOpacity={0.8}
+                                >
+                                    <BlurView intensity={30} tint="light" style={styles.choiceBlur}>
+                                        <View style={styles.choiceIconContainer}>
+                                            {choice.iconType === 'Ionicons' ? (
+                                                <Ionicons name={choice.icon as any} size={24} color={colors.arcane.emerald} />
+                                            ) : (
+                                                <MaterialCommunityIcons name={choice.icon as any} size={24} color={colors.arcane.emerald} />
+                                            )}
+                                        </View>
+                                        <View style={styles.choiceTextContainer}>
+                                            <Text style={styles.choiceLabel}>{choice.label}</Text>
+                                            <Text variant="caption" style={styles.choiceSub}>{choice.description}</Text>
+                                        </View>
+                                    </BlurView>
+                                </TouchableOpacity>
+                            </Animated.View>
+                        ))
+                    ) : (
+                        <Animated.View entering={SlideInUp.springify()} style={{ width: '100%', alignItems: 'center' }}>
+                            <TouchableOpacity
+                                style={styles.continueButton}
+                                onPress={handleContinue}
+                                activeOpacity={0.8}
+                            >
+                                <ExpoLinearGradient
+                                    colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
+                                    style={styles.continueGradient}
+                                >
+                                    <Text style={styles.continueText}>CONTINUE JOURNEY</Text>
+                                </ExpoLinearGradient>
+                            </TouchableOpacity>
+                        </Animated.View>
+                    )}
+                </View>
+            </Animated.ScrollView>
+
+            {/* Header / Back */}
+            <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Ionicons name="chevron-back" size={24} color={colors.arcane.white} />
+                </TouchableOpacity>
+                <Text variant="caption" color={colors.arcane.emerald} style={styles.headerText}>MYSTERIOUS ENCOUNTER</Text>
+             </View>
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: colors.arcane.obsidian,
+    },
+    header: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: spacing.lg,
+        zIndex: 10,
+    },
+    backButton: {
+        padding: spacing.xs,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        borderRadius: 20,
+    },
+    headerText: {
+        marginLeft: spacing.md,
+        letterSpacing: 3,
+        fontWeight: '900',
+    },
+    content: {
+        flex: 1,
+    },
+    scrollContent: {
+        paddingBottom: spacing['4xl'],
+    },
+    imageContainer: {
+        width: '100%',
+        height: height * 0.4,
+        overflow: 'hidden',
+    },
+    eventImage: {
+        width: '100%',
+        height: '100%',
+    },
+    imageOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 150,
+    },
+    narrativeContainer: {
+        padding: spacing.xl,
+        marginTop: -spacing.xl,
+        backgroundColor: colors.arcane.obsidian,
+        borderTopLeftRadius: 32,
+        borderTopRightRadius: 32,
+        minHeight: 200,
+    },
+    title: {
+        color: colors.arcane.white,
+        letterSpacing: 4,
+        textAlign: 'center',
+        marginBottom: spacing.md,
+    },
+    divider: {
+        height: 2,
+        width: 100,
+        backgroundColor: colors.arcane.emerald,
+        alignSelf: 'center',
+        marginBottom: spacing.xl,
+        opacity: 0.5,
+    },
+    description: {
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 16,
+        lineHeight: 24,
+        textAlign: 'center',
+        fontStyle: 'italic',
+    },
+    choicesContainer: {
+        padding: spacing.xl,
+        paddingBottom: spacing['2xl'],
+        backgroundColor: colors.arcane.obsidian,
+    },
+    choiceButton: {
+        width: '100%',
+        marginBottom: spacing.md,
+        borderRadius: 16,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+    },
+    choiceBlur: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: spacing.lg,
+    },
+    choiceIconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: spacing.md,
+    },
+    choiceTextContainer: {
+        flex: 1,
+    },
+    choiceLabel: {
+        color: colors.arcane.white,
+        fontWeight: '900',
+        fontSize: 16,
+        letterSpacing: 1,
+        marginBottom: 2,
+    },
+    choiceSub: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 12,
+    },
+    continueButton: {
+        width: '100%',
+        height: 56,
+        borderRadius: 28,
+        overflow: 'hidden',
+        ...shadows.lg,
+    },
+    continueGradient: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    continueText: {
+        color: colors.arcane.obsidian,
+        fontWeight: '900',
+        letterSpacing: 2,
+    }
+});
