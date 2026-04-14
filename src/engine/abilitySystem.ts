@@ -47,14 +47,19 @@ export const calculateBoardPower = (
         let power = card.power || 0;
 
         // Apply global weather
-        const isWeatherAffected =
+        // HERO IMMUNITY: Legendary units and Hero cards are immune to weather
+        const isHero = card.isHero || card.rarity === 'legendary';
+        
+        const isWeatherAffected = !isHero && (
             (card.category === 'melee' && activeWeather.melee) ||
             (card.category === 'ranged' && activeWeather.ranged) ||
-            (card.category === 'siege' && activeWeather.siege);
+            (card.category === 'siege' && activeWeather.siege)
+        );
 
         if (isWeatherAffected) {
             // Keep any boosts that were applied above the base power
-            const base = card.basePower || 0;
+            // If basePower is missing, assume current power is the base power
+            const base = card.basePower || card.power || 0;
             const boost = Math.max(0, power - base);
             power = 1 + boost;
         }
@@ -97,7 +102,6 @@ export const drawCards = (deck: Card[], hand: Card[], count: number): { newDeck:
 
 // Effect handlers for different ability types
 export const abilityEffects = {
-    // Boost adjacent units
     // Boost adjacent units
     boost: (context: AbilityContext): void => {
         const { state, card, player } = context;
@@ -142,7 +146,6 @@ export const abilityEffects = {
     },
 
     // Spy - give card to enemy, draw cards
-    // Spy - give card to enemy, draw cards
     spy: (context: AbilityContext): void => {
         const { state, card, player } = context;
 
@@ -164,7 +167,6 @@ export const abilityEffects = {
     },
 
     // Revive a unit from graveyard
-    // Revive a unit from graveyard
     revive: (context: AbilityContext): void => {
         const { state, player } = context;
 
@@ -180,7 +182,6 @@ export const abilityEffects = {
         }
     },
 
-    // Destroy strongest units
     // Destroy strongest units
     destroy: (context: AbilityContext): void => {
         const { state, card } = context;
@@ -224,14 +225,7 @@ export const abilityEffects = {
         });
     },
 
-    // Weather effects are handled separately in game engine
-    weather: (_context: AbilityContext): void => {
-        // Weather state is tracked in game engine
-    },
 
-    clear: (_context: AbilityContext): void => {
-        // Clear weather is handled in game engine
-    },
     
     decoy: (context: AbilityContext): void => {
         const { state, player } = context;
@@ -430,6 +424,27 @@ export const abilityEffects = {
                 context.eventBus?.emit('UNIT_SUMMONED', { cardId: summoned.id, name: summoned.name, player: currentPlayer });
             });
         }
+    },
+
+    // Weather - sets row weather to true
+    weather: (context: AbilityContext): void => {
+        const { state, card } = context;
+        const name = card.name.toLowerCase();
+        if (name.includes('frost') || name.includes('ground')) {
+            state.weather.melee = true;
+        } else if (name.includes('fog')) {
+            state.weather.ranged = true;
+        } else if (name.includes('rain') || name.includes('storm')) {
+            state.weather.siege = true;
+        }
+    },
+
+    // Clear Weather - sets all row weather to false
+    clear: (context: AbilityContext): void => {
+        const { state } = context;
+        state.weather.melee = false;
+        state.weather.ranged = false;
+        state.weather.siege = false;
     },
 };
 

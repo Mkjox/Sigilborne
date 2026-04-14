@@ -247,6 +247,33 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                     </Text>
                                 </View>
                             )}
+
+                            {/* Class/Row Indicator (Top Right) */}
+                            {card.type === 'unit' && card.category && (
+                                <View style={[
+                                    styles.statOrb,
+                                    {
+                                        width: badgeSize,
+                                        height: badgeSize,
+                                        borderRadius: badgeSize / 2,
+                                        top: padding,
+                                        right: padding,
+                                        borderColor: colors.arcane.emerald,
+                                        backgroundColor: 'rgba(0,0,0,0.85)',
+                                        padding: badgeSize * 0.15,
+                                    }
+                                ]}>
+                                    <Image 
+                                        source={
+                                            card.category === 'melee' ? require('../../assets/icons/melee.png') :
+                                            card.category === 'ranged' ? require('../../assets/icons/ranged.png') :
+                                            require('../../assets/icons/siege.png')
+                                        }
+                                        style={{ width: '100%', height: '100%', tintColor: colors.arcane.white }}
+                                        resizeMode="contain"
+                                    />
+                                </View>
+                            )}
                         </>
                     )}
 

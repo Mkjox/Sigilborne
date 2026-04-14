@@ -190,7 +190,21 @@ export const playCard = (
         // Spells go to graveyard after use
         newState[currentPlayer].graveyard.push(card);
     } else if (card.type === 'weather') {
-        // Weather effects are handled by the store
+        // Execute onPlay abilities (Weather/Clear)
+        card.abilities
+            .filter(a => a.trigger === 'onPlay')
+            .forEach(ability => {
+                const context: AbilityContext = {
+                    state: newState,
+                    card,
+                    player: currentPlayer,
+                    eventBus,
+                    updateState: () => { },
+                };
+                executeAbility(ability, context);
+            });
+            
+        // Weather cards go to graveyard after use (the effect persists in state.weather)
         newState[currentPlayer].graveyard.push(card);
     } else {
         // Fallback for any other type to avoid "disappearing" cards
@@ -383,9 +397,8 @@ export const shouldEndRound = (state: GameState): boolean => {
 
 // Resolve round winner
 export const resolveRound = (state: GameState, eventBus?: EventBus): GameState => {
-    const weather = { melee: false, ranged: false, siege: false }; // Weather removed/simplified
-    const playerPower = calculateBoardPower(state.player.board, weather, state.ai.board, state.player.unlockedTalents);
-    const aiPower = calculateBoardPower(state.ai.board, weather, state.player.board, state.ai.unlockedTalents);
+    const playerPower = calculateBoardPower(state.player.board, state.weather, state.ai.board, state.player.unlockedTalents);
+    const aiPower = calculateBoardPower(state.ai.board, state.weather, state.player.board, state.ai.unlockedTalents);
 
     let winner: PlayerType | 'draw' = 'draw';
     if (playerPower > aiPower) winner = 'player';

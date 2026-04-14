@@ -134,10 +134,19 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
 
     // Scroll to Level 1 (bottom) on layout/mount
     const handleInitialScroll = () => {
-        // Use a small delay to ensure content is measured
+        // Use a small delay to ensure content is measured and layout is ready
         setTimeout(() => {
-            mapRef.current?.scrollToEnd({ animated: true });
-        }, 100);
+            const currentLayout = stageLayouts.layouts[currentNodeId];
+            if (currentLayout) {
+                // Center the current node vertically in the viewport
+                // We offset by (screenHeight / 2) and add back half the node distance (57) for centering
+                const centeredY = currentLayout.top - (screenHeight / 2) + 57;
+                mapRef.current?.scrollTo({ y: Math.max(0, centeredY), animated: true });
+            } else {
+                // Fallback to start of the path (bottom of ScrollView)
+                mapRef.current?.scrollToEnd({ animated: true });
+            }
+        }, 150);
     };
 
     React.useEffect(() => {
@@ -234,7 +243,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                     activeOpacity={0.7}
                 >
                     <Ionicons name="chevron-back" size={20} color={colors.arcane.emerald} />
-                    <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText}>{t('common.exit')}</Text>
+                    <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText} numberOfLines={1}>{t('common.exit')}</Text>
                 </TouchableOpacity>
 
                 <BiomeHeader scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
@@ -258,14 +267,16 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                 <Text style={styles.pillBadgeText}>{talentPoints}</Text>
                             </View>
                         )}
-                        <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText}>{t('common.ascend')}</Text>
+                        <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText} numberOfLines={1}>{t('common.ascend')}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         onPress={() => setDifficultyModalVisible(true)}
                         style={[styles.headerPill, { borderColor: colors.arcane.cyan }]}
                     >
-                        <Text variant="caption" color={colors.arcane.cyan} style={styles.pillText}>{selectedDifficulty.toUpperCase()}</Text>
+                        <Text variant="caption" color={colors.arcane.cyan} style={styles.pillText} numberOfLines={1}>
+                            {t(`campaign.difficulty.${selectedDifficulty}`).toUpperCase()}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -432,6 +443,10 @@ const BiomeHeader: React.FC<{ scrollY: SharedValue<number>, totalHeight: number 
     const { t } = useTranslation();
     const [name, setName] = useState('');
 
+    const updateBiomeName = (biomeId: string) => {
+        setName(t(`biome.${biomeId}`).toUpperCase());
+    };
+
     useAnimatedReaction(
         () => {
             if (!totalHeight) return '';
@@ -443,7 +458,7 @@ const BiomeHeader: React.FC<{ scrollY: SharedValue<number>, totalHeight: number 
         },
         (next, prev) => {
             if (next !== prev && next) {
-                runOnJS(setName)(t(`biome.${next}`).toUpperCase());
+                runOnJS(updateBiomeName)(next);
             }
         },
         [totalHeight, t]
@@ -618,13 +633,14 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
         marginLeft: spacing.sm,
+        flexShrink: 0,
     },
     pillText: {
         fontSize: 10,
         fontWeight: '900',
         color: colors.arcane.white,
         marginLeft: 6,
-        letterSpacing: 2,
+        letterSpacing: 1,
     },
     currencyText: {
         color: '#FBBF24',

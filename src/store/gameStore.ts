@@ -238,17 +238,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             return;
         }
 
-        // Handle weather cards
-        if (card.type === 'weather') {
-            const weatherId = card.abilities[0]?.id;
-            if (weatherId === 'clear_weather') {
-                set({ weather: { melee: false, ranged: false, siege: false } });
-            } else if (weatherId === 'frost') {
-                set({ weather: { ...state.weather, melee: true } });
-            } else if (weatherId === 'fog') {
-                set({ weather: { ...state.weather, ranged: true } });
-            }
-        }
+        // VFX determination logic remains here as it's UI/Store concern...
 
         // Determine VFX
         let vfx: 'scorch' | 'boost' | 'revive' | 'frost' | 'fog' | 'none' = 'none';
@@ -608,22 +598,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         bus
                     );
 
-                    // Handle weather effects if AI played a weather card
-                    let newWeather = { ...currentState.weather };
-                    if (card?.type === 'weather') {
-                        const weatherId = card.abilities[0]?.id;
-                        if (weatherId === 'clear_weather') {
-                            newWeather = { melee: false, ranged: false, siege: false };
-                        } else if (weatherId === 'frost') {
-                            newWeather.melee = true;
-                        } else if (weatherId === 'fog') {
-                            newWeather.ranged = true;
-                        }
-                    }
+
 
                     set({
                         ...newState,
-                        weather: newWeather,
                         isAIThinking: false,
                         message: card 
                             ? i18n.t('common.messages.ai_played_card', { name: i18n.t(`cards.${card.name}`) }) 
