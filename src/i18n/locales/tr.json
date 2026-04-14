@@ -1,0 +1,594 @@
+{
+  "abilities": {
+    "morale_boost": {
+      "name": "Moral Desteği",
+      "desc": "Yanındaki birimlere +{{value}} güç verir"
+    },
+    "bond": {
+      "name": "Sıkı Bağ",
+      "desc": "Aynı isimdeki bir birimle yan yana geldiğinde gücü ikiye katlanır"
+    },
+    "spy": {
+      "name": "Casus",
+      "desc": "Düşman sahasına oyna ve {{value}} kart çek"
+    },
+    "medic": {
+      "name": "Sıhhiyeci",
+      "desc": "Mezarlıktan bir birimi canlandır"
+    },
+    "scorch": {
+      "name": "Yakma",
+      "desc": "Sahadaki en güçlü birimleri yok et"
+    },
+    "muster": {
+      "name": "Toplanma",
+      "desc": "Destendeki tüm aynı isimli kartları bul ve oyna"
+    },
+    "commander_horn": {
+      "name": "Komutanın Borusu",
+      "desc": "Bu sıradaki tüm birimlerin gücünü ikiye katla"
+    },
+    "frost": {
+      "name": "Isıran Ayaz",
+      "desc": "Tüm yakın dövüş birimlerinin gücünü 1 yapar"
+    },
+    "fog": {
+      "name": "Geçit Vermez Sis",
+      "desc": "Tüm menzilli birimlerin gücünü 1 yapar"
+    },
+    "clear_weather": {
+      "name": "Açık Gökyüzü",
+      "desc": "Sahadaki tüm hava etkilerini kaldırır"
+    },
+    "decoy": {
+      "name": "Yem",
+      "desc": "Sahadaki bir birimi eline geri almak için onunla yer değiştir"
+    },
+    "ability_rally": {
+      "name": "Toplanma",
+      "desc": "Tüm dost birimleri +1 güçlendirir"
+    },
+    "ability_dark_command": {
+      "name": "Karanlık Emir",
+      "desc": "En güçlü düşman birimine 2 hasar ver"
+    },
+    "ability_arcane_blast": {
+      "name": "Arkane Patlama",
+      "desc": "Tüm düşman birimlerine 1 hasar ver"
+    },
+    "ability_precision_strike": {
+      "name": "Hassas Vuruş",
+      "desc": "En zayıf düşman birimini yok eder"
+    },
+    "ability_divine_shield": {
+      "name": "Kutsal Işık",
+      "desc": "Kahramanına 2 sağlık kazandırır"
+    },
+    "ability_quick_draw": {
+      "name": "Hızlı Çekiş",
+      "desc": "Bir kart çek"
+    },
+    "ability_bloodlust": {
+      "name": "Kan Susuzluğu",
+      "desc": "Rastgele bir düşman birimine 1 hasar verir"
+    },
+    "ability_nature_growth": {
+      "name": "Doğal Büyüme",
+      "desc": "Rastgele bir dost birimi +2 güçlendirir"
+    }
+  },
+  "common": {
+    "exit": "ÇIKIŞ",
+    "ascend": "YÜKSELİŞ",
+    "visit_merchant": "TÜCCARI ZİYARET ET",
+    "enter_void": "BOŞLUĞA GİR",
+    "completed": "TAMAMLANDI",
+    "level": "SEVİYE {{num}}",
+    "stage": "AŞAMA {{num}}",
+    "boss": "BOSS {{num}}",
+    "elite": "ELİT {{num}}",
+    "back": "GERİ",
+    "back_void": "BOŞLUK",
+    "gold": "ALTIN",
+    "points_abbr": "PT",
+    "no_relics": "Kalıntı bulunamadı",
+    "not_enough_gold": "Yetersiz altın!",
+    "merchant_refusal": "Tüccar başını sallıyor. \"Daha fazla paran olduğunda gel buralara, yolcu.\"",
+    "game_errors": {
+      "not_in_hand": "Kart elde değil",
+      "not_enough_mana": "Yetersiz mana",
+      "unit_not_found": "Birim bulunamadı",
+      "unit_exhausted": "Birim bitkin",
+      "attack_success": "Saldırı başarılı",
+      "ability_cooldown": "Yetenek bekleme süresinde",
+      "ability_success": "Kahraman yeteneği kullanıldı"
+    },
+    "you": "SEN",
+    "opponent": "RAKİP",
+    "rounds": "RAUNTLAR",
+    "power": "GÜÇ",
+    "mana": "MANA",
+    "hand": "EL",
+    "cards": "KARTLAR",
+    "deck": "DESTE",
+    "turn": "SIRA",
+    "passed": "PAS GEÇİLDİ",
+    "used": "KULLANILDI",
+    "leader": "LİDER",
+    "victory": "ZAFER",
+    "defeat": "HÜSRAN",
+    "draw": "BERABERLİK",
+    "continue": "DEVAM ET",
+    "end_turn": "SIRAYI BİTİR",
+    "escape": "KAÇIŞ",
+    "void_keeper": "BOŞLUK MUHAFIZI",
+    "void_keeper_title": "Hancı'nın Gölgesi",
+    "corruption": "YOZLAŞMA",
+    "essence": "ÖZ",
+    "round_complete": "RAUNT {{num}} TAMAMLANDI",
+    "continue_expedition": "KEŞFE DEVAM ET",
+    "replay": "TEKRAR OYNA",
+    "reawaken": "YENİDEN UYAN",
+    "abandon": "TERK ET",
+    "messages": {
+      "game_started": "Oyun Başladı",
+      "cannot_play": "Kart oynanamaz",
+      "played_card": "{{name}} oynandı",
+      "used_hero_ability": "Kahraman Yeteneği Kullanıldı",
+      "cannot_use_ability": "Yetenek kullanılamaz",
+      "victory": "Zafer!",
+      "stalemate": "Beraberlik!",
+      "defeat": "Mağlubiyet!",
+      "you_won": "Kazandın!",
+      "ai_won": "Yapay Zeka Kazandı!",
+      "draw": "Berabere!",
+      "you_passed": "Pas geçtin",
+      "round_start": "Raunt {{num}} Başladı!",
+      "attack": "Saldırı!",
+      "attack_failed": "Saldırı başarısız",
+      "ai_passed": "Yapay Zeka pas geçti",
+      "ai_used_ability": "Yapay Zeka {{name}} kullandı",
+      "ai_played_card": "Yapay Zeka {{name}} oynadı",
+      "ai_played_generic": "Yapay Zeka bir kart oynadı",
+      "card_info": "{{name}}: {{desc}}",
+      "no_description": "Açıklama yok"
+    }
+  },
+  "shop": {
+    "title": "Boşluk Tüccarı",
+    "subtitle": "Unutulmuş zamanların kalıntıları...",
+    "tabs": {
+      "buy": "Satın Al",
+      "remove": "Arındır"
+    },
+    "sections": {
+      "stock": "Mevcut Stok",
+      "purify": "Zayıfları Ayıkla"
+    },
+    "acquired": "ALINDI",
+    "removal_title": "Kurban edilecek bir sunu seç",
+    "purged_title": "Arındırıldı",
+    "purged_msg": "Kart arkane toza dönüşerek yanıyor. Desten daha hafif hissediliyor.",
+    "services": {
+      "remove": {
+        "name": "Boşluk Temizliği",
+        "desc": "Daha iyi çekişler için desteni inceltmek üzere bir kartı kalıcı olarak çıkar."
+      }
+    },
+    "select_to_remove": "ÇIKARILACAK KARTI SEÇ",
+    "confirm_purchase": "SATIN ALMAYI ONAYLA",
+    "confirm_desc": "\"{{name}}\" kartını destene eklemek istediğinden emin misin?",
+    "buy_for": "{{price}} Altına Satın Al",
+    "confirm_purify": "ARINDIRMAYI ONAYLA",
+    "confirm_purify_desc": "\"{{name}}\" kartını destenden kalıcı olarak çıkarmak istediğinden emin misin?",
+    "purify_for": "{{price}} Altına Arındır"
+  },
+  "relics": {
+    "war_banner": {
+      "name": "Savaş Sancağı",
+      "desc": "Sıranın başında rastgele bir dosta +1 güç verir."
+    },
+    "mana_crystal": {
+      "name": "Mana Kristali",
+      "desc": "Her rauntun başında +1 Maksimum Mana kazan."
+    },
+    "soul_gem": {
+      "name": "Ruh Taşı",
+      "desc": "Bir dost birim yok edildiğinde, 1 kart çek."
+    },
+    "thornmail": {
+      "name": "Dikenli Zırh",
+      "desc": "Bir dost birim hasar aldığında, rastgele bir düşmana 1 hasar ver."
+    }
+  },
+  "deck_builder": {
+    "vault_title": "MAHZEN",
+    "construct_title": "İNŞA",
+    "unlinked": "BAĞSIZ",
+    "forge_link": "BAĞ DÖV",
+    "active_hero": "AKTİF KAHRAMAN",
+    "default_deck_name": "Deste {{num}}",
+    "hero_count": "{{count}} KAHRAMAN",
+    "essence_count": "{{count}} ÖZ",
+    "deck_count": "{{count}}/25 ÖZ",
+    "filters": {
+      "hero": "KAHRAMAN",
+      "all": "HEPSİ",
+      "unit": "BİRİMLER",
+      "spell": "BÜYÜLER"
+    }
+  },
+  "hero_classes": {
+    "Warrior": "Savaşçı",
+    "Mage": "Büyücü",
+    "Rogue": "Düzenbaz",
+    "Paladin": "Paladin",
+    "Druid": "Druid"
+  },
+  "collection": {
+    "title": "KOLEKSİYON",
+    "hero_label": "KAHRAMAN",
+    "hero_subtitle": "{{class}} Kahramanı • {{ability}}",
+    "hero_desc": "{{desc}} (Bekleme Süresi: {{cooldown}} Raunt)",
+    "no_flavor": "Boşluktan gelen gizemli bir yankı.",
+    "stats": {
+      "total": "TOPLAM",
+      "decks": "DESTELER"
+    },
+    "categories": {
+      "all": "Hepsi",
+      "units": "Birimler",
+      "heroes": "Kahramanlar",
+      "spells": "Büyüler",
+      "weather": "Hava Durumu"
+    }
+  },
+  "menu": {
+    "subtitle": "ARKANE GÜNCELERİ",
+    "enter_void": "Boşluğa Gir",
+    "collection": "Koleksiyon",
+    "deck_builder": "Deste Oluşturucu",
+    "settings": "Ayarlar"
+  },
+  "settings": {
+    "title": "AYARLAR",
+    "sensory": {
+      "title": "DUYUSAL",
+      "sound_effects": "Ses Efektleri",
+      "sound_sub": "Kart kullanımları, darbeler ve ortam sesleri",
+      "music": "Arka Plan Müziği",
+      "music_sub": "Arkane boşluk melodileri",
+      "haptics": "Titreşim Geri Bildirimi",
+      "haptics_sub": "Eylemlerde dokunsal tepki"
+    },
+    "visuals": {
+      "title": "GÖRSEL",
+      "animation_speed": "ANİMASYON HIZI",
+      "speeds": {
+        "slow": "YAVAŞ",
+        "normal": "NORMAL",
+        "fast": "HIZLI"
+      }
+    },
+    "language": {
+      "title": "DİL",
+      "select": "Dilinizi seçin",
+      "en": "ENGLISH",
+      "tr": "TÜRKÇE"
+    },
+    "footer": "✧ BOŞLUKTA DÖVÜLDÜ ✧",
+    "version": "ARKANE PROTOKOLÜ v0.1.0"
+  },
+  "biome": {
+    "verdant_echo": "Yeşil Yankı",
+    "azure_spire": "Mavi Kule",
+    "twilight_rift": "Alacakaranlık Yarığı",
+    "crimson_wake": "Kızıl İz",
+    "obsidian_heart": "Obsidyen Kalp"
+  },
+  "campaign": {
+    "select_difficulty": "ZORLUK SEÇ",
+    "difficulty": {
+      "easy": "KOLAY",
+      "medium": "ORTA",
+      "hard": "ZOR"
+    },
+    "descriptions": {
+      "boss": "Kozmik bir dehşet yolu kapatıyor. Ruhunu çağlar sürecek bir savaşa hazırla.",
+      "shop": "Altını olanlar için saçılmış kalıntılar ve nadir kartlar.",
+      "event": "Boşlukta öngörülemeyen enerjiler dönüyor. Şans cesurdan yanadır.",
+      "battle": "Düşman kuvvetleri bu bölgede toplanıyor. İlerlemek için yolu temizle."
+    }
+  },
+  "talent_tree": {
+    "title": "Kahraman Yükselişi",
+    "subtitle": "Gerçek gücü uyandır",
+    "ascended": "YÜKSELDİ",
+    "ascend_cost": "Yüksel ({{cost}} PT)"
+  },
+  "talents": {
+    "hero_commander": {
+      "t_cmd_1": {
+        "name": "Öncü Ruhu",
+        "desc": "+1 Kahraman Canı"
+      },
+      "t_cmd_2": {
+        "name": "İlham",
+        "desc": "+2 Mana ile başla"
+      },
+      "t_cmd_3": {
+        "name": "Düzen Ustalığı",
+        "desc": "Düzen birimleri +1 Saldırı alır"
+      }
+    },
+    "hero_darklord": {
+      "t_dark_1": {
+        "name": "Boşluk Erişimi",
+        "desc": "Kahraman Yeteneği bekleme süresi -1"
+      },
+      "t_dark_2": {
+        "name": "Karanlık Ritüel",
+        "desc": "+3 Mana ile başla"
+      }
+    },
+    "hero_archmage": {
+      "t_mage_1": {
+        "name": "Arkane Odak",
+        "desc": "+3 Mana ile başla"
+      },
+      "t_mage_2": {
+        "name": "Mana Taşması",
+        "desc": "Oyun başında +1 kart çek"
+      }
+    },
+    "hero_ranger": {
+      "t_rng_1": {
+        "name": "Kararlı Nişan",
+        "desc": "Doğa birimleri +1 Saldırı alır"
+      },
+      "t_rng_2": {
+        "name": "Kartal Gözü",
+        "desc": "Kahraman Yeteneği bekleme süresi -1"
+      }
+    },
+    "hero_paladin": {
+      "t_pal_1": {
+        "name": "Kutsal Adanmışlık",
+        "desc": "+2 Kahraman Canı"
+      },
+      "t_pal_2": {
+        "name": "Koruma Haresi",
+        "desc": "Düzen birimleri +1 Saldırı alır"
+      }
+    },
+    "hero_druid": {
+      "t_dru_1": {
+        "name": "Orman Bağı",
+        "desc": "Doğa birimleri +1 Saldırı alır"
+      },
+      "t_dru_2": {
+        "name": "Kadim Büyüme",
+        "desc": "+2 Mana ile başla"
+      }
+    }
+  },
+  "cards": {
+    "Swordsman": "Kılıç Ustası",
+    "Knight": "Şövalye",
+    "Berserker": "Berserker",
+    "Archer": "Okçu",
+    "Catapult": "Mancınık",
+    "Lich King": "Lich Kralı",
+    "descriptions": {
+      "swordsman": "Temel yakın dövüş birimi",
+      "knight": "Zırhlı yakın dövüş birimi",
+      "berserker": "Dostlarına ilham veren vahşi savaşçı",
+      "shield_captain": "Diğer kaptanlarla birlikte daha güçlü",
+      "champion": "Diyarın elit savaşçısı",
+      "warlord": "Savaş alanında saygı uyandırır",
+      "lich_king": "Donmuş ölülerin efendisi",
+      "grave_ghoul": "Savaş kalıntılarıyla beslenir",
+      "wight": "Zırha hapsolmuş kadim ruhlar",
+      "skeleton_warrior": "Yorulmak bilmeyen kemik yığınları",
+      "death_knight": "Boşluğa hizmet eden düşmüş bir kahraman",
+      "zombie_horde": "Geliyorlar...",
+      "crypt_guard": "Mezarın ebedi koruyucuları",
+      "archer": "Temel menzilli saldırıcı",
+      "crossbowman": "Güçlü menzilli birim",
+      "elven_marksman": "Ölümcül nişan alan elf okçusu",
+      "scout": "Düşman hatlarına sızar",
+      "sniper": "Seçkin keskin nişancı",
+      "dragon_hunter": "En kudretli canavarların avcısı",
+      "dark_elf_archer": "Gölgelerden ölümcül isabet",
+      "soul_harvester": "Yaşayanların özünü hasat eder",
+      "banshee": "Çığlığı bir ölüm fermanıdır",
+      "void_wizard": "Kararsız karanlık enerji kullanıcısı",
+      "shadow_assassin": "Sessiz ölümün ustası",
+      "necromancer": "Ahiret ile bağ kuran aracı",
+      "dark_elf_matriarch": "Obsidyen kulenin lideri",
+      "catapult": "Temel kuşatma silahı",
+      "ballista": "Ağır kuşatma silahı",
+      "trebuchet": "Devasa kuşatma motoru",
+      "war_elephant": "Durdurulamaz savaş canavarı",
+      "siege_tower": "Mobil kale",
+      "dragon": "Nihai silah",
+      "bone_catapult": "Kalıntılardan yapılmış kuşatma silahı",
+      "plague_spreader": "Savaş alanına hastalık yayar",
+      "abomination": "Titanlardan dikilmiş bir ucube",
+      "demon_prince": "Yanan düzlemlerin hükümdarı",
+      "hellhound": "Uçurumun ateş püsküren canavarı",
+      "gargoyle": "Ete ve nefrete dönüşmüş taş",
+      "cursed_ballista": "Gölgeyle büyülenmiş oklar",
+      "commanders_horn": "Bir sıranın gücünü ikiye katlar",
+      "decoy": "Rastgele bir dost birimi eline döndürür",
+      "scorch_spell": "En güçlü birimleri yok eder",
+      "resurrection": "Mezarlıktan bir birimi canlandırır",
+      "dark_pact": "Bir birimi canlandırmak için öz feda et",
+      "void_bolt": "En güçlü birimleri siler",
+      "life_drain": "Dostları güçlendirmek için güç çeker",
+      "raise_dead": "Ölüler efendilerine itaat eder.",
+      "frost": "Yakın dövüş birimlerini 1 güce sabitler",
+      "fog": "Menzilli birimleri 1 güce sabitler",
+      "clear_weather": "Tüm hava durumu efektlerini kaldırır",
+      "corrupt_ground": "Yakın dövüş birimleri azimlerini kaybeder",
+      "wailing_fog": "Menzilli birimler görüşlerini kaybeder"
+    },
+    "flavor": {
+      "swordsman": "Çelik, tanıdığı tek gerçektir.",
+      "knight": "Onur kalkanı, çelik kılıcıdır.",
+      "berserker": "Öfkesi efsanedir.",
+      "shield_captain": "Birlik güçtür.",
+      "champion": "Teke tek dövüşte yenilmedi.",
+      "warlord": "Herkes savaş beyinin önünde eğilir.",
+      "lich_king": "Ölüm sadece yeni bir başlangıçtır.",
+      "grave_ghoul": "Her zaman aç.",
+      "wight": "Nefretten başka bir şey hatırlamazlar.",
+      "skeleton_warrior": "Yüksel ve yürü.",
+      "death_knight": "Onur uzun zaman önce öldü.",
+      "zombie_horde": "Sayıca üstünlük.",
+      "crypt_guard": "Kimse geçemez.",
+      "archer": "Nişanını al.",
+      "crossbowman": "Tek cıvata, tek ölüm.",
+      "elven_marksman": "Asla kaçırmaz.",
+      "scout": "Bilgi güçtür.",
+      "sniper": "Tek atış yeterli.",
+      "dragon_hunter": "Avcıdan kork.",
+      "dark_elf_archer": "İki göz, tek hedef.",
+      "soul_harvester": "Ruhun feda edildi.",
+      "banshee": "Duyacağın son şey.",
+      "void_wizard": "Boşluk hepimizi çağırıyor.",
+      "shadow_assassin": "Gövde yere düşmeden gitmişti.",
+      "necromancer": "Mezar sadece bir kapıdır.",
+      "dark_elf_matriarch": "Güç tek para birimidir.",
+      "catapult": "Kayalar geliyor!",
+      "ballista": "Her türlü zırhı deler.",
+      "trebuchet": "Duvarlar önünde ufalanır.",
+      "war_elephant": "Durdurulamaz güç.",
+      "siege_tower": "Zaferi yakınlaştırır.",
+      "dragon": "Ateş ve öfke.",
+      "bone_catapult": "Kayadan daha fazlasını fırlatır.",
+      "plague_spreader": "Hastalığın onları almasına izin ver.",
+      "abomination": "Kan ve dehşetin şaheseri.",
+      "demon_prince": "Diz çök ya da yan.",
+      "hellhound": "Isıran çeneler.",
+      "gargoyle": "Gözünü gökyüzünden ayırma.",
+      "cursed_ballista": "Ruhu delip geçer.",
+      "archmage": "Gerçekliğin ipleri onun lavtasındaki teller gibidir. Kozmik bir ateş şarkısı çalar.",
+      "ranger": "Orman rüzgarın fısıltılarıyla konuşur. Gerçekten dinleyen tek kişi odur.",
+      "paladin": "Çelik ve inanç onun tek yoldaşıdır. En karanlık gecede kalkanı en parlak parlar.",
+      "rogue": "Tacını çalabilecekken neden bir taht için savaşasın? Kendi zaferini garantilemek için her tarafı oynar.",
+      "beserker_hero": "Akıl, çukurun sıcağında çoktan öldü. Şimdi sadece baltanın ritmi var.",
+      "druid": "Ağaçlar, taşın unuttuğunu hatırlar. O, uyanan dünyanın sesidir."
+    }
+  },
+  "abilities": {
+    "scorch": {
+      "name": "Kavur",
+      "desc": "Savaş alanındaki en güçlü birim(ler)i yok eder"
+    },
+    "muster": {
+      "name": "Toplan",
+      "desc": "Destendeki tüm {{name}} kopyalarını oyna"
+    },
+    "commander_horn": {
+      "name": "Komutanın Boynuzu",
+      "desc": "Bitişik birimlerin gücünü ikiye katlar"
+    },
+    "frost": {
+      "name": "Dondurucu Ayaz",
+      "desc": "Yakın dövüş birimlerini 1 güce sabitler"
+    },
+    "fog": {
+      "name": "Geçilmez Sis",
+      "desc": "Menzilli birimleri 1 güce sabitler"
+    },
+    "clear_weather": {
+      "name": "Hava Temizleme",
+      "desc": "Tüm hava durumu efektlerini kaldırır"
+    },
+    "decoy": {
+      "name": "Tuzak",
+      "desc": "Rastgele bir dost birimi eline döndürür"
+    },
+    "ability_rally": {
+      "name": "Toplanma",
+      "desc": "Tüm dost birimleri +1 güçlendirir"
+    },
+    "ability_dark_command": {
+      "name": "Karanlık Emir",
+      "desc": "En güçlü düşman birimine 2 hasar ver"
+    },
+    "ability_arcane_blast": {
+      "name": "Arkane Patlama",
+      "desc": "Tüm düşman birimlerine 1 hasar ver"
+    },
+    "ability_precision_strike": {
+      "name": "Hassas Vuruş",
+      "desc": "En zayıf düşman birimini yok eder"
+    },
+    "ability_divine_shield": {
+      "name": "Kutsal Işık",
+      "desc": "Kahramanına 2 sağlık kazandırır"
+    },
+    "ability_quick_draw": {
+      "name": "Hızlı Çekiş",
+      "desc": "Bir kart çek"
+    },
+    "ability_bloodlust": {
+      "name": "Kanasusamışlık",
+      "desc": "Rastgele bir düşman birimine 1 hasar ver"
+    },
+    "ability_nature_growth": {
+      "name": "Vahşi Büyüme",
+      "desc": "Rastgele bir dost birimi +2 güçlendirir"
+    }
+  },
+  "events": {
+    "mysterious_encounter": "GİZEMLİ KARŞILAŞMA",
+    "continue_journey": "YOLCULUĞA DEVAM ET",
+    "whispering_void": {
+      "title": "Fısıldayan Boşluk",
+      "description": "Gerçeklikteki bir yarık düşük, titreşimli bir frekansla uğulduyor. Varlığınıza tepki veriyor gibi görünüyor, başka bir aleme bakış sunuyor.",
+      "choices": {
+        "gift_gold_label": "Yankıyı Kucakla",
+        "gift_gold_desc": "Yarığın kutsamasını kabul et. 50 Altın kazan.",
+        "gift_card_label": "Arkane Sifonla",
+        "gift_card_desc": "Yarıktan güç çek. Rastgele bir Kart kazan."
+      },
+      "resolution": {
+        "gold": "Yarığa adım attığınızda, avuç dolusu antik sikke maddeleşiyor. Boşluk minnettarlığını fısıldıyor.",
+        "card": "Işıldayan enerjiye uzanıyor ve bir parşömen çıkarıyorsunuz: {{name}}. Desteniz güçleniyor."
+      }
+    },
+    "weeping_willow": {
+      "title": "Ağlayan Söğüt",
+      "description": "Bir açıklıkta tek başına kadim, kristal bir ağaç duruyor. Özsuyu yumuşak, masmavi bir ışıkla parlıyor. Efsaneye göre kurban sunanlara bilgelik verir.",
+      "choices": {
+        "offer_gold_label": "Sunu Yap",
+        "offer_gold_desc": "Gizli bir Kalıntı bulmak için 25 Altın feda et.",
+        "ignore_label": "Kendi Haline Bırak",
+        "ignore_desc": "Riske atma. Dikkatlice devam et."
+      },
+      "resolution": {
+        "not_enough_gold": "Yeterli altının yok. Ağaç hayal kırıklığına uğramış görünüyor.",
+        "success": "Ağaç haraçınızı kabul ediyor. Köklerinde gizli bir oda açılıyor ve bir {{relic}} ortaya çıkıyor.",
+        "ignore": "Arkanda ağacın soğuk bakışını hissederek uzaklaşıyorsun. Güvenlik kendi ödülüdür."
+      }
+    },
+    "abandoned_caravan": {
+      "title": "Terk Edilmiş Kervan",
+      "description": "Enkaz haline gelmiş bir tüccar vagonuna rastlıyorsunuz. Malların çoğu harap olmuş, ancak enkaz arasında hala kurtarılmaya değer bir şeyler olabilir.",
+      "choices": {
+        "scavenge_label": "Eşele",
+        "scavenge_desc": "Değerli bir şeyler ara. 30 Altın kazan.",
+        "search_carefully_label": "Derinden Ara",
+        "search_carefully_desc": "Daha iyi bir ödül için tuzak riskine gir. %50 şansla 60 Altın kazan veya hiçbir şey alma."
+      },
+      "resolution": {
+        "scavenge": "Enkazı kazıyorsun ve gizli bir sikke yığını buluyorsun. Zafer gözlemci olanındır.",
+        "success": "Israr karşılığını veriyor! Döşeme tahtalarının altına gizlenmiş ağır bir altın sandığı buluyorsunuz.",
+        "failed": "Bir tuzak fırlıyor! Kıl payı kurtuluyorsunuz, ancak bu süreçte kalan değerli eşyalar yok oluyor."
+      }
+    }
+  }
+}

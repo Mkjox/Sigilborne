@@ -75,16 +75,16 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: He
         } 
     } : {
         id: `hero_${id}`,
-        name: type === 'player' ? 'Commander' : 'Dark Lord',
+        name: type === 'player' ? 'hero_commander' : 'hero_darklord',
         health: 2 + healthBonus,
         maxHealth: 2 + healthBonus,
         faction: (type === 'player' ? 'order' : 'shadow') as Faction,
         ability: {
             id: `ability_${id}`,
-            name: type === 'player' ? 'Rally' : 'Dark Command',
+            name: type === 'player' ? 'abilities.ability_rally.name' : 'abilities.ability_dark_command.name',
             type: type === 'player' ? 'boost_all' : 'damage_strongest',
             trigger: 'activate',
-            description: type === 'player' ? 'Boost all units by 1' : 'Deal 2 damage to strongest enemy',
+            description: type === 'player' ? 'abilities.ability_rally.desc' : 'abilities.ability_dark_command.desc',
             cooldown: Math.max(1, 3 - cooldownReduction),
             currentCooldown: 0,
         },
@@ -128,7 +128,7 @@ export const playCard = (
     // Find card in hand
     const cardIndex = playerState.hand.findIndex(c => c.id === cardId);
     if (cardIndex === -1) {
-        return { newState: state, success: false, message: 'Card not in hand' };
+        return { newState: state, success: false, message: 'common.game_errors.not_in_hand' };
     }
 
     const card = playerState.hand[cardIndex];
@@ -136,7 +136,7 @@ export const playCard = (
     // Check mana cost
     const manaCost = card.manaCost ?? 0;
     if (manaCost > playerState.mana) {
-        return { newState: state, success: false, message: 'Not enough mana' };
+        return { newState: state, success: false, message: 'common.game_errors.not_enough_mana' };
     }
 
     // Remove from hand
@@ -275,14 +275,14 @@ export const attackUnit = (
     const targetRef = state[opponent].board.find(c => c.id === targetId);
 
     if (!attackerRef || !targetRef) {
-        return { newState: state, success: false, message: "Unit not found" };
+        return { newState: state, success: false, message: "common.game_errors.unit_not_found" };
     }
 
     // phase check removed to allow attacking without a UI phase-advance button
 
     // 2. Validation
     if (attackerRef.isExhausted) {
-        return { newState: state, success: false, message: "Unit is exhausted" };
+        return { newState: state, success: false, message: "common.game_errors.unit_exhausted" };
     }
 
     // 3. Combat Math
@@ -325,7 +325,7 @@ export const attackUnit = (
         eventBus?.emit('CARD_DESTROYED', { cardId: attackerId, player: currentPlayer });
     }
 
-    return { newState: finalState, success: true, message: "Attack successful" };
+    return { newState: finalState, success: true, message: "common.game_errors.attack_success" };
 };
 
 // End turn and switch active player
@@ -460,7 +460,7 @@ export const useHeroAbility = (state: GameState, eventBus?: EventBus): { newStat
     const playerState = state[player];
 
     if (playerState.hero.ability.currentCooldown > 0) {
-        return { newState: state, success: false, message: "Ability on cooldown" };
+        return { newState: state, success: false, message: "common.game_errors.ability_cooldown" };
     }
 
     // Execute ability
@@ -497,7 +497,7 @@ export const useHeroAbility = (state: GameState, eventBus?: EventBus): { newStat
 
     eventBus?.emit('HERO_ABILITY_USED', { player, abilityType, abilityName: playerState.hero.ability.name });
 
-    return { newState, success: true, message: "Hero ability used" };
+    return { newState, success: true, message: "common.game_errors.ability_success" };
 };
 
 // Setup next round

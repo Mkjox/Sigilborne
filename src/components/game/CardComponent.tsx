@@ -13,6 +13,7 @@ import Animated, {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Card, CardRarity } from '../../types';
 import { Text } from '../ui';
+import { useTranslation } from 'react-i18next';
 import { colors, borderRadius, shadows, getCardDimensions } from '../../theme';
 
 interface CardComponentProps {
@@ -50,6 +51,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     height,
     hideStats,
 }) => {
+    const { t } = useTranslation();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const scale = useSharedValue(1);
     const translateY = useSharedValue(0);
@@ -276,7 +278,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                     {/* Name Bar */}
                     <View style={[styles.nameBar, { bottom: cardHeight * 0.26 }]}>
                         <Text style={[styles.cardName, { fontSize: Math.max(6, cardHeight * 0.075) }]} numberOfLines={1}>
-                            {card.name.toUpperCase()}
+                            {t(`cards.${card.name}`).toUpperCase()}
                         </Text>
                     </View>
 

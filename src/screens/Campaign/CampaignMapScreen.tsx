@@ -35,6 +35,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { RootStackParamList, Difficulty } from '../../types';
 import { Text } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing, borderRadius, shadows, typography } from '../../theme';
 import { CampaignMapSkiaBackground } from './components/CampaignMapSkiaBackground';
 import { MapParallaxLayers } from './components/MapParallaxLayers';
@@ -42,6 +43,7 @@ import { TOTAL_STAGES, MAP_BIOMES } from './constants';
 import { generateCampaignMap, MapNode as MapNodeTypeData } from '../../data/campaignData';
 import { useCampaignStore } from '../../store/campaignStore';
 import { useDeckStore } from '../../store/deckStore';
+import i18n from '../../i18n';
 
 type CampaignMapNavigationProp = StackNavigationProp<RootStackParamList, 'CampaignMap'>;
 
@@ -50,6 +52,7 @@ interface Props {
 }
 
 export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
+    const { t } = useTranslation();
     const insets = useSafeAreaInsets();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const mapRef = React.useRef<ScrollView>(null);
@@ -231,7 +234,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                     activeOpacity={0.7}
                 >
                     <Ionicons name="chevron-back" size={20} color={colors.arcane.emerald} />
-                    <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText}>EXIT</Text>
+                    <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText}>{t('common.exit')}</Text>
                 </TouchableOpacity>
 
                 <BiomeHeader scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
@@ -255,7 +258,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                 <Text style={styles.pillBadgeText}>{talentPoints}</Text>
                             </View>
                         )}
-                        <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText}>ASCEND</Text>
+                        <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText}>{t('common.ascend')}</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -287,7 +290,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                             style={styles.difficultyModalContainer}
                         >
                             <ExpoLinearGradient colors={['rgba(30, 30, 60, 0.98)', 'rgba(10, 10, 20, 0.98)']} style={styles.difficultyGradient}>
-                                <Text style={styles.difficultyHeader}>SELECT DIFFICULTY</Text>
+                                <Text style={styles.difficultyHeader}>{t('campaign.select_difficulty')}</Text>
                                 <View style={styles.difficultyList}>
                                     {(['easy', 'medium', 'hard'] as Difficulty[]).map((diff) => {
                                         const isActive = selectedDifficulty === diff;
@@ -310,7 +313,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                                     {diff === 'hard' && <MaterialCommunityIcons name="skull-outline" size={18} color={isActive ? colors.arcane.emerald : 'rgba(255,255,255,0.4)'} />}
                                                 </View>
                                                 <Text style={[styles.difficultyLabel, isActive && styles.difficultyLabelActive]}>
-                                                    {diff.toUpperCase()}
+                                                    {t(`campaign.difficulty.${diff}`)}
                                                 </Text>
                                             </TouchableOpacity>
                                         );
@@ -345,10 +348,10 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                 <Text style={styles.stageLevelName}>
                                     {(() => {
                                         const type = stages.find(s => s.id === selectedStage)?.type;
-                                        if (type === 'boss') return `BOSS ${selectedStage}`;
-                                        if (type === 'elite') return `ELITE ${selectedStage}`;
-                                        if (type === 'shop') return `MERCHANT ${selectedStage}`;
-                                        return `STAGE ${selectedStage}`;
+                                        if (type === 'boss') return t('common.boss', { num: selectedStage });
+                                        if (type === 'elite') return t('common.elite', { num: selectedStage });
+                                        if (type === 'shop') return t('common.merchant', { num: selectedStage });
+                                        return t('common.stage', { num: selectedStage });
                                     })()}
                                 </Text>
                                 <TouchableOpacity onPress={() => setStageModalVisible(false)} style={styles.closePortal}>
@@ -360,18 +363,18 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                 <View style={styles.stageInfoRow}>
                                     <View style={styles.stageLevelPill}>
                                         <Text style={styles.stageLevelText}>
-                                            LEVEL {selectedStage}
+                                            {t('common.level', { num: selectedStage })}
                                         </Text>
                                     </View>
                                     <View style={[styles.stageLevelPill, { borderColor: colors.arcane.cyan }]}>
                                         <Text style={[styles.stageLevelText, { color: colors.arcane.cyan }]}>
-                                            {selectedDifficulty.toUpperCase()}
+                                            {t(`campaign.difficulty.${selectedDifficulty}`)}
                                         </Text>
                                     </View>
                                     {selectedStage !== null && completedNodes.includes(selectedStage) && (
                                         <View style={[styles.stageLevelPill, { borderColor: colors.arcane.emerald, backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
                                             <Text style={[styles.stageLevelText, { color: colors.arcane.emerald }]}>
-                                                COMPLETED
+                                                {t('common.completed')}
                                             </Text>
                                         </View>
                                     )}
@@ -395,10 +398,10 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                 <Text style={styles.stageDesc}>
                                     {(() => {
                                         const type = stages.find(s => s.id === selectedStage)?.type;
-                                        if (type === 'boss') return 'A cosmic terror guards the path forward. Steel your soul for a battle of ages.';
-                                        if (type === 'shop') return 'Scattered relics and rare cards for those with the gold to pay.';
-                                        if (type === 'event') return 'Unpredictable energies swirl in the void. Fortune favors the bold.';
-                                        return 'Enemy forces congregate in this sector. Clear the path to advance.';
+                                        if (type === 'boss') return t('campaign.descriptions.boss');
+                                        if (type === 'shop') return t('campaign.descriptions.shop');
+                                        if (type === 'event') return t('campaign.descriptions.event');
+                                        return t('campaign.descriptions.battle');
                                     })()}
                                 </Text>
                             </View>
@@ -413,7 +416,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                     style={styles.portalActionGradient}
                                 >
                                     <Text style={styles.portalActionText}>
-                                        {stages.find(s => s.id === selectedStage)?.type === 'shop' ? 'VISIT MERCHANT' : 'ENTER VOID'}
+                                        {stages.find(s => s.id === selectedStage)?.type === 'shop' ? t('common.visit_merchant') : t('common.enter_void')}
                                     </Text>
                                 </ExpoLinearGradient>
                             </TouchableOpacity>
@@ -426,23 +429,24 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
 };
 
 const BiomeHeader: React.FC<{ scrollY: SharedValue<number>, totalHeight: number }> = ({ scrollY, totalHeight }) => {
-    const [name, setName] = useState(MAP_BIOMES[0].name.toUpperCase());
+    const { t } = useTranslation();
+    const [name, setName] = useState('');
 
     useAnimatedReaction(
         () => {
-            if (!totalHeight) return MAP_BIOMES[0].name.toUpperCase();
+            if (!totalHeight) return '';
             const maxTop = totalHeight - 200;
             const logicScroll = Math.max(0, maxTop - scrollY.value);
             const stage = Math.floor((logicScroll / Math.max(1, maxTop)) * 200);
             const biome = MAP_BIOMES.find(b => stage >= b.start && stage <= b.end);
-            return biome ? biome.name.toUpperCase() : MAP_BIOMES[0].name.toUpperCase();
+            return biome ? biome.id : MAP_BIOMES[0].id;
         },
         (next, prev) => {
-            if (next !== prev) {
-                runOnJS(setName)(next);
+            if (next !== prev && next) {
+                runOnJS(setName)(t(`biome.${next}`).toUpperCase());
             }
         },
-        [totalHeight]
+        [totalHeight, t]
     );
 
     const animatedStyle = useAnimatedStyle(() => {
@@ -872,7 +876,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: 0,
-        marginBottom: spacing.xl,
+        marginBottom: spacing.lg,
     },
     stageArtGlow: {
         position: 'absolute',

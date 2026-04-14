@@ -22,6 +22,8 @@ import Animated, {
 import { RootStackParamList } from '../../types';
 import { Text, BoardSurface } from '../../components/ui';
 import { colors, spacing } from '../../theme';
+import { useTranslation } from 'react-i18next';
+import i18n from '../../i18n';
 import { useSettingsStore } from '../../store';
 
 type SettingsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Settings'>;
@@ -112,13 +114,14 @@ const ToggleRow: React.FC<{
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
+    const { t } = useTranslation();
     const insets = useSafeAreaInsets();
     const { width, height } = useWindowDimensions();
     const isLandscape = width > height;
 
     const {
-        soundEnabled, musicEnabled, hapticsEnabled, animationSpeed,
-        toggleSound, toggleMusic, toggleHaptics, setAnimationSpeed,
+        soundEnabled, musicEnabled, hapticsEnabled, animationSpeed, language,
+        toggleSound, toggleMusic, toggleHaptics, setAnimationSpeed, setLanguage,
     } = useSettingsStore();
 
     return (
@@ -133,13 +136,13 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                 <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
                     <View style={styles.backBtnInner}>
                         <Text style={styles.backArrow}>‹</Text>
-                        <Text style={styles.backText}>BACK</Text>
+                        <Text style={styles.backText}>{t('common.back')}</Text>
                     </View>
                 </Pressable>
 
                 <View style={styles.titleBlock}>
                     <Text style={styles.titleEyebrow}>ARCANE</Text>
-                    <Text style={styles.titleMain}>SETTINGS</Text>
+                    <Text style={styles.titleMain}>{t('settings.title')}</Text>
                     <View style={styles.titleUnderline} />
                 </View>
 
@@ -164,27 +167,27 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
             >
                 {/* SENSORY */}
                 <View style={isLandscape ? styles.columnHalf : styles.columnFull}>
-                    <Section title="SENSORY" delay={150}>
+                    <Section title={t('settings.sensory.title')} delay={150}>
                         <ToggleRow
                             icon="🔊"
-                            label="Sound Effects"
-                            sublabel="Card plays, impacts & ambience"
+                            label={t('settings.sensory.sound_effects')}
+                            sublabel={t('settings.sensory.sound_sub')}
                             value={soundEnabled}
                             onValueChange={toggleSound}
                         />
                         <View style={styles.rowDivider} />
                         <ToggleRow
                             icon="🎵"
-                            label="Background Music"
-                            sublabel="Arcane void melodies"
+                            label={t('settings.sensory.music')}
+                            sublabel={t('settings.sensory.music_sub')}
                             value={musicEnabled}
                             onValueChange={toggleMusic}
                         />
                         <View style={styles.rowDivider} />
                         <ToggleRow
                             icon="📳"
-                            label="Haptic Feedback"
-                            sublabel="Tactile response on actions"
+                            label={t('settings.sensory.haptics')}
+                            sublabel={t('settings.sensory.haptics_sub')}
                             value={hapticsEnabled}
                             onValueChange={toggleHaptics}
                         />
@@ -193,8 +196,8 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
 
                 {/* VISUALS */}
                 <View style={isLandscape ? styles.columnHalf : styles.columnFull}>
-                    <Section title="VISUALS" delay={280}>
-                        <Text style={styles.speedLabel}>ANIMATION SPEED</Text>
+                    <Section title={t('settings.visuals.title')} delay={280}>
+                        <Text style={styles.speedLabel}>{t('settings.visuals.animation_speed')}</Text>
                         <View style={styles.speedRow}>
                             {(['slow', 'normal', 'fast'] as const).map((speed) => {
                                 const isActive = animationSpeed === speed;
@@ -211,7 +214,39 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                                             style={StyleSheet.absoluteFill}
                                         />
                                         <Text style={[styles.speedBtnText, isActive && styles.speedBtnTextActive]}>
-                                            {speed.toUpperCase()}
+                                            {t(`settings.visuals.speeds.${speed}`)}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </View>
+                    </Section>
+                </View>
+
+                {/* LANGUAGE */}
+                <View style={isLandscape ? styles.columnHalf : styles.columnFull}>
+                    <Section title={t('settings.language.title')} delay={400}>
+                        <Text style={styles.speedLabel}>{t('settings.language.select').toUpperCase()}</Text>
+                        <View style={styles.speedRow}>
+                            {(['en', 'tr'] as const).map((lang) => {
+                                const isActive = i18n.language.startsWith(lang);
+                                return (
+                                    <Pressable
+                                        key={lang}
+                                        onPress={() => {
+                                            setLanguage(lang);
+                                            i18n.changeLanguage(lang);
+                                        }}
+                                        style={[styles.speedBtn, isActive && styles.speedBtnActive]}
+                                    >
+                                        <LinearGradient
+                                            colors={isActive
+                                                ? [colors.arcane.emerald, colors.arcane.emeraldDark]
+                                                : ['rgba(16,185,129,0.04)', 'rgba(0,0,0,0)']}
+                                            style={StyleSheet.absoluteFill}
+                                        />
+                                        <Text style={[styles.speedBtnText, isActive && styles.speedBtnTextActive]}>
+                                            {t(`settings.language.${lang}`)}
                                         </Text>
                                     </Pressable>
                                 );
@@ -226,8 +261,8 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                 entering={FadeIn.delay(500).duration(600)}
                 style={[styles.footer, { paddingBottom: insets.bottom + 8 }]}
             >
-                <Text style={styles.footerText}>✧ FORGED IN THE VOID ✧</Text>
-                <Text style={styles.footerVersion}>ARCANE PROTOCOL v0.1.0</Text>
+                <Text style={styles.footerText}>{t('settings.footer')}</Text>
+                <Text style={styles.footerVersion}>{t('settings.version')}</Text>
             </Animated.View>
         </BoardSurface>
     );

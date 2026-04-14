@@ -19,6 +19,7 @@ import * as Haptics from 'expo-haptics';
 import { RootStackParamList } from '../../types';
 import { Text } from '../../components/ui';
 import { colors, spacing } from '../../theme';
+import { useTranslation } from 'react-i18next';
 
 // Components
 import { MainMenuSkiaBackground } from './components/MainMenuSkiaBackground';
@@ -34,6 +35,7 @@ interface Props {
 export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
     const { width, height } = useWindowDimensions();
     const insets = useSafeAreaInsets();
+    const { t } = useTranslation();
     const isLandscape = width > height;
 
     // Scale title font relative to screen width so it never overflows
@@ -102,7 +104,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                         <View style={styles.titleUnderline} />
                     </View>
 
-                    <Text style={styles.subtitle}>ARCANE CHRONICLES</Text>
+                    <Text style={styles.subtitle}>{t('menu.subtitle')}</Text>
                 </Animated.View>
 
                 {/* MENU PANEL SECTION */}
@@ -112,19 +114,19 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                 >
                     <MenuPanel>
                         <MenuButton
-                            title="Enter The Void"
+                            title={t('menu.enter_void')}
                             onPress={handleEnterVoid}
                         />
                         <MenuButton
-                            title="Collection"
+                            title={t('menu.collection')}
                             onPress={() => navigation.navigate('Collection')}
                         />
                         <MenuButton
-                            title="Deck Builder"
+                            title={t('menu.deck_builder')}
                             onPress={() => navigation.navigate('DeckBuilder')}
                         />
                         <MenuButton
-                            title="Settings"
+                            title={t('menu.settings')}
                             onPress={() => navigation.navigate('Settings')}
                         />
                     </MenuPanel>

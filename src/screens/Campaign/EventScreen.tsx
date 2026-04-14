@@ -18,6 +18,7 @@ import Animated, { FadeIn, FadeInDown, SlideInUp } from 'react-native-reanimated
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 import { getAllCards } from '../../data/cardData';
 import { getRelicById } from '../../data/relicData';
 
@@ -43,6 +44,7 @@ interface EventChoice {
 export const EventScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const route = useRoute<EventRouteProp>();
+    const { t } = useTranslation();
     const { stageId } = route.params;
     const insets = useSafeAreaInsets();
 
@@ -61,25 +63,25 @@ export const EventScreen: React.FC = () => {
         switch (seed) {
             case 0:
                 return {
-                    title: 'The Whispering Void',
-                    description: 'A rift in reality hums with a low, vibrating frequency. It seems to react to your presence, offering a glimpse into another realm.',
+                    title: t('events.whispering_void.title'),
+                    description: t('events.whispering_void.description'),
                     image: voidRiftImg,
                     choices: [
                         {
                             id: 'gift_gold',
-                            label: 'Embrace the Echo',
-                            description: 'Accept the rift\'s blessing. Gain 50 Gold.',
+                            label: t('events.whispering_void.choices.gift_gold_label'),
+                            description: t('events.whispering_void.choices.gift_gold_desc'),
                             icon: 'cash',
                             iconType: 'Ionicons' as const,
                             action: () => {
                                 completeNode(stageId, { gold: 50 });
-                                setResolutionText('As you step into the rift, pocketfuls of ancient coins materialize. The void whispers its gratitude.');
+                                setResolutionText(t('events.whispering_void.resolution.gold'));
                             }
                         },
                         {
                             id: 'gift_card',
-                            label: 'Siphon the Arcane',
-                            description: 'Draw power from the rift. Gain a random Card.',
+                            label: t('events.whispering_void.choices.gift_card_label'),
+                            description: t('events.whispering_void.choices.gift_card_desc'),
                             icon: 'card',
                             iconType: 'Ionicons' as const,
                             action: () => {
@@ -89,77 +91,79 @@ export const EventScreen: React.FC = () => {
                                     addCardToDeck(activeDeck.id, randomCard);
                                 }
                                 completeNode(stageId);
-                                setResolutionText(`You reach into the shimmering energy and pull out a scroll: ${randomCard.name}. Your deck grows stronger.`);
+                                const transName = t(`cards.${randomCard.name}`);
+                                setResolutionText(t('events.whispering_void.resolution.card', { name: transName }));
                             }
                         }
                     ]
                 };
             case 1:
                 return {
-                    title: 'The Weeping Willow',
-                    description: 'An ancient, crystalline tree stands alone in a clearing. Its sap glows with a soft, azure light. Legend says it grants wisdom to those who offer a sacrifice.',
+                    title: t('events.weeping_willow.title'),
+                    description: t('events.weeping_willow.description'),
                     image: willowTreeImg,
                     choices: [
                         {
                             id: 'offer_gold',
-                            label: 'Make an Offering',
-                            description: 'Lose 25 Gold to find a hidden Relic.',
+                            label: t('events.weeping_willow.choices.offer_gold_label'),
+                            description: t('events.weeping_willow.choices.offer_gold_desc'),
                             icon: 'diamond',
                             iconType: 'Ionicons' as const,
                             action: () => {
                                 if (gold < 25) {
-                                    setResolutionText('You don\'t have enough gold. The tree seems disappointed.');
+                                    setResolutionText(t('events.weeping_willow.resolution.not_enough_gold'));
                                     return;
                                 }
                                 const relicId = Math.random() > 0.5 ? 'war_banner' : 'mana_crystal';
                                 addRelic(relicId);
                                 completeNode(stageId, { gold: -25 });
-                                setResolutionText(`The tree accepts your tribute. A hidden chamber opens at its roots, revealing a ${getRelicById(relicId)?.name || 'Relic'}.`);
+                                const relicName = t(`relics.${relicId}.name`);
+                                setResolutionText(t('events.weeping_willow.resolution.success', { relic: relicName }));
                             }
                         },
                         {
                             id: 'ignore',
-                            label: 'Leave it Be',
-                            description: 'Don\'t risk it. Proceed carefully.',
+                            label: t('events.weeping_willow.choices.ignore_label'),
+                            description: t('events.weeping_willow.choices.ignore_desc'),
                             icon: 'walk',
                             iconType: 'Ionicons' as const,
                             action: () => {
                                 completeNode(stageId);
-                                setResolutionText('You walk away, feeling the tree\'s cold gaze on your back. Safety is its own reward.');
+                                setResolutionText(t('events.weeping_willow.resolution.ignore'));
                             }
                         }
                     ]
                 };
             default:
                 return {
-                    title: 'Abandoned Caravan',
-                    description: 'You stumble upon a wrecked merchant wagon. Most of the goods are ruined, but something might still be salvageable among the wreckage.',
+                    title: t('events.abandoned_caravan.title'),
+                    description: t('events.abandoned_caravan.description'),
                     image: caravanWreckImg,
                     choices: [
                         {
                             id: 'scavenge',
-                            label: 'Scavenge',
-                            description: 'Look for valuables. Gain 30 Gold.',
+                            label: t('events.abandoned_caravan.choices.scavenge_label'),
+                            description: t('events.abandoned_caravan.choices.scavenge_desc'),
                             icon: 'search',
                             iconType: 'Ionicons' as const,
                             action: () => {
                                 completeNode(stageId, { gold: 30 });
-                                setResolutionText('You dig through the debris and find a hidden stash of coins. Victory belongs to the observant.');
+                                setResolutionText(t('events.abandoned_caravan.resolution.scavenge'));
                             }
                         },
                         {
                             id: 'search_carefully',
-                            label: 'Search Deeply',
-                            description: 'Risk a trap for a better reward. 50% chance for 60 Gold or 0.',
+                            label: t('events.abandoned_caravan.choices.search_carefully_label'),
+                            description: t('events.abandoned_caravan.choices.search_carefully_desc'),
                             icon: 'alert-circle',
                             iconType: 'Ionicons' as const,
                             action: () => {
                                 if (Math.random() > 0.5) {
                                     completeNode(stageId, { gold: 60 });
-                                    setResolutionText('Persistence pays off! You find a heavy chest of gold hidden beneath the floorboards.');
+                                    setResolutionText(t('events.abandoned_caravan.resolution.success'));
                                 } else {
                                     completeNode(stageId);
-                                    setResolutionText('A trap springs! You narrowly escape, but the remaining valuables are destroyed in the process.');
+                                    setResolutionText(t('events.abandoned_caravan.resolution.failed'));
                                 }
                             }
                         }
@@ -249,7 +253,7 @@ export const EventScreen: React.FC = () => {
                                     colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
                                     style={styles.continueGradient}
                                 >
-                                    <Text style={styles.continueText}>CONTINUE JOURNEY</Text>
+                                    <Text style={styles.continueText}>{t('events.continue_journey')}</Text>
                                 </ExpoLinearGradient>
                             </TouchableOpacity>
                         </Animated.View>
@@ -262,7 +266,7 @@ export const EventScreen: React.FC = () => {
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Ionicons name="chevron-back" size={24} color={colors.arcane.white} />
                 </TouchableOpacity>
-                <Text variant="caption" color={colors.arcane.emerald} style={styles.headerText}>MYSTERIOUS ENCOUNTER</Text>
+                <Text variant="caption" color={colors.arcane.emerald} style={styles.headerText}>{t('events.mysterious_encounter')}</Text>
              </View>
         </View>
     );

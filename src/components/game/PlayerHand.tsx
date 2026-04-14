@@ -5,6 +5,7 @@ import { Card } from '../../types';
 import { CardComponent } from './CardComponent';
 import { Text } from '../ui';
 import { colors, spacing, getCardDimensions } from '../../theme';
+import { useTranslation } from 'react-i18next';
 
 interface PlayerHandProps {
     cards: Card[];
@@ -25,6 +26,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
     isPlayerTurn,
     hasPassed,
 }) => {
+    const { t } = useTranslation();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const cardDims = getCardDimensions(screenWidth, screenHeight);
     const handCardWidth = cardDims.width * 0.85;
@@ -46,7 +48,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
         return (
             <View style={styles.emptyHand}>
                 <Text variant="body" color={colors.text.tertiary}>
-                    No cards in hand
+                    {t('common.player_hand.empty')}
                 </Text>
             </View>
         );
@@ -59,11 +61,11 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
         >
             <View style={styles.header}>
                 <Text variant="caption" color={colors.text.secondary}>
-                    Your Hand ({cards.length})
+                    {t('common.player_hand.title', { count: cards.length })}
                 </Text>
                 {hasPassed && (
                     <Text variant="caption" color={colors.warning}>
-                        PASSED
+                        {t('common.passed').toUpperCase()}
                     </Text>
                 )}
             </View>
@@ -106,7 +108,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                     exiting={FadeOut.duration(200)}
                 >
                     <Text variant="caption" color={colors.text.secondary}>
-                        Tap again to play
+                        {t('common.player_hand.hint')}
                     </Text>
                 </Animated.View>
             )}

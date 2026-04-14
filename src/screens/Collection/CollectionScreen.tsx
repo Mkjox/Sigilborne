@@ -17,9 +17,10 @@ import { RootStackParamList, Card, CardType } from '../../types';
 import { Hero } from '../../types/hero.types';
 import { Text, BoardSurface } from '../../components/ui';
 import { CardComponent } from '../../components/game';
-import { colors, spacing, borderRadius, getCardDimensions, getLayoutDimensions } from '../../theme';
+import { colors, spacing, getCardDimensions, getLayoutDimensions } from '../../theme';
 import { getAllCards, AVAILABLE_HEROES } from '../../data/cardData';
 import { useDeckStore } from '../../store/deckStore';
+import { useTranslation } from 'react-i18next';
 
 type CollectionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Collection'>;
 
@@ -62,6 +63,7 @@ const AnimatedBackground: React.FC = () => {
 
 export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
+    const { t } = useTranslation();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const { decks } = useDeckStore();
 
@@ -75,11 +77,11 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     const cardHeight = cardDims.height * 1.1;
 
     const categories: { id: 'all' | CardType | 'hero'; label: string; icon: string }[] = [
-        { id: 'all', label: 'All', icon: '✧' },
-        { id: 'unit', label: 'Units', icon: '⚔' },
-        { id: 'hero', label: 'Heroes', icon: '👑' },
-        { id: 'spell', label: 'Spells', icon: '✨' },
-        { id: 'weather', label: 'Weather', icon: '☁' },
+        { id: 'all', label: t('collection.categories.all'), icon: '✧' },
+        { id: 'unit', label: t('collection.categories.units'), icon: '⚔' },
+        { id: 'hero', label: t('collection.categories.heroes'), icon: '👑' },
+        { id: 'spell', label: t('collection.categories.spells'), icon: '✨' },
+        { id: 'weather', label: t('collection.categories.weather'), icon: '☁' },
     ];
 
     const filteredCards = useMemo(() => {
@@ -110,10 +112,10 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                             onPress={() => navigation.goBack()}
                             style={styles.backButton}
                         >
-                            <Text variant="body" color={colors.arcane.emerald} style={styles.backText}>← VOID</Text>
+                            <Text variant="body" color={colors.arcane.emerald} style={styles.backText}>← {t('common.back_void')}</Text>
                         </Pressable>
                         <View style={styles.titleContainer}>
-                            <Text variant="h2" style={styles.title}>COLLECTION</Text>
+                            <Text variant="h2" style={styles.title}>{t('collection.title')}</Text>
                             <View style={styles.titleUnderline} />
                         </View>
                         <View style={styles.backButton} />
@@ -160,12 +162,12 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                             <Animated.View entering={FadeIn.delay(500)} style={styles.statsGlass}>
                                 <View style={styles.statItem}>
                                     <Text variant="h4" color={colors.arcane.emerald} style={{ fontWeight: '900' }}>{ALL_CARDS.length + AVAILABLE_HEROES.length}</Text>
-                                    <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>TOTAL</Text>
+                                    <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>{t('collection.stats.total').toUpperCase()}</Text>
                                 </View>
                                 <View style={styles.statDivider} />
                                 <View style={styles.statItem}>
                                     <Text variant="h4" color={colors.arcane.cyan} style={{ fontWeight: '900' }}>{decks.length}</Text>
-                                    <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>DECKS</Text>
+                                    <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 8 }}>{t('collection.stats.decks').toUpperCase()}</Text>
                                 </View>
                             </Animated.View>
                         </View>
@@ -211,11 +213,11 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
 
                         <View style={styles.cardDetailsPanel}>
                             <View style={styles.cardDetailHeader}>
-                                <Text variant="h4" color={colors.arcane.white} style={{ flex: 1, fontFamily: 'serif', letterSpacing: 2 }}>{card.name.toUpperCase()}</Text>
+                                <Text variant="h4" color={colors.arcane.white} style={{ flex: 1, fontFamily: 'serif', letterSpacing: 2 }}>{t(`cards.${card.name}`).toUpperCase()}</Text>
                                 <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
                                     {isHero ? (
                                         <View style={[styles.miniBadge, { borderColor: colors.arcane.emerald, width: 'auto', paddingHorizontal: 8 }]}>
-                                            <Text variant="caption" color={colors.arcane.emerald}>HERO</Text>
+                                            <Text variant="caption" color={colors.arcane.emerald}>{t('collection.hero_label')}</Text>
                                         </View>
                                     ) : (
                                         <View style={[styles.miniBadge, { borderColor: colors.arcane.cyan }]}>
@@ -233,10 +235,10 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                                 </View>
                             </View>
                             <Text variant="caption" color={colors.arcane.emerald} style={{ fontStyle: 'italic', marginBottom: 8, opacity: 0.7 }}>
-                                {isHero ? `${hero?.className} Hero • ${hero?.ability.name}` : (card.flavorText || "A mysterious echo from the void.")}
+                                {isHero ? t('collection.hero_subtitle', { class: hero?.className, ability: t(hero?.ability.name || '') }) : (t(card.flavorText || "collection.no_flavor"))}
                             </Text>
                             <Text variant="body" color={colors.arcane.white} style={{ fontSize: 13, lineHeight: 18, opacity: 0.9 }}>
-                                {isHero ? `${hero?.ability.description} (Cooldown: ${hero?.ability.cooldown} Rounds)` : card.description}
+                                {isHero ? t('collection.hero_desc', { desc: t(hero?.ability.description || ''), cooldown: hero?.ability.cooldown }) : t(card.description)}
                             </Text>
                         </View>
                     </Animated.View>

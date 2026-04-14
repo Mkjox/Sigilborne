@@ -3,8 +3,8 @@ import { Relic } from '../types';
 export const AVAILABLE_RELICS: Relic[] = [
     {
         id: 'war_banner',
-        name: 'War Banner',
-        description: 'At the start of your turn, boost a random ally by 1.',
+        name: 'relics.war_banner.name',
+        description: 'relics.war_banner.desc',
         icon: 'flag-variant', // MaterialCommunityIcons
         rarity: 'common',
         trigger: 'TURN_STARTED',
@@ -17,8 +17,8 @@ export const AVAILABLE_RELICS: Relic[] = [
     },
     {
         id: 'mana_crystal',
-        name: 'Mana Crystal',
-        description: 'At the start of each round, gain 1 Max Mana.',
+        name: 'relics.mana_crystal.name',
+        description: 'relics.mana_crystal.desc',
         icon: 'crystal',
         rarity: 'rare',
         trigger: 'ROUND_STARTED',
@@ -31,8 +31,8 @@ export const AVAILABLE_RELICS: Relic[] = [
     },
     {
         id: 'soul_gem',
-        name: 'Soul Gem',
-        description: 'When an ally is destroyed, draw 1 card.',
+        name: 'relics.soul_gem.name',
+        description: 'relics.soul_gem.desc',
         icon: 'diamond',
         rarity: 'boss',
         trigger: 'CARD_DESTROYED',
@@ -45,8 +45,8 @@ export const AVAILABLE_RELICS: Relic[] = [
     },
     {
         id: 'thornmail',
-        name: 'Thornmail',
-        description: 'When an ally is damaged, deal 1 damage to a random enemy.',
+        name: 'relics.thornmail.name',
+        description: 'relics.thornmail.desc',
         icon: 'shield-sun',
         rarity: 'common',
         trigger: 'UNIT_DAMAGED',

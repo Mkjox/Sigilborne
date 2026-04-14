@@ -25,6 +25,7 @@ import { UnifiedVFXManager } from '../../components/game';
 import { GameBoardSkiaBackground } from './components/GameBoardSkiaBackground';
 import { useCampaignStore } from '../../store/campaignStore';
 import { generateCampaignMap } from '../../data/campaignData';
+import { useTranslation } from 'react-i18next';
 
 type GameBoardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameBoard'>;
 type GameBoardScreenRouteProp = RouteProp<RootStackParamList, 'GameBoard'>;
@@ -122,6 +123,7 @@ export const GameBoardScreen: React.FC<Props> = (props) => {
 };
 
 const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
+    const { t } = useTranslation();
     const { difficulty = 'medium', stageId } = route.params || {};
     const insets = useSafeAreaInsets();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -282,9 +284,9 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                     <Text
                         variant="caption"
                         style={{ textAlign: 'center', lineHeight: 16 }}
-                        color={message.includes('Victory') || message.includes('You Won') || message.includes('Played') ? colors.arcane.emerald : (message.includes('Defeat') || message.includes('AI Won') ? colors.error : colors.arcane.white)}
+                        color={message.toLowerCase().includes('victory') || message.toLowerCase().includes('won') || message.toLowerCase().includes('played') ? colors.arcane.emerald : (message.toLowerCase().includes('defeat') || message.toLowerCase().includes('failed') ? colors.error : colors.arcane.white)}
                     >
-                        {message.toUpperCase()}
+                        {t(message).toUpperCase()}
                     </Text>
                 </View>
             </Animated.View>
@@ -310,8 +312,8 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                 <Text style={{ fontSize: 18 }}>👁</Text>
                             </View>
                             <View>
-                                <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '900', letterSpacing: 1 }}>VOID KEEPER</Text>
-                                <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 10 }}>The Innkeeper's Shadow</Text>
+                                <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '900', letterSpacing: 1 }}>{t('common.void_keeper')}</Text>
+                                <Text variant="caption" color={colors.text.disabled} style={{ fontSize: 10 }}>{t('common.void_keeper_title')}</Text>
                             </View>
                         </View>
 
@@ -326,7 +328,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                             <View style={styles.scoreBoard}>
                                 {stageId ? (
                                     <Text variant="caption" color={colors.arcane.emerald} style={{ letterSpacing: 2, fontWeight: '900' }}>
-                                        STAGE {stageId}
+                                        {t('common.stage', { num: stageId })}
                                     </Text>
                                 ) : (
                                     <>
@@ -349,7 +351,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                             onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }}
                             style={styles.menuBtn}
                         >
-                            <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '600' }}>ESCAPE</Text>
+                            <Text variant="caption" color={colors.arcane.emerald} style={{ fontWeight: '600' }}>{t('common.escape')}</Text>
                         </Pressable>
                     </View>
 
@@ -363,7 +365,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                         {/* LEFT COLUMN: Stats */}
                         <View style={[styles.sideColumnLeft, { width: sideColWidth }]}>
                             <View style={styles.statDisplay}>
-                                <Text variant="caption" color={colors.text.disabled} style={styles.statLabel}>HAND</Text>
+                                <Text variant="caption" color={colors.text.disabled} style={styles.statLabel}>{t('common.hand')}</Text>
                                 <Text variant="h4" color={colors.arcane.white}>{ai.hand.length}</Text>
                             </View>
 
@@ -371,7 +373,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                 <View style={[styles.powerBadge, { borderColor: colors.error }]}>
                                     <Text variant="h3" color={colors.arcane.white} style={styles.powerText}>{aiPower}</Text>
                                 </View>
-                                <Text variant="caption" color={colors.error} style={styles.statLabel}>CORRUPTION</Text>
+                                <Text variant="caption" color={colors.error} style={styles.statLabel}>{t('common.corruption')}</Text>
                             </View>
                         </View>
 
@@ -416,14 +418,14 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                 <View style={[styles.powerBadge, { borderColor: colors.arcane.emerald, backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
                                     <Text variant="h3" color={colors.arcane.emerald} style={styles.powerText}>{playerPower}</Text>
                                 </View>
-                                <Text variant="caption" color={colors.arcane.emerald} style={styles.statLabel}>ESSENCE</Text>
+                                <Text variant="caption" color={colors.arcane.emerald} style={styles.statLabel}>{t('common.essence')}</Text>
                             </View>
 
                             <View style={styles.statDisplay}>
                                 <View style={[styles.manaBadge]}>
                                     <Text variant="h4" color={colors.arcane.white} style={{ fontWeight: 'bold' }}>{player.mana}</Text>
                                 </View>
-                                <Text variant="caption" color={colors.arcane.cyan} style={styles.statLabel}>MANA</Text>
+                                <Text variant="caption" color={colors.arcane.cyan} style={styles.statLabel}>{t('common.mana')}</Text>
                             </View>
 
                             {/* Bottom action cluster: Hero Ability + End Turn */}
@@ -440,7 +442,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     ]}
                                 >
                                     <Text style={{ fontSize: 10, color: player.hero.ability.currentCooldown > 0 ? colors.text.disabled : colors.arcane.white, fontWeight: '900', letterSpacing: 1 }}>
-                                        {player.hero.ability.currentCooldown > 0 ? '◇ USED' : `⚡ ${player.hero.ability.name.toUpperCase()}`}
+                                        {player.hero.ability.currentCooldown > 0 ? t('common.used') : `⚡ ${t(player.hero.ability.name).toUpperCase()}`}
                                     </Text>
                                 </Pressable>
 
@@ -460,7 +462,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     />
                                     <View style={styles.passButtonInner}>
                                         <Text variant="button" color={player.hasPassed ? colors.text.disabled : colors.arcane.white} style={{ fontWeight: '900', fontSize: 10, letterSpacing: 2 }}>
-                                            {player.hasPassed ? "PASSED" : "END TURN"}
+                                            {player.hasPassed ? t('common.passed') : t('common.end_turn')}
                                         </Text>
                                     </View>
                                 </Pressable>
@@ -528,7 +530,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                         <View style={styles.overlay}>
                             <View style={styles.overlayCard}>
                                 <Text variant="h2" style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: 'serif' }}>
-                                    {winner === 'player' ? 'VICTORY' : (winner === 'draw' ? 'STALEMATE' : 'OBLIVION')}
+                                    {winner === 'player' ? t('common.victory') : (winner === 'draw' ? t('common.draw') : t('common.defeat'))}
                                 </Text>
                                 
                                 {winner === 'player' && (
@@ -536,16 +538,16 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                         onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} 
                                         style={[styles.overlayBtn, { backgroundColor: colors.arcane.emerald, marginBottom: 12 }]}
                                     >
-                                        <Text variant="button" color={colors.arcane.obsidian} style={{ letterSpacing: 4, fontWeight: '900' }}>CONTINUE EXPEDITION</Text>
+                                        <Text variant="button" color={colors.arcane.obsidian} style={{ letterSpacing: 4, fontWeight: '900' }}>{t('common.continue_expedition')}</Text>
                                     </Pressable>
                                 )}
 
                                 <Pressable onPress={() => startGame(difficulty)} style={[styles.overlayBtn, winner === 'player' && { backgroundColor: 'transparent', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }]}>
-                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>{winner === 'player' ? 'REPLAY' : 'REAWAKEN'}</Text>
+                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>{winner === 'player' ? t('common.replay') : t('common.reawaken')}</Text>
                                 </Pressable>
 
                                 <Pressable onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald, marginTop: 16 }]}>
-                                    <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>ABANDON</Text>
+                                    <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>{t('common.abandon')}</Text>
                                 </Pressable>
                             </View>
                         </View>
@@ -555,31 +557,31 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                     {phase === 'round_end' && !gameOver && (
                         <View style={styles.overlay}>
                             <Animated.View entering={FadeIn.delay(300)} style={styles.overlayCard}>
-                                <Text variant="caption" color={colors.text.disabled} style={{ letterSpacing: 4, marginBottom: 8 }}>ROUND {currentRound} COMPLETE</Text>
+                                <Text variant="caption" color={colors.text.disabled} style={{ letterSpacing: 4, marginBottom: 8 }}>{t('common.round_complete', { num: currentRound })}</Text>
                                 
                                 <View style={styles.roundEndScores}>
                                     <View style={styles.roundEndScoreItem}>
                                         <Text variant="h3" color={colors.error}>{aiPower}</Text>
-                                        <Text variant="caption" color={colors.text.disabled}>VOID</Text>
+                                        <Text variant="caption" color={colors.text.disabled}>{t('common.back_void')}</Text>
                                     </View>
                                     <View style={styles.roundEndScoreDivider}>
                                         <Text style={{ color: colors.arcane.emerald, fontSize: 24 }}>⚔</Text>
                                     </View>
                                     <View style={styles.roundEndScoreItem}>
                                         <Text variant="h3" color={colors.arcane.emerald}>{playerPower}</Text>
-                                        <Text variant="caption" color={colors.text.disabled}>YOU</Text>
+                                        <Text variant="caption" color={colors.text.disabled}>{t('common.you')}</Text>
                                     </View>
                                 </View>
 
                                 <Text variant="h4" color={colors.arcane.white} style={{ marginVertical: 20, fontFamily: 'serif', textAlign: 'center' }}>
-                                    {message?.toUpperCase()}
+                                    {message ? t(message).toUpperCase() : ''}
                                 </Text>
 
                                 <Pressable 
                                     onPress={continueToNextRound} 
                                     style={styles.overlayBtn}
                                 >
-                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>CONTINUE</Text>
+                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>{t('common.continue')}</Text>
                                 </Pressable>
                             </Animated.View>
                         </View>

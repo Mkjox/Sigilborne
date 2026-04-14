@@ -23,6 +23,7 @@ import { useCampaignStore } from './campaignStore';
 import { createStarterDeck, AVAILABLE_HEROES, getTalentTreeForHero } from '../data/cardData';
 import { getRelicById } from '../data/relicData';
 import { Card } from '../types';
+import i18n from '../i18n';
 
 interface GameStore extends GameState {
     // Game settings
@@ -193,7 +194,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
             weather: { melee: false, ranged: false, siege: false },
             isAIThinking: false,
             winner: undefined,
-            message: 'Game Started',
+            message: i18n.t('common.messages.game_started'),
         });
     },
 
@@ -233,7 +234,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         );
 
         if (!success) {
-            set({ message: message || 'Cannot play card' });
+            set({ message: message ? i18n.t(message) : i18n.t('common.messages.cannot_play') });
             return;
         }
 
@@ -265,7 +266,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set({
             ...newState,
             selectedCardId: null,
-            message: `Played ${card.name}`,
+            message: i18n.t('common.messages.played_card', { name: i18n.t(`cards.${card.name}`) }),
         });
 
         // End turn after playing
@@ -285,12 +286,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (success) {
             set({
                 ...newState,
-                message: message || 'Used Hero Ability',
+                message: message ? i18n.t(message) : i18n.t('common.messages.used_hero_ability'),
             });
             // Hero ability is a FREE ACTION — does not end the turn.
             // Player can still play a card or pass after using it.
+            // Player can still play a card or pass after using it.
         } else {
-            set({ message: message || 'Cannot use ability' });
+            set({ message: message ? i18n.t(message) : i18n.t('common.messages.cannot_use_ability') });
         }
     },
 
@@ -325,23 +327,27 @@ export const useGameStore = create<GameStore>((set, get) => ({
                 set({
                     ...resolvedState,
                     phase: 'end',
-                    message: resolvedState.winner === 'player' ? 'Victory!' : (resolvedState.winner === 'draw' ? 'Stalemate!' : 'Defeat!'),
+                    message: resolvedState.winner === 'player' 
+                        ? i18n.t('common.messages.victory') 
+                        : (resolvedState.winner === 'draw' ? i18n.t('common.messages.stalemate') : i18n.t('common.messages.defeat')),
                 });
             } else {
                 const lastRound = resolvedState.roundHistory[resolvedState.roundHistory.length - 1];
-                const roundWinner = lastRound.playerScore > lastRound.aiScore ? 'You Won' : (lastRound.aiScore > lastRound.playerScore ? 'AI Won' : 'Draw');
+                const roundWinner = lastRound.playerScore > lastRound.aiScore 
+                    ? i18n.t('common.messages.you_won') 
+                    : (lastRound.aiScore > lastRound.playerScore ? i18n.t('common.messages.ai_won') : i18n.t('common.messages.draw'));
 
                 set({
                     ...resolvedState,
                     phase: 'round_end',
-                    message: `${roundWinner}!`,
+                    message: roundWinner,
                 });
             }
         } else {
             // AI's turn
             set({
                 ...passedState,
-                message: 'You passed',
+                message: i18n.t('common.messages.you_passed'),
             });
             get().endTurn();
         }
@@ -356,7 +362,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         set({
             ...nextRoundState,
             weather: { melee: false, ranged: false, siege: false },
-            message: `Round ${nextRoundState.currentRound} Start!`,
+            message: i18n.t('common.messages.round_start', { num: nextRoundState.currentRound }),
         });
 
         // Check if AI goes first next round
@@ -445,11 +451,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             set({
                 ...newState,
                 attackingCardId: null, // Reset after attack
-                message: 'Attack!',
+                message: i18n.t('common.messages.attack'),
             });
             // Update UI/Sound?
         } else {
-            set({ message: message || 'Attack failed', attackingCardId: null });
+            set({ message: message ? i18n.t(message) : i18n.t('common.messages.attack_failed'), attackingCardId: null });
         }
     },
 
@@ -519,17 +525,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
                                 ...resolvedState,
                                 phase: 'end',
                                 isAIThinking: false,
-                                message: resolvedState.winner === 'player' ? 'Victory!' : (resolvedState.winner === 'draw' ? 'Stalemate!' : 'Defeat!'),
+                                message: resolvedState.winner === 'player' 
+                                    ? i18n.t('common.messages.victory') 
+                                    : (resolvedState.winner === 'draw' ? i18n.t('common.messages.stalemate') : i18n.t('common.messages.defeat')),
                             });
                         } else {
                             const lastRound = resolvedState.roundHistory[resolvedState.roundHistory.length - 1];
-                            const roundWinner = lastRound.playerScore > lastRound.aiScore ? 'You Won' : (lastRound.aiScore > lastRound.playerScore ? 'AI Won' : 'Draw');
+                            const roundWinner = lastRound.playerScore > lastRound.aiScore 
+                                ? i18n.t('common.messages.you_won') 
+                                : (lastRound.aiScore > lastRound.playerScore ? i18n.t('common.messages.ai_won') : i18n.t('common.messages.draw'));
 
                             set({
                                 ...resolvedState,
                                 phase: 'round_end',
                                 isAIThinking: false,
-                                message: `${roundWinner}!`,
+                                message: roundWinner,
                             });
                         }
                     } else {
@@ -539,7 +549,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
                             ai: { ...aiPassedState.ai, hasPassed: true },
                             currentTurn: 'player',
                             isAIThinking: false,
-                            message: 'AI passed',
+                            message: i18n.t('common.messages.ai_passed'),
                         });
                     }
                 } else if (decision.action === 'ability') {
@@ -564,13 +574,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         set({
                             ...newState,
                             isAIThinking: false,
-                            message: abilityMsg || `AI used ${currentState.ai.hero.ability.name}`,
+                            message: abilityMsg ? i18n.t(abilityMsg) : i18n.t('common.messages.ai_used_ability', { name: i18n.t(currentState.ai.hero.ability.name) }),
                         });
                         // AI ability is also a free action — re-trigger AI to play a card or pass
                         get().triggerAI();
                     } else {
                         // Fallback to pass if ability fails
-                        set({ currentTurn: 'player', isAIThinking: false, message: 'AI passed' });
+                        set({ currentTurn: 'player', isAIThinking: false, message: i18n.t('common.messages.ai_passed') });
                     }
                 } else if (decision.cardId) {
                     // AI plays a card
@@ -615,7 +625,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
                         ...newState,
                         weather: newWeather,
                         isAIThinking: false,
-                        message: card ? `AI played ${card.name}` : 'AI played a card',
+                        message: card 
+                            ? i18n.t('common.messages.ai_played_card', { name: i18n.t(`cards.${card.name}`) }) 
+                            : i18n.t('common.messages.ai_played_generic'),
                     });
 
                     // End turn to cycle back to player or keep handling AI if player passed
@@ -647,7 +659,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
             if (card) {
                 set({
                     selectedCardId: cardId,
-                    message: `${card.name}: ${card.description || 'No description'}`
+                    message: i18n.t('common.messages.card_info', { 
+                        name: i18n.t(`cards.${card.name}`), 
+                        desc: i18n.t(card.description || 'common.messages.no_description') 
+                    })
                 });
             } else {
                 set({ selectedCardId: cardId });

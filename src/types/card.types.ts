@@ -50,6 +50,7 @@ export interface Ability {
     type: string;
     trigger: AbilityTrigger;
     value?: number;
+    targetId?: string;
     description: string;
     effect?: (context: any) => void;
     /** New composable format — engine prefers this over legacy `type` string */

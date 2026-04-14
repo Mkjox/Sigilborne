@@ -396,6 +396,41 @@ export const abilityEffects = {
         const randomIndex = Math.floor(Math.random() * board.length);
         board[randomIndex].power = (board[randomIndex].power || 0) + boostValue;
     },
+
+    // Summon (Muster) - pull all cards with matching targetId from deck to board
+    summon: (context: AbilityContext): void => {
+        const { state, player, card } = context;
+        const ability = card.abilities.find(a => a.type === 'summon');
+        if (!ability || !ability.targetId) return;
+
+        const targetName = ability.targetId;
+        const currentPlayer = player === 'player' ? 'player' : 'ai';
+        const deck = state[currentPlayer].deck;
+        const board = state[currentPlayer].board;
+
+        // Find all cards in deck with same name as targetId
+        const matchingIndices: number[] = [];
+        deck.forEach((c, idx) => {
+            if (c.name === targetName) {
+                matchingIndices.push(idx);
+            }
+        });
+
+        if (matchingIndices.length > 0) {
+            // Extract from deck in reverse to not mess up indices
+            const summonedCards: Card[] = [];
+            for (let i = matchingIndices.length - 1; i >= 0; i--) {
+                const [summoned] = state[currentPlayer].deck.splice(matchingIndices[i], 1);
+                summonedCards.push(summoned);
+            }
+
+            // Add to board
+            summonedCards.forEach(summoned => {
+                board.push({ ...summoned });
+                context.eventBus?.emit('UNIT_SUMMONED', { cardId: summoned.id, name: summoned.name, player: currentPlayer });
+            });
+        }
+    },
 };
 
 // ─── Effect Graph Resolution ────────────────────────────────────

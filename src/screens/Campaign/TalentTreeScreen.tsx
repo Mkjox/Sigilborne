@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
     View,
-    Text,
     StyleSheet,
     TouchableOpacity,
     Dimensions,
@@ -21,6 +20,8 @@ import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import Animated, { FadeInUp, FadeInDown, useSharedValue, useAnimatedStyle, withRepeat, withTiming, Easing } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Text } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 
 const { width, height } = Dimensions.get('window');
 
@@ -81,6 +82,7 @@ const TalentNode = ({ talent, unlocked, selected, available, onPress, index }: a
 export const TalentTreeScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const insets = useSafeAreaInsets();
+    const { t } = useTranslation();
     const { talentPoints, unlockedTalentIds, unlockTalent } = useCampaignStore();
     const { getActiveDeck } = useDeckStore();
 
@@ -132,13 +134,13 @@ export const TalentTreeScreen: React.FC = () => {
                     <Ionicons name="chevron-back" size={28} color={colors.text.primary} />
                 </TouchableOpacity>
                 <View style={styles.headerTitleContainer}>
-                    <Text style={styles.title}>Hero Ascension</Text>
-                    <Text style={styles.subtitle}>Awaken true power</Text>
+                    <Text variant="h2" style={styles.title}>{t('talent_tree.title')}</Text>
+                    <Text variant="caption" style={styles.subtitle}>{t('talent_tree.subtitle')}</Text>
                 </View>
                 <View style={styles.pointsDisplay}>
                     <Ionicons name="sparkles" size={12} color={colors.arcane.emerald} style={{ marginRight: 4 }} />
                     <Text style={styles.pointsValue}>{talentPoints}</Text>
-                    <Text style={styles.pointsLabel}> PT{talentPoints !== 1 ? 'S' : ''}</Text>
+                    <Text style={styles.pointsLabel}> {t('common.points_abbr').toUpperCase()}</Text>
                 </View>
             </ExpoLinearGradient>
 
@@ -219,8 +221,8 @@ export const TalentTreeScreen: React.FC = () => {
                     >
                         <View style={styles.talentInfoHeader}>
                             <View style={{ flex: 1, paddingRight: 20 }}>
-                                <Text style={styles.talentTitle}>{selectedTalent.name.toUpperCase()}</Text>
-                                <Text style={styles.talentDescription} numberOfLines={3}>{selectedTalent.description}</Text>
+                                <Text style={styles.talentTitle}>{t(`talents.${selectedTalent.id}.name`).toUpperCase()}</Text>
+                                <Text style={styles.talentDescription} numberOfLines={3}>{t(`talents.${selectedTalent.id}.desc`)}</Text>
                             </View>
 
                             <TouchableOpacity
@@ -245,7 +247,7 @@ export const TalentTreeScreen: React.FC = () => {
                                         isUnlocked(selectedTalent.id) && { color: colors.arcane.white, opacity: 0.7 },
                                         !canUnlock(selectedTalent) && !isUnlocked(selectedTalent.id) && { color: 'rgba(255,255,255,0.3)' }
                                     ]}>
-                                        {isUnlocked(selectedTalent.id) ? 'ASCENDED' : 'ASCEND (1 PT)'}
+                                        {isUnlocked(selectedTalent.id) ? t('talent_tree.ascended').toUpperCase() : t('talent_tree.ascend_cost', { cost: 1 }).toUpperCase()}
                                     </Text>
                                 </ExpoLinearGradient>
                             </TouchableOpacity>

@@ -8,82 +8,83 @@ const createId = () => Math.random().toString(36).substring(2, 11);
 export const ABILITIES = {
     MORALE_BOOST: (value: number): Ability => ({
         id: 'morale_boost',
-        name: 'Morale Boost',
+        name: 'abilities.morale_boost.name',
         type: 'boost',
         trigger: 'onPlay',
         value,
-        description: `Boost adjacent units by ${value}`,
+        description: 'abilities.morale_boost.desc',
     }),
     TIGHT_BOND: (): Ability => ({
         id: 'tight_bond',
-        name: 'Tight Bond',
+        name: 'abilities.bond.name',
         type: 'bond',
         trigger: 'passive',
-        description: 'Double power when beside a unit with the same name',
+        description: 'abilities.bond.desc',
     }),
     SPY: (drawCount: number): Ability => ({
         id: 'spy',
-        name: 'Spy',
+        name: 'abilities.spy.name',
         type: 'spy',
         trigger: 'onPlay',
         value: drawCount,
-        description: `Place on enemy board. Draw ${drawCount} cards`,
+        description: 'abilities.spy.desc',
     }),
     MEDIC: (): Ability => ({
         id: 'medic',
-        name: 'Medic',
+        name: 'abilities.medic.name',
         type: 'revive',
         trigger: 'onPlay',
-        description: 'Revive a unit from your graveyard',
+        description: 'abilities.medic.desc',
     }),
     SCORCH: (): Ability => ({
         id: 'scorch',
-        name: 'Scorch',
+        name: 'abilities.scorch.name',
         type: 'destroy',
         trigger: 'onPlay',
-        description: 'Destroy the strongest unit(s) on the battlefield',
+        description: 'abilities.scorch.desc',
     }),
     MUSTER: (targetName: string): Ability => ({
         id: 'muster',
-        name: 'Muster',
+        name: 'abilities.muster.name',
         type: 'summon',
         trigger: 'onPlay',
-        description: `Play all copies of ${targetName} from your deck`,
+        description: 'abilities.muster.desc',
+        targetId: targetName, // Use targetId to store which card to muster
     }),
     COMMANDER_HORN: (): Ability => ({
         id: 'commander_horn',
-        name: "Commander's Horn",
+        name: 'abilities.commander_horn.name',
         type: 'boost_row',
         trigger: 'onPlay',
-        description: 'Double the power of adjacent units (simulated row effect)',
+        description: 'abilities.commander_horn.desc',
     }),
     FROST: (): Ability => ({
         id: 'frost',
-        name: 'Biting Frost',
+        name: 'abilities.frost.name',
         type: 'weather',
         trigger: 'onPlay',
-        description: 'Set all melee-type units to 1 power (Legacy)',
+        description: 'abilities.frost.desc',
     }),
     FOG: (): Ability => ({
         id: 'fog',
-        name: 'Impenetrable Fog',
+        name: 'abilities.fog.name',
         type: 'weather',
         trigger: 'onPlay',
-        description: 'Set all ranged-type units to 1 power (Legacy)',
+        description: 'abilities.fog.desc',
     }),
     CLEAR_WEATHER: (): Ability => ({
         id: 'clear_weather',
-        name: 'Clear Weather',
+        name: 'abilities.clear_weather.name',
         type: 'clear',
         trigger: 'onPlay',
-        description: 'Remove all weather effects',
+        description: 'abilities.clear_weather.desc',
     }),
     DECOY: (): Ability => ({
         id: 'decoy',
-        name: 'Decoy',
+        name: 'abilities.decoy.name',
         type: 'decoy',
         trigger: 'onPlay',
-        description: 'Return a random friendly unit to your hand',
+        description: 'abilities.decoy.desc',
     }),
 };
 
@@ -120,81 +121,81 @@ const createCard = (
 
 // Melee Units
 export const MELEE_UNITS: Card[] = [
-    createCard('Swordsman', 'unit', 'common', 1, 3, [], 'A basic infantry soldier', 'The first line of defense.', require('../../assets/units/melee/swordsman.jpg')),
-    createCard('Knight', 'unit', 'common', 2, 5, [], 'Armored cavalry unit', 'For honor and glory!', require('../../assets/units/melee/knight.jpg')),
-    createCard('Berserker', 'unit', 'rare', 3, 7, [ABILITIES.MORALE_BOOST(1)], 'Fierce warrior that inspires allies', 'His rage is legendary.', require('../../assets/units/melee/berserker.jpg')),
-    createCard('Shield Captain', 'unit', 'rare', 3, 4, [ABILITIES.TIGHT_BOND()], 'Stronger with fellow captains', 'Unity is strength.', require('../../assets/units/melee/shield_captain.jpg')),
-    createCard('Champion', 'unit', 'epic', 4, 9, [], 'Elite warrior of the realm', 'Undefeated in single combat.', require('../../assets/units/melee/champion.jpg')),
-    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'Commands respect on the battlefield', 'All bow before the warlord.', require('../../assets/units/melee/warlord.jpg')),
+    createCard('Swordsman', 'unit', 'common', 1, 3, [], 'cards.descriptions.swordsman', 'cards.flavor.swordsman', require('../../assets/units/melee/swordsman.jpg')),
+    createCard('Knight', 'unit', 'common', 2, 5, [], 'cards.descriptions.knight', 'cards.flavor.knight', require('../../assets/units/melee/knight.jpg')),
+    createCard('Berserker', 'unit', 'rare', 3, 7, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.berserker', 'cards.flavor.berserker', require('../../assets/units/melee/berserker.jpg')),
+    createCard('Shield Captain', 'unit', 'rare', 3, 4, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.shield_captain', 'cards.flavor.shield_captain', require('../../assets/units/melee/shield_captain.jpg')),
+    createCard('Champion', 'unit', 'epic', 4, 9, [], 'cards.descriptions.champion', 'cards.flavor.champion', require('../../assets/units/melee/champion.jpg')),
+    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'cards.descriptions.warlord', 'cards.flavor.warlord', require('../../assets/units/melee/warlord.jpg')),
     // Sinister Expansion
-    createCard('Lich King', 'unit', 'legendary', 10, 12, [ABILITIES.MORALE_BOOST(2)], 'Lord of the frozen dead', 'Death is but a new beginning.', require('../../assets/units/melee/lich_king.jpg')),
-    createCard('Grave Ghoul', 'unit', 'common', 1, 3, [], 'Feasts on the remains of battle', 'Always hungry.', require('../../assets/units/melee/grave_ghoul.jpg')),
-    createCard('Wight', 'unit', 'rare', 3, 5, [ABILITIES.TIGHT_BOND()], 'Ancient spirits bound to armor', 'They remember nothing but hate.', require('../../assets/units/melee/wight.jpg')),
-    createCard('Skeleton Warrior', 'unit', 'common', 1, 2, [ABILITIES.MUSTER('Skeleton Warrior')], 'Clattering bones that never tire', 'Rise and walk.', require('../../assets/units/melee/skeleton_warrior.jpg')),
-    createCard('Death Knight', 'unit', 'epic', 5, 10, [], 'A fallen hero serving the void', 'Honor died long ago.', require('../../assets/units/melee/death_knight.jpg')),
-    createCard('Zombie Horde', 'unit', 'common', 2, 1, [ABILITIES.MUSTER('Zombie Horde')], 'They keep coming...', 'Strength in numbers.', require('../../assets/units/melee/zombie_horde.jpg')),
-    createCard('Crypt Guard', 'unit', 'rare', 3, 6, [], 'Eternal protectors of the tomb', 'None shall pass.', require('../../assets/units/melee/crypt_guard.jpg')),
+    createCard('Lich King', 'unit', 'legendary', 10, 12, [ABILITIES.MORALE_BOOST(2)], 'cards.descriptions.lich_king', 'cards.flavor.lich_king', require('../../assets/units/melee/lich_king.jpg')),
+    createCard('Grave Ghoul', 'unit', 'common', 1, 3, [], 'cards.descriptions.grave_ghoul', 'cards.flavor.grave_ghoul', require('../../assets/units/melee/grave_ghoul.jpg')),
+    createCard('Wight', 'unit', 'rare', 3, 5, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.wight', 'cards.flavor.wight', require('../../assets/units/melee/wight.jpg')),
+    createCard('Skeleton Warrior', 'unit', 'common', 1, 2, [ABILITIES.MUSTER('Skeleton Warrior')], 'cards.descriptions.skeleton_warrior', 'cards.flavor.skeleton_warrior', require('../../assets/units/melee/skeleton_warrior.jpg')),
+    createCard('Death Knight', 'unit', 'epic', 5, 10, [], 'cards.descriptions.death_knight', 'cards.flavor.death_knight', require('../../assets/units/melee/death_knight.jpg')),
+    createCard('Zombie Horde', 'unit', 'common', 2, 1, [ABILITIES.MUSTER('Zombie Horde')], 'cards.descriptions.zombie_horde', 'cards.flavor.zombie_horde', require('../../assets/units/melee/zombie_horde.jpg')),
+    createCard('Crypt Guard', 'unit', 'rare', 3, 6, [], 'cards.descriptions.crypt_guard', 'cards.flavor.crypt_guard', require('../../assets/units/melee/crypt_guard.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction, category: 'melee' as const }));
 
 // Ranged Units
 export const RANGED_UNITS: Card[] = [
-    createCard('Archer', 'unit', 'common', 1, 2, [], 'Basic ranged attacker', 'Aim true.', require('../../assets/units/ranged/archer.jpg')),
-    createCard('Crossbowman', 'unit', 'common', 2, 4, [], 'Powerful ranged unit', 'One bolt, one kill.', require('../../assets/units/ranged/crossbowman.jpg')),
-    createCard('Elven Marksman', 'unit', 'rare', 3, 6, [ABILITIES.TIGHT_BOND()], 'Elven archer with deadly aim', 'Never misses.', require('../../assets/units/ranged/elven_marksman.jpg')),
-    createCard('Scout', 'unit', 'rare', 2, 1, [ABILITIES.SPY(2)], 'Infiltrates enemy lines', 'Information is power.', require('../../assets/units/ranged/scout.jpg')),
-    createCard('Sniper', 'unit', 'epic', 4, 8, [], 'Elite marksman', 'One shot is all it takes.', require('../../assets/units/ranged/sniper.jpg')),
-    createCard('Dragon Hunter', 'unit', 'legendary', 5, 10, [ABILITIES.SCORCH()], 'Slayer of the mightiest beasts', 'Fear the hunter.', require('../../assets/units/ranged/dragon_hunter.jpg')),
+    createCard('Archer', 'unit', 'common', 1, 2, [], 'cards.descriptions.archer', 'cards.flavor.archer', require('../../assets/units/ranged/archer.jpg')),
+    createCard('Crossbowman', 'unit', 'common', 2, 4, [], 'cards.descriptions.crossbowman', 'cards.flavor.crossbowman', require('../../assets/units/ranged/crossbowman.jpg')),
+    createCard('Elven Marksman', 'unit', 'rare', 3, 6, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.elven_marksman', 'cards.flavor.elven_marksman', require('../../assets/units/ranged/elven_marksman.jpg')),
+    createCard('Scout', 'unit', 'rare', 2, 1, [ABILITIES.SPY(2)], 'cards.descriptions.scout', 'cards.flavor.scout', require('../../assets/units/ranged/scout.jpg')),
+    createCard('Sniper', 'unit', 'epic', 4, 8, [], 'cards.descriptions.sniper', 'cards.flavor.sniper', require('../../assets/units/ranged/sniper.jpg')),
+    createCard('Dragon Hunter', 'unit', 'legendary', 5, 10, [ABILITIES.SCORCH()], 'cards.descriptions.dragon_hunter', 'cards.flavor.dragon_hunter', require('../../assets/units/ranged/dragon_hunter.jpg')),
     // Sinister Expansion
-    createCard('Dark Elf Archer', 'unit', 'common', 1, 3, [], 'Deadly precision from the shadows', 'Two eyes, one target.', require('../../assets/units/ranged/dark_elf_archer.jpg')),
-    createCard('Soul Harvester', 'unit', 'rare', 4, 3, [ABILITIES.SPY(2)], 'Reaps the essence of the living', 'Your soul is forfeit.', require('../../assets/units/ranged/soul_harvester.jpg')),
-    createCard('Banshee', 'unit', 'epic', 4, 7, [ABILITIES.SCORCH()], 'Her scream is a death sentence', 'The last thing you hear.', require('../../assets/units/ranged/banshee.jpg')),
-    createCard('Void Wizard', 'unit', 'rare', 3, 5, [ABILITIES.MORALE_BOOST(1)], 'Wielder of unstable dark energy', 'The void calls to us all.', require('../../assets/units/ranged/void_wizard.jpg')),
-    createCard('Shadow Assassin', 'unit', 'epic', 4, 8, [], 'Master of the silent kill', 'Gone before the body hits the floor.', require('../../assets/units/ranged/shadow_assassin.jpg')),
-    createCard('Necromancer', 'unit', 'legendary', 6, 6, [ABILITIES.MEDIC()], 'Conduit for the afterlife', 'The grave is merely a door.', require('../../assets/units/ranged/necromancer.jpg')),
-    createCard('Dark Elf Matriarch', 'unit', 'rare', 5, 7, [], 'Leader of the obsidian spire', 'Power is the only currency.', require('../../assets/units/ranged/dark_elf_matriarch.jpg')),
+    createCard('Dark Elf Archer', 'unit', 'common', 1, 3, [], 'cards.descriptions.dark_elf_archer', 'cards.flavor.dark_elf_archer', require('../../assets/units/ranged/dark_elf_archer.jpg')),
+    createCard('Soul Harvester', 'unit', 'rare', 4, 3, [ABILITIES.SPY(2)], 'cards.descriptions.soul_harvester', 'cards.flavor.soul_harvester', require('../../assets/units/ranged/soul_harvester.jpg')),
+    createCard('Banshee', 'unit', 'epic', 4, 7, [ABILITIES.SCORCH()], 'cards.descriptions.banshee', 'cards.flavor.banshee', require('../../assets/units/ranged/banshee.jpg')),
+    createCard('Void Wizard', 'unit', 'rare', 3, 5, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.void_wizard', 'cards.flavor.void_wizard', require('../../assets/units/ranged/void_wizard.jpg')),
+    createCard('Shadow Assassin', 'unit', 'epic', 4, 8, [], 'cards.descriptions.shadow_assassin', 'cards.flavor.shadow_assassin', require('../../assets/units/ranged/shadow_assassin.jpg')),
+    createCard('Necromancer', 'unit', 'legendary', 6, 6, [ABILITIES.MEDIC()], 'cards.descriptions.necromancer', 'cards.flavor.necromancer', require('../../assets/units/ranged/necromancer.jpg')),
+    createCard('Dark Elf Matriarch', 'unit', 'rare', 5, 7, [], 'cards.descriptions.dark_elf_matriarch', 'cards.flavor.dark_elf_matriarch', require('../../assets/units/ranged/dark_elf_matriarch.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction, category: 'ranged' as const }));
 
 // Siege Units
 export const SIEGE_UNITS: Card[] = [
-    createCard('Catapult', 'unit', 'common', 2, 4, [], 'Basic siege weapon', 'Rocks incoming!', require('../../assets/units/siege/catapult.jpg')),
-    createCard('Ballista', 'unit', 'common', 3, 6, [], 'Heavy siege weapon', 'Pierces any armor.', require('../../assets/units/siege/ballista.jpg')),
-    createCard('Trebuchet', 'unit', 'rare', 4, 8, [], 'Massive siege engine', 'Walls crumble before it.', require('../../assets/units/siege/trebutchet.jpg')),
-    createCard('War Elephant', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'Armored beast of war', 'Unstoppable force.', require('../../assets/units/siege/war_elephant.jpg')),
-    createCard('Siege Tower', 'unit', 'epic', 5, 5, [ABILITIES.COMMANDER_HORN()], 'Mobile fortress', 'Brings victory closer.', require('../../assets/units/siege/siege_tower.jpg')),
-    createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'The ultimate weapon', 'Fire and fury.', require('../../assets/units/siege/dragon.jpg')),
+    createCard('Catapult', 'unit', 'common', 2, 4, [], 'cards.descriptions.catapult', 'cards.flavor.catapult', require('../../assets/units/siege/catapult.jpg')),
+    createCard('Ballista', 'unit', 'common', 3, 6, [], 'cards.descriptions.ballista', 'cards.flavor.ballista', require('../../assets/units/siege/ballista.jpg')),
+    createCard('Trebuchet', 'unit', 'rare', 4, 8, [], 'cards.descriptions.trebuchet', 'cards.flavor.trebuchet', require('../../assets/units/siege/trebutchet.jpg')),
+    createCard('War Elephant', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.war_elephant', 'cards.flavor.war_elephant', require('../../assets/units/siege/war_elephant.jpg')),
+    createCard('Siege Tower', 'unit', 'epic', 5, 5, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.siege_tower', 'cards.flavor.siege_tower', require('../../assets/units/siege/siege_tower.jpg')),
+    createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'cards.descriptions.dragon', 'cards.flavor.dragon', require('../../assets/units/siege/dragon.jpg')),
     // Sinister Expansion
-    createCard('Bone Catapult', 'unit', 'common', 2, 4, [], 'Siege engine made of remains', 'Fires more than just rocks.', require('../../assets/units/siege/bone_catapult.jpg')),
-    createCard('Plague Spreader', 'unit', 'rare', 4, 6, [], 'Infects the battlefield', 'Let the sickness take them.', require('../../assets/units/siege/plague_spreader.jpg')),
-    createCard('Abomination', 'unit', 'epic', 6, 12, [], 'Stitched together from titans', 'A masterpiece of gore.', require('../../assets/units/siege/abomination.jpg')),
-    createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'Ruler of the burning planes', 'Kneel or burn.', require('../../assets/units/siege/demon_prince.jpg')),
-    createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'Firespitting beast of the abyss', 'The jaws that bite.', require('../../assets/units/siege/hellhound.jpg')),
-    createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'Stone turned flesh and malice', 'Watch the skies.', require('../../assets/units/siege/gargoyle.jpg')),
-    createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'Enchanted bolts of shadow', 'Pierce the soul.', require('../../assets/units/siege/cursed_ballista.jpg')),
+    createCard('Bone Catapult', 'unit', 'common', 2, 4, [], 'cards.descriptions.bone_catapult', 'cards.flavor.bone_catapult', require('../../assets/units/siege/bone_catapult.jpg')),
+    createCard('Plague Spreader', 'unit', 'rare', 4, 6, [], 'cards.descriptions.plague_spreader', 'cards.flavor.plague_spreader', require('../../assets/units/siege/plague_spreader.jpg')),
+    createCard('Abomination', 'unit', 'epic', 6, 12, [], 'cards.descriptions.abomination', 'cards.flavor.abomination', require('../../assets/units/siege/abomination.jpg')),
+    createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'cards.descriptions.demon_prince', 'cards.flavor.demon_prince', require('../../assets/units/siege/demon_prince.jpg')),
+    createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'cards.descriptions.hellhound', 'cards.flavor.hellhound', require('../../assets/units/siege/hellhound.jpg')),
+    createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'cards.descriptions.gargoyle', 'cards.flavor.gargoyle', require('../../assets/units/siege/gargoyle.jpg')),
+    createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'cards.descriptions.cursed_ballista', 'cards.flavor.cursed_ballista', require('../../assets/units/siege/cursed_ballista.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 6 ? 'order' : 'shadow') as Faction, category: 'siege' as const }));
 
 // ============ SPELL CARDS ============
 
 export const SPELL_CARDS: Card[] = [
-    createCard("Commander's Horn", 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Double the power of a row', undefined, require('../../assets/units/spell/commanders_horn.jpg')),
-    createCard('Decoy', 'spell', 'common', 1, undefined, [ABILITIES.DECOY()], 'Return a random friendly unit to your hand', undefined, require('../../assets/units/spell/decoy.jpg')),
-    createCard('Scorch', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Destroy the strongest units', undefined, require('../../assets/units/spell/scorch.jpg')),
-    createCard('Resurrection', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Revive a unit from graveyard', undefined, require('../../assets/units/spell/resurrection.jpg')),
+    createCard("Commander's Horn", 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.commanders_horn', undefined, require('../../assets/units/spell/commanders_horn.jpg')),
+    createCard('Decoy', 'spell', 'common', 1, undefined, [ABILITIES.DECOY()], 'cards.descriptions.decoy', undefined, require('../../assets/units/spell/decoy.jpg')),
+    createCard('Scorch', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'cards.descriptions.scorch_spell', undefined, require('../../assets/units/spell/scorch.jpg')),
+    createCard('Resurrection', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'cards.descriptions.resurrection', undefined, require('../../assets/units/spell/resurrection.jpg')),
     // Sinister Expansion
-    createCard('Dark Pact', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'Sacrifice essence to revive a unit', undefined, require('../../assets/units/spell/dark_pact.jpg')),
-    createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'Obliterate the strongest units', undefined, require('../../assets/units/spell/void_bolt.jpg')),
-    createCard('Life Drain', 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'Siphon power to boost allies', undefined, require('../../assets/units/spell/life_drain.jpg')),
-    createCard('Raise Dead', 'spell', 'common', 2, undefined, [ABILITIES.MEDIC()], 'The dead obey their master.', undefined, require('../../assets/units/spell/raise_dead.jpg')),
+    createCard('Dark Pact', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'cards.descriptions.dark_pact', undefined, require('../../assets/units/spell/dark_pact.jpg')),
+    createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'cards.descriptions.void_bolt', undefined, require('../../assets/units/spell/void_bolt.jpg')),
+    createCard('Life Drain', 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.life_drain', undefined, require('../../assets/units/spell/life_drain.jpg')),
+    createCard('Raise Dead', 'spell', 'common', 2, undefined, [ABILITIES.MEDIC()], 'cards.descriptions.raise_dead', undefined, require('../../assets/units/spell/raise_dead.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 4 ? 'neutral' : 'shadow') as Faction }));
 
 // ============ WEATHER CARDS ============
 
 export const WEATHER_CARDS: Card[] = [
-    createCard('Biting Frost', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Sets melee units to 1 power', undefined, require('../../assets/units/weather/biting_frost.jpg')),
-    createCard('Impenetrable Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Sets ranged units to 1 power', undefined, require('../../assets/units/weather/impenetrable_fog.jpg')),
-    createCard('Clear Skies', 'weather', 'common', 0, undefined, [ABILITIES.CLEAR_WEATHER()], 'Removes all weather effects', undefined, require('../../assets/units/weather/clear_skies.jpg')),
+    createCard('Biting Frost', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'cards.descriptions.frost', undefined, require('../../assets/units/weather/biting_frost.jpg')),
+    createCard('Impenetrable Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'cards.descriptions.fog', undefined, require('../../assets/units/weather/impenetrable_fog.jpg')),
+    createCard('Clear Skies', 'weather', 'common', 0, undefined, [ABILITIES.CLEAR_WEATHER()], 'cards.descriptions.clear_weather', undefined, require('../../assets/units/weather/clear_skies.jpg')),
     // Sinister Expansion
-    createCard('Corrupt Ground', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'Melee units lose their resolve', undefined, require('../../assets/units/weather/corrupt_ground.jpg')),
-    createCard('Wailing Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'Ranged units lose their sight', undefined, require('../../assets/units/weather/wailing_fog.jpg')),
+    createCard('Corrupt Ground', 'weather', 'common', 1, undefined, [ABILITIES.FROST()], 'cards.descriptions.corrupt_ground', undefined, require('../../assets/units/weather/corrupt_ground.jpg')),
+    createCard('Wailing Fog', 'weather', 'common', 1, undefined, [ABILITIES.FOG()], 'cards.descriptions.wailing_fog', undefined, require('../../assets/units/weather/wailing_fog.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 3 ? 'neutral' : 'shadow') as Faction }));
 
 // ============ HEROES ============
@@ -207,10 +208,10 @@ export const AVAILABLE_HEROES: Hero[] = [
         maxHealth: 2,
         ability: {
             id: 'ability_rally',
-            name: 'Rally',
+            name: 'abilities.ability_rally.name',
             type: 'boost_all',
             trigger: 'activate',
-            description: 'Boost all friendly units by +1 power',
+            description: 'abilities.ability_rally.desc',
             value: 1,
             cooldown: 3,
             currentCooldown: 0,
@@ -226,10 +227,10 @@ export const AVAILABLE_HEROES: Hero[] = [
         maxHealth: 2,
         ability: {
             id: 'ability_dark_command',
-            name: 'Dark Command',
+            name: 'abilities.ability_dark_command.name',
             type: 'damage_strongest',
             trigger: 'activate',
-            description: 'Deal 2 damage to the strongest enemy unit',
+            description: 'abilities.ability_dark_command.desc',
             value: 2,
             cooldown: 3,
             currentCooldown: 0,
@@ -245,10 +246,10 @@ export const AVAILABLE_HEROES: Hero[] = [
         maxHealth: 2,
         ability: {
             id: 'ability_arcane_blast',
-            name: 'Arcane Blast',
+            name: 'abilities.ability_arcane_blast.name',
             type: 'damage_all', // We will implement this in gameEngine
             trigger: 'activate',
-            description: 'Deal 1 damage to all enemy units',
+            description: 'abilities.ability_arcane_blast.desc',
             value: 1,
             cooldown: 4,
             currentCooldown: 0,
@@ -256,7 +257,7 @@ export const AVAILABLE_HEROES: Hero[] = [
         artwork: require('../../assets/heroes/hero_archmage.jpg'),
         className: 'Mage',
         faction: 'arcane',
-        flavorText: 'The threads of reality are but strings on his lute. He plays a song of cosmic fire.',
+        flavorText: 'cards.flavor.archmage',
     },
     {
         id: 'hero_ranger',
@@ -265,10 +266,10 @@ export const AVAILABLE_HEROES: Hero[] = [
         maxHealth: 2,
         ability: {
             id: 'ability_precision_strike',
-            name: 'Precision Strike',
+            name: 'abilities.ability_precision_strike.name',
             type: 'destroy_weakest', // We will implement this in gameEngine
             trigger: 'activate',
-            description: 'Destroy the weakest enemy unit',
+            description: 'abilities.ability_precision_strike.desc',
             value: 1, // Doesn't use value, but for consistency
             cooldown: 4,
             currentCooldown: 0,
@@ -276,7 +277,7 @@ export const AVAILABLE_HEROES: Hero[] = [
         artwork: require('../../assets/heroes/hero_ranger.jpg'),
         className: 'Hunter',
         faction: 'nature',
-        flavorText: 'The forest speaks in whispers of wind and rustling leaves. She is the only one who truly listens.',
+        flavorText: 'cards.flavor.ranger',
     },
     {
         id: 'hero_paladin',
@@ -285,10 +286,10 @@ export const AVAILABLE_HEROES: Hero[] = [
         maxHealth: 2,
         ability: {
             id: 'ability_divine_shield',
-            name: 'Divine Light',
+            name: 'abilities.ability_divine_shield.name',
             type: 'heal',
             trigger: 'activate',
-            description: 'Restore 2 health to your hero',
+            description: 'abilities.ability_divine_shield.desc',
             value: 2,
             cooldown: 3,
             currentCooldown: 0,
@@ -296,7 +297,7 @@ export const AVAILABLE_HEROES: Hero[] = [
         artwork: require('../../assets/heroes/hero_paladin.jpg'),
         className: 'Cleric',
         faction: 'order',
-        flavorText: 'Steel and faith are his only companions. In the darkest night, his shield shines the brightest.',
+        flavorText: 'cards.flavor.paladin',
     },
     {
         id: 'hero_rogue',
@@ -305,10 +306,10 @@ export const AVAILABLE_HEROES: Hero[] = [
         maxHealth: 2,
         ability: {
             id: 'ability_quick_draw',
-            name: 'Quick Dig',
+            name: 'abilities.ability_quick_draw.name',
             type: 'draw_card',
             trigger: 'activate',
-            description: 'Draw a card',
+            description: 'abilities.ability_quick_draw.desc',
             value: 1,
             cooldown: 4,
             currentCooldown: 0,
@@ -316,7 +317,7 @@ export const AVAILABLE_HEROES: Hero[] = [
         artwork: require('../../assets/heroes/hero_rogue.jpg'),
         className: 'Rogue',
         faction: 'neutral',
-        flavorText: 'Why fight for a throne when you can steal the crown? He plays every side to ensure his own victory.',
+        flavorText: 'cards.flavor.rogue',
     },
     {
         id: 'hero_berserker',
@@ -325,10 +326,10 @@ export const AVAILABLE_HEROES: Hero[] = [
         maxHealth: 2,
         ability: {
             id: 'ability_bloodlust',
-            name: 'Bloodlust',
+            name: 'abilities.ability_bloodlust.name',
             type: 'damage_random',
             trigger: 'activate',
-            description: 'Deal 1 damage to a random enemy unit',
+            description: 'abilities.ability_bloodlust.desc',
             value: 1,
             cooldown: 2,
             currentCooldown: 0,
@@ -336,7 +337,7 @@ export const AVAILABLE_HEROES: Hero[] = [
         artwork: require('../../assets/heroes/hero_berserker.jpg'),
         className: 'Fighter',
         faction: 'order',
-        flavorText: 'Reason died long ago in the heat of the pit. Now, there is only the rhythm of the axe.',
+        flavorText: 'cards.flavor.beserker_hero',
     },
     {
         id: 'hero_druid',
@@ -345,10 +346,10 @@ export const AVAILABLE_HEROES: Hero[] = [
         maxHealth: 2,
         ability: {
             id: 'ability_nature_growth',
-            name: 'Wild Growth',
+            name: 'abilities.ability_nature_growth.name',
             type: 'boost_random',
             trigger: 'activate',
-            description: 'Boost a random friendly unit by +2 power',
+            description: 'abilities.ability_nature_growth.desc',
             value: 2,
             cooldown: 3,
             currentCooldown: 0,
@@ -356,7 +357,7 @@ export const AVAILABLE_HEROES: Hero[] = [
         artwork: require('../../assets/heroes/hero_druid.jpg'),
         className: 'Shaman',
         faction: 'nature',
-        flavorText: 'The trees remember what the stone has forgotten. He is the voice of the awakening earth.',
+        flavorText: 'cards.flavor.druid',
     }
 ];
 
@@ -438,24 +439,24 @@ export const getAllCards = (): Card[] => [
 
 export const FACTION_LORE: Record<string, { title: string; description: string }> = {
     order: {
-        title: 'The Eternal Bastion',
-        description: 'Bound by ancient oaths and rigid hierarchy, the Order seeks to impose absolute harmony upon the chaos of the world.'
+        title: 'factions.order.title',
+        description: 'factions.order.desc'
     },
     shadow: {
-        title: 'The Whispering Abyss',
-        description: 'Cultists and exiles who have looked into the void and found it staring back. They wield the raw essence of entropy.'
+        title: 'factions.shadow.title',
+        description: 'factions.shadow.desc'
     },
     nature: {
-        title: 'The Verdant Wilds',
-        description: 'The world itself has a memory. Nature cares not for kings or gods, only for the cycle of growth and decay.'
+        title: 'factions.nature.title',
+        description: 'factions.nature.desc'
     },
     arcane: {
-        title: 'The Astral Spire',
-        description: 'Scholars who have mastered the ley lines. To an Arcane mage, magic is a science to be measured and harvested.'
+        title: 'factions.arcane.title',
+        description: 'factions.arcane.desc'
     },
     neutral: {
-        title: 'The Mercenary Clans',
-        description: 'Those who belong to no realm but their own. Selling their blades and wits to the highest bidder.'
+        title: 'factions.neutral.title',
+        description: 'factions.neutral.desc'
     }
 };
 
@@ -467,16 +468,16 @@ export const TALENT_TREES: Record<string, TalentTree> = {
         talents: [
             {
                 id: 't_cmd_1',
-                name: 'Vanguard Spirit',
-                description: '+1 Hero Health',
+                name: 'talents.hero_commander.t_cmd_1.name',
+                description: 'talents.hero_commander.t_cmd_1.desc',
                 icon: 'heart',
                 effect: { type: 'stat_boost', target: 'hero_health', value: 1 },
                 position: { x: 100, y: 100 }
             },
             {
                 id: 't_cmd_2',
-                name: 'Inspiration',
-                description: 'Start with +2 Mana',
+                name: 'talents.hero_commander.t_cmd_2.name',
+                description: 'talents.hero_commander.t_cmd_2.desc',
                 icon: 'flash',
                 effect: { type: 'stat_boost', target: 'starting_mana', value: 2 },
                 requirements: ['t_cmd_1'],
@@ -484,8 +485,8 @@ export const TALENT_TREES: Record<string, TalentTree> = {
             },
             {
                 id: 't_cmd_3',
-                name: 'Order Mastery',
-                description: 'Order units get +1 Attack',
+                name: 'talents.hero_commander.t_cmd_3.name',
+                description: 'talents.hero_commander.t_cmd_3.desc',
                 icon: 'shield',
                 effect: { type: 'faction_bonus', faction: 'order', attackBoost: 1 },
                 requirements: ['t_cmd_2'],
@@ -498,16 +499,16 @@ export const TALENT_TREES: Record<string, TalentTree> = {
         talents: [
             {
                 id: 't_dark_1',
-                name: 'Void Reach',
-                description: 'Hero Power cooldown -1',
+                name: 'talents.hero_darklord.t_dark_1.name',
+                description: 'talents.hero_darklord.t_dark_1.desc',
                 icon: 'stopwatch',
                 effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
                 position: { x: 100, y: 100 }
             },
             {
                 id: 't_dark_2',
-                name: 'Dark Ritual',
-                description: 'Start with +3 Mana',
+                name: 'talents.hero_darklord.t_dark_2.name',
+                description: 'talents.hero_darklord.t_dark_2.desc',
                 icon: 'flash',
                 effect: { type: 'stat_boost', target: 'starting_mana', value: 3 },
                 requirements: ['t_dark_1'],
@@ -520,16 +521,16 @@ export const TALENT_TREES: Record<string, TalentTree> = {
         talents: [
             {
                 id: 't_mage_1',
-                name: 'Arcane Focus',
-                description: 'Start with +3 Mana',
+                name: 'talents.hero_archmage.t_mage_1.name',
+                description: 'talents.hero_archmage.t_mage_1.desc',
                 icon: 'flash',
                 effect: { type: 'stat_boost', target: 'starting_mana', value: 3 },
                 position: { x: 100, y: 100 }
             },
             {
                 id: 't_mage_2',
-                name: 'Mana Overflow',
-                description: 'Card draw +1 at start of game',
+                name: 'talents.hero_archmage.t_mage_2.name',
+                description: 'talents.hero_archmage.t_mage_2.desc',
                 icon: 'documents',
                 effect: { type: 'stat_boost', target: 'starting_mana', value: 2 }, // Placeholder
                 requirements: ['t_mage_1'],
@@ -542,16 +543,16 @@ export const TALENT_TREES: Record<string, TalentTree> = {
         talents: [
             {
                 id: 't_rng_1',
-                name: 'Steady Aim',
-                description: 'Nature units get +1 Attack',
+                name: 'talents.hero_ranger.t_rng_1.name',
+                description: 'talents.hero_ranger.t_rng_1.desc',
                 icon: 'leaf',
                 effect: { type: 'faction_bonus', faction: 'nature', attackBoost: 1 },
                 position: { x: 100, y: 100 }
             },
             {
                 id: 't_rng_2',
-                name: 'Eagle Eye',
-                description: 'Hero Power cooldown -1',
+                name: 'talents.hero_ranger.t_rng_2.name',
+                description: 'talents.hero_ranger.t_rng_2.desc',
                 icon: 'stopwatch',
                 effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
                 requirements: ['t_rng_1'],
@@ -564,16 +565,16 @@ export const TALENT_TREES: Record<string, TalentTree> = {
         talents: [
             {
                 id: 't_pal_1',
-                name: 'Holy Devotion',
-                description: '+2 Hero Health',
+                name: 'talents.hero_paladin.t_pal_1.name',
+                description: 'talents.hero_paladin.t_pal_1.desc',
                 icon: 'heart',
                 effect: { type: 'stat_boost', target: 'hero_health', value: 2 },
                 position: { x: 100, y: 100 }
             },
             {
                 id: 't_pal_2',
-                name: 'Aura of Guarding',
-                description: 'Order units get +1 Attack',
+                name: 'talents.hero_paladin.t_pal_2.name',
+                description: 'talents.hero_paladin.t_pal_2.desc',
                 icon: 'shield',
                 effect: { type: 'faction_bonus', faction: 'order', attackBoost: 1 },
                 requirements: ['t_pal_1'],
@@ -586,16 +587,16 @@ export const TALENT_TREES: Record<string, TalentTree> = {
         talents: [
             {
                 id: 't_dru_1',
-                name: 'Forest bond',
-                description: 'Nature units get +1 Attack',
+                name: 'talents.hero_druid.t_dru_1.name',
+                description: 'talents.hero_druid.t_dru_1.desc',
                 icon: 'leaf',
                 effect: { type: 'faction_bonus', faction: 'nature', attackBoost: 1 },
                 position: { x: 100, y: 100 }
             },
             {
                 id: 't_dru_2',
-                name: 'Ancient Growth',
-                description: 'Start with +2 Mana',
+                name: 'talents.hero_druid.t_dru_2.name',
+                description: 'talents.hero_druid.t_dru_2.desc',
                 icon: 'flash',
                 effect: { type: 'stat_boost', target: 'starting_mana', value: 2 },
                 requirements: ['t_dru_1'],

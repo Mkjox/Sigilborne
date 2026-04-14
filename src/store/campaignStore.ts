@@ -170,9 +170,9 @@ export const useCampaignStore = create<CampaignStore>()(
                         id: 'shop_service_remove',
                         type: 'service',
                         itemId: 'remove_card',
-                        name: 'Amnesia Draught',
+                        name: 'shop.services.amnesia_name',
                         price: Rules.PRICE_REMOVE_CARD,
-                        description: 'Forget a weak or unwanted skill forever.',
+                        description: 'shop.services.amnesia_desc',
                         purchased: false,
                     });
 

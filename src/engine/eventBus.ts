@@ -22,6 +22,7 @@ export type GameEventType =
     | 'HERO_ABILITY_USED'
     | 'GAME_OVER'
     | 'CARD_DRAWN'
+    | 'UNIT_SUMMONED'
     | 'PLAYER_PASSED';
 
 export interface GameEvent {

@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { PlayerType, Hero } from '../../types';
 import { Text } from '../ui';
 import { colors, spacing, borderRadius } from '../../theme';
+import { useTranslation } from 'react-i18next';
 
 interface PlayerInfoProps {
     playerType: PlayerType;
@@ -33,8 +34,9 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
     hero,
     onUseHeroAbility,
 }) => {
+    const { t } = useTranslation();
     const isPlayer = playerType === 'player';
-    const name = isPlayer ? 'You' : 'Opponent';
+    const name = isPlayer ? t('common.you') : t('common.opponent');
 
     return (
         <Animated.View
@@ -59,16 +61,16 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
                     )}
                     <View>
                         <View style={styles.nameRow}>
-                            <Text variant="body" style={styles.name}>{hero?.name || name}</Text>
+                            <Text variant="body" style={styles.name}>{hero?.name ? t(`cards.${hero.name}`) : name}</Text>
                             {isCurrentTurn && (
                                 <View style={styles.turnIndicator}>
-                                    <Text variant="caption" color={colors.secondary[400]}>TURN</Text>
+                                    <Text variant="caption" color={colors.secondary[400]}>{t('common.turn')}</Text>
                                 </View>
                             )}
                         </View>
                         {hasPassed && (
                             <View style={styles.passedIndicator}>
-                                <Text variant="caption" color={colors.warning}>PASSED</Text>
+                                <Text variant="caption" color={colors.warning}>{t('common.passed')}</Text>
                             </View>
                         )}
                     </View>
@@ -78,7 +80,7 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
                 <View style={styles.statsRow}>
                     {/* Rounds won */}
                     <View style={styles.stat}>
-                        <Text variant="caption" color={colors.text.tertiary}>Rounds</Text>
+                        <Text variant="caption" color={colors.text.tertiary}>{t('common.rounds')}</Text>
                         <View style={styles.roundsContainer}>
                             {[0, 1].map(i => (
                                 <View
@@ -94,14 +96,14 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
 
                     {/* Total power */}
                     <View style={styles.stat}>
-                        <Text variant="caption" color={colors.text.tertiary}>Power</Text>
+                        <Text variant="caption" color={colors.text.tertiary}>{t('common.power')}</Text>
                         <Text variant="h3" style={styles.powerValue}>{totalPower}</Text>
                     </View>
 
                     {/* Mana (only for player) */}
                     {isPlayer && (
                         <View style={styles.stat}>
-                            <Text variant="caption" color={colors.text.tertiary}>Mana</Text>
+                            <Text variant="caption" color={colors.text.tertiary}>{t('common.mana')}</Text>
                             <Text variant="body" color={colors.accent[400]}>
                                 {mana}/{maxMana}
                             </Text>
@@ -111,7 +113,7 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
                     {/* Cards info */}
                     <View style={styles.stat}>
                         <Text variant="caption" color={colors.text.tertiary}>
-                            {isPlayer ? 'Hand' : 'Cards'}
+                            {isPlayer ? t('common.hand') : t('common.cards')}
                         </Text>
                         <Text variant="body" color={colors.text.secondary}>
                             {cardsInHand}
@@ -120,7 +122,7 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
 
                     {/* Deck count */}
                     <View style={styles.stat}>
-                        <Text variant="caption" color={colors.text.tertiary}>Deck</Text>
+                        <Text variant="caption" color={colors.text.tertiary}>{t('common.deck')}</Text>
                         <Text variant="body" color={colors.text.secondary}>
                             {cardsInDeck}
                         </Text>
@@ -139,8 +141,8 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
                         >
                             <Text variant="caption" style={styles.abilityText}>
                                 {hero.ability.currentCooldown > 0
-                                    ? 'Used'
-                                    : 'Leader'}
+                                    ? t('common.used')
+                                    : t('common.leader')}
                             </Text>
                         </Pressable>
                     )}

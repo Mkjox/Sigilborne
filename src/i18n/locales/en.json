@@ -1,0 +1,566 @@
+{
+  "abilities": {
+    "morale_boost": {
+      "name": "Morale Boost",
+      "desc": "Boost adjacent units by {{value}} power"
+    },
+    "bond": {
+      "name": "Tight Bond",
+      "desc": "Double power when next to a unit with the same name"
+    },
+    "spy": {
+      "name": "Spy",
+      "desc": "Play on the enemy's board and draw {{value}} cards"
+    },
+    "medic": {
+      "name": "Medic",
+      "desc": "Revive a unit from the graveyard"
+    },
+    "scorch": {
+      "name": "Scorch",
+      "desc": "Destroy the strongest units on the board"
+    },
+    "muster": {
+      "name": "Muster",
+      "desc": "Search your deck for all cards with the same name and play them"
+    },
+    "commander_horn": {
+      "name": "Commander's Horn",
+      "desc": "Double the power of all units in this row"
+    },
+    "frost": {
+      "name": "Biting Frost",
+      "desc": "Sets power of all melee units to 1"
+    },
+    "fog": {
+      "name": "Impenetrable Fog",
+      "desc": "Sets power of all ranged units to 1"
+    },
+    "clear_weather": {
+      "name": "Clear Skies",
+      "desc": "Remove all weather effects from the board"
+    },
+    "decoy": {
+      "name": "Decoy",
+      "desc": "Swap with a unit on the board to return it to your hand"
+    },
+    "ability_rally": {
+      "name": "Rally",
+      "desc": "Boost all friendly units by +1 power"
+    },
+    "ability_dark_command": {
+      "name": "Dark Command",
+      "desc": "Deal 2 damage to the strongest enemy unit"
+    },
+    "ability_arcane_blast": {
+      "name": "Arcane Blast",
+      "desc": "Deal 1 damage to all enemy units"
+    },
+    "ability_precision_strike": {
+      "name": "Precision Strike",
+      "desc": "Destroy the weakest enemy unit"
+    },
+    "ability_divine_shield": {
+      "name": "Divine Light",
+      "desc": "Restore 2 health to your hero"
+    },
+    "ability_quick_draw": {
+      "name": "Quick Dig",
+      "desc": "Draw a card"
+    },
+    "ability_bloodlust": {
+      "name": "Bloodlust",
+      "desc": "Deal 1 damage to a random enemy unit"
+    },
+    "ability_nature_growth": {
+      "name": "Wild Growth",
+      "desc": "Boost a random friendly unit by +2 power"
+    }
+  },
+  "common": {
+    "exit": "EXIT",
+    "ascend": "ASCEND",
+    "visit_merchant": "VISIT MERCHANT",
+    "enter_void": "ENTER VOID",
+    "completed": "COMPLETED",
+    "level": "LEVEL {{num}}",
+    "stage": "STAGE {{num}}",
+    "boss": "BOSS {{num}}",
+    "elite": "ELITE {{num}}",
+    "back": "BACK",
+    "back_void": "VOID",
+    "gold": "GOLD",
+    "points_abbr": "PTS",
+    "no_relics": "No relics found",
+    "not_enough_gold": "Not enough gold!",
+    "merchant_refusal": "The merchant shakes his head. \"Come back when you have more coin, traveler.\"",
+    "game_errors": {
+      "not_in_hand": "Card not in hand",
+      "not_enough_mana": "Not enough mana",
+      "unit_not_found": "Unit not found",
+      "unit_exhausted": "Unit is exhausted",
+      "attack_success": "Attack successful",
+      "ability_cooldown": "Ability on cooldown",
+      "ability_success": "Hero ability used"
+    },
+    "you": "YOU",
+    "opponent": "OPPONENT",
+    "rounds": "ROUNDS",
+    "power": "POWER",
+    "mana": "MANA",
+    "hand": "HAND",
+    "cards": "CARDS",
+    "deck": "DECK",
+    "turn": "TURN",
+    "passed": "PASSED",
+    "used": "USED",
+    "leader": "LEADER",
+    "victory": "VICTORY",
+    "defeat": "OBLIVION",
+    "draw": "STALEMATE",
+    "continue": "CONTINUE",
+    "end_turn": "END TURN",
+    "stage": "STAGE {{num}}",
+    "escape": "ESCAPE",
+    "void_keeper": "VOID KEEPER",
+    "void_keeper_title": "The Innkeeper's Shadow",
+    "corruption": "CORRUPTION",
+    "essence": "ESSENCE",
+    "round_complete": "ROUND {{num}} COMPLETE",
+    "continue_expedition": "CONTINUE EXPEDITION",
+    "replay": "REPLAY",
+    "reawaken": "REAWAKEN",
+    "abandon": "ABANDON",
+    "messages": {
+      "game_started": "Game Started",
+      "cannot_play": "Cannot play card",
+      "played_card": "Played {{name}}",
+      "used_hero_ability": "Used Hero Ability",
+      "cannot_use_ability": "Cannot use ability",
+      "victory": "Victory!",
+      "stalemate": "Stalemate!",
+      "defeat": "Defeat!",
+      "you_won": "You Won!",
+      "ai_won": "AI Won!",
+      "draw": "Draw!",
+      "you_passed": "You passed",
+      "round_start": "Round {{num}} Start!",
+      "attack": "Attack!",
+      "attack_failed": "Attack failed",
+      "ai_passed": "AI passed",
+      "ai_used_ability": "AI used {{name}}",
+      "ai_played_card": "AI played {{name}}",
+      "ai_played_generic": "AI played a card",
+      "card_info": "{{name}}: {{desc}}",
+      "no_description": "No description"
+    }
+  },
+  "shop": {
+    "title": "The Void Merchant",
+    "subtitle": "Relics of forgotten times...",
+    "tabs": {
+      "buy": "Acquire",
+      "remove": "Purify"
+    },
+    "sections": {
+      "stock": "Current Stock",
+      "purify": "Purge the Weak"
+    },
+    "acquired": "ACQUIRED",
+    "removal_title": "Select an offering to burn",
+    "purged_title": "Purged",
+    "purged_msg": "The card burns away into arcane dust. Your deck feels lighter.",
+    "services": {
+      "remove": {
+        "name": "Void Cleansing",
+        "desc": "Permanently remove a card from your deck to thin it for better draws."
+      }
+    },
+    "select_to_remove": "SELECT CARD TO REMOVE",
+    "confirm_purchase": "CONFIRM PURCHASE",
+    "confirm_desc": "Are you sure you want to add \"{{name}}\" to your deck?",
+    "buy_for": "Buy for {{price}}",
+    "confirm_purify": "CONFIRM PURIFICATION",
+    "confirm_purify_desc": "Are you sure you want to permanently remove \"{{name}}\" from your deck?",
+    "purify_for": "Purify for {{price}}"
+  },
+  "relics": {
+    "war_banner": {
+      "name": "War Banner",
+      "desc": "At the start of your turn, boost a random ally by 1."
+    },
+    "mana_crystal": {
+      "name": "Mana Crystal",
+      "desc": "At the start of each round, gain 1 Max Mana."
+    },
+    "soul_gem": {
+      "name": "Soul Gem",
+      "desc": "When an ally is destroyed, draw 1 card."
+    },
+    "thornmail": {
+      "name": "Thornmail",
+      "desc": "When an ally is damaged, deal 1 damage to a random enemy."
+    }
+  },
+  "deck_builder": {
+    "vault_title": "VAULT",
+    "construct_title": "CONSTRUCT",
+    "unlinked": "UNLINKED",
+    "forge_link": "FORGE LINK",
+    "active_hero": "ACTIVE HERO",
+    "default_deck_name": "Deck {{num}}",
+    "hero_count": "{{count}} HEROES",
+    "essence_count": "{{count}} ESSENCES",
+    "deck_count": "{{count}}/25 ESSENCES",
+    "filters": {
+      "hero": "HERO",
+      "all": "ALL",
+      "unit": "UNITS",
+      "spell": "SPELLS"
+    }
+  },
+  "hero_classes": {
+    "Warrior": "Warrior",
+    "Mage": "Mage",
+    "Rogue": "Rogue",
+    "Paladin": "Paladin",
+    "Druid": "Druid"
+  },
+  "collection": {
+    "title": "COLLECTION",
+    "hero_label": "HERO",
+    "hero_subtitle": "{{class}} Hero • {{ability}}",
+    "hero_desc": "{{desc}} (Cooldown: {{cooldown}} Rounds)",
+    "no_flavor": "A mysterious echo from the void.",
+    "stats": {
+      "total": "TOTAL",
+      "decks": "DECKS"
+    },
+    "categories": {
+      "all": "All",
+      "units": "Units",
+      "heroes": "Heroes",
+      "spells": "Spells",
+      "weather": "Weather"
+    }
+  },
+  "menu": {
+    "subtitle": "ARCANE CHRONICLES",
+    "enter_void": "Enter The Void",
+    "collection": "Collection",
+    "deck_builder": "Deck Builder",
+    "settings": "Settings"
+  },
+  "settings": {
+    "title": "SETTINGS",
+    "sensory": {
+      "title": "SENSORY",
+      "sound_effects": "Sound Effects",
+      "sound_sub": "Card plays, impacts & ambience",
+      "music": "Background Music",
+      "music_sub": "Arcane void melodies",
+      "haptics": "Haptic Feedback",
+      "haptics_sub": "Tactile response on actions"
+    },
+    "visuals": {
+      "title": "VISUALS",
+      "animation_speed": "ANIMATION SPEED",
+      "speeds": {
+        "slow": "SLOW",
+        "normal": "NORMAL",
+        "fast": "FAST"
+      }
+    },
+    "language": {
+      "title": "LANGUAGE",
+      "select": "Select your language",
+      "en": "ENGLISH",
+      "tr": "TÜRKÇE"
+    },
+    "footer": "✧ FORGED IN THE VOID ✧",
+    "version": "ARCANE PROTOCOL v0.1.0"
+  },
+  "biome": {
+    "verdant_echo": "Verdant Echo",
+    "azure_spire": "Azure Spire",
+    "twilight_rift": "Twilight Rift",
+    "crimson_wake": "Crimson Wake",
+    "obsidian_heart": "Obsidian Heart"
+  },
+  "campaign": {
+    "select_difficulty": "SELECT DIFFICULTY",
+    "difficulty": {
+      "easy": "EASY",
+      "medium": "MEDIUM",
+      "hard": "HARD"
+    },
+    "descriptions": {
+      "boss": "A cosmic terror guards the path forward. Steel your soul for a battle of ages.",
+      "shop": "Scattered relics and rare cards for those with the gold to pay.",
+      "event": "Unpredictable energies swirl in the void. Fortune favors the bold.",
+      "battle": "Enemy forces congregate in this sector. Clear the path to advance."
+    }
+  },
+  "cards": {
+    "Swordsman": "Swordsman",
+    "Knight": "Knight",
+    "Berserker": "Berserker",
+    "Archer": "Archer",
+    "Catapult": "Catapult",
+    "Lich King": "Lich King",
+    "descriptions": {
+      "swordsman": "A basic infantry soldier",
+      "knight": "Armored cavalry unit"
+    },
+    "flavor": {
+      "swordsman": "The first line of defense.",
+      "knight": "For honor and glory!"
+    }
+  },
+
+  "cards": {
+    "descriptions": {
+      "swordsman": "Basic melee unit",
+      "knight": "Armored melee unit",
+      "berserker": "Fierce warrior that inspires allies",
+      "shield_captain": "Stronger with fellow captains",
+      "champion": "Elite warrior of the realm",
+      "warlord": "Commands respect on the battlefield",
+      "lich_king": "Lord of the frozen dead",
+      "grave_ghoul": "Feasts on the remains of battle",
+      "wight": "Ancient spirits bound to armor",
+      "skeleton_warrior": "Clattering bones that never tire",
+      "death_knight": "A fallen hero serving the void",
+      "zombie_horde": "They keep coming...",
+      "crypt_guard": "Eternal protectors of the tomb",
+      "archer": "Basic ranged attacker",
+      "crossbowman": "Powerful ranged unit",
+      "elven_marksman": "Elven archer with deadly aim",
+      "scout": "Infiltrates enemy lines",
+      "sniper": "Elite marksman",
+      "dragon_hunter": "Slayer of the mightiest beasts",
+      "dark_elf_archer": "Deadly precision from the shadows",
+      "soul_harvester": "Reaps the essence of the living",
+      "banshee": "Her scream is a death sentence",
+      "void_wizard": "Wielder of unstable dark energy",
+      "shadow_assassin": "Master of the silent kill",
+      "necromancer": "Conduit for the afterlife",
+      "dark_elf_matriarch": "Leader of the obsidian spire",
+      "catapult": "Basic siege weapon",
+      "ballista": "Heavy siege weapon",
+      "trebuchet": "Massive siege engine",
+      "war_elephant": "Armored beast of war",
+      "siege_tower": "Mobile fortress",
+      "dragon": "The ultimate weapon",
+      "bone_catapult": "Siege engine made of remains",
+      "plague_spreader": "Infects the battlefield",
+      "abomination": "Stitched together from titans",
+      "demon_prince": "Ruler of the burning planes",
+      "hellhound": "Firespitting beast of the abyss",
+      "gargoyle": "Stone turned flesh and malice",
+      "cursed_ballista": "Enchanted bolts of shadow",
+      "commanders_horn": "Double the power of a row",
+      "decoy": "Return a random friendly unit to your hand",
+      "scorch_spell": "Destroy the strongest units",
+      "resurrection": "Revive a unit from graveyard",
+      "dark_pact": "Sacrifice essence to revive a unit",
+      "void_bolt": "Obliterate the strongest units",
+      "life_drain": "Siphon power to boost allies",
+      "raise_dead": "The dead obey their master.",
+      "frost": "Sets melee units to 1 power",
+      "fog": "Sets ranged units to 1 power",
+      "clear_weather": "Removes all weather effects",
+      "corrupt_ground": "Melee units lose their resolve",
+      "wailing_fog": "Ranged units lose their sight"
+    },
+    "flavor": {
+      "swordsman": "Steel is the only truth he knows.",
+      "knight": "Honor is his shield, steel is his sword.",
+      "berserker": "His rage is legendary.",
+      "shield_captain": "Unity is strength.",
+      "champion": "Undefeated in single combat.",
+      "warlord": "All bow before the warlord.",
+      "lich_king": "Death is but a new beginning.",
+      "grave_ghoul": "Always hungry.",
+      "wight": "They remember nothing but hate.",
+      "skeleton_warrior": "Rise and walk.",
+      "death_knight": "Honor died long ago.",
+      "zombie_horde": "Strength in numbers.",
+      "crypt_guard": "None shall pass.",
+      "archer": "Aim true.",
+      "crossbowman": "One bolt, one kill.",
+      "elven_marksman": "Never misses.",
+      "scout": "Information is power.",
+      "sniper": "One shot is all it takes.",
+      "dragon_hunter": "Fear the hunter.",
+      "dark_elf_archer": "Two eyes, one target.",
+      "soul_harvester": "Your soul is forfeit.",
+      "banshee": "The last thing you hear.",
+      "void_wizard": "The void calls to us all.",
+      "shadow_assassin": "Gone before the body hits the floor.",
+      "necromancer": "The grave is merely a door.",
+      "dark_elf_matriarch": "Power is the only currency.",
+      "catapult": "Rocks incoming!",
+      "ballista": "Pierces any armor.",
+      "trebuchet": "Walls crumble before it.",
+      "war_elephant": "Unstoppable force.",
+      "siege_tower": "Brings victory closer.",
+      "dragon": "Fire and fury.",
+      "bone_catapult": "Fires more than just rocks.",
+      "plague_spreader": "Let the sickness take them.",
+      "abomination": "A masterpiece of gore.",
+      "demon_prince": "Kneel or burn.",
+      "hellhound": "The jaws that bite.",
+      "gargoyle": "Watch the skies.",
+      "cursed_ballista": "Pierce the soul.",
+      "archmage": "The threads of reality are but strings on his lute. He plays a song of cosmic fire.",
+      "ranger": "The forest speaks in whispers of wind and rustling leaves. She is the only one who truly listens.",
+      "paladin": "Steel and faith are his only companions. In the darkest night, his shield shines the brightest.",
+      "rogue": "Why fight for a throne when you can steal the crown? He plays every side to ensure his own victory.",
+      "beserker_hero": "Reason died long ago in the heat of the pit. Now, there is only the rhythm of the axe.",
+      "druid": "The trees remember what the stone has forgotten. He is the voice of the awakening earth."
+    }
+  },
+  "factions": {
+    "order": {
+      "title": "The Eternal Bastion",
+      "desc": "Bound by ancient oaths and rigid hierarchy, the Order seeks to impose absolute harmony upon the chaos of the world."
+    },
+    "shadow": {
+      "title": "The Whispering Abyss",
+      "desc": "Cultists and exiles who have looked into the void and found it staring back. They wield the raw essence of entropy."
+    },
+    "nature": {
+      "title": "The Verdant Wilds",
+      "desc": "The world itself has a memory. Nature cares not for kings or gods, only for the cycle of growth and decay."
+    },
+    "arcane": {
+      "title": "The Astral Spire",
+      "desc": "Scholars who have mastered the ley lines. To an Arcane mage, magic is a science to be measured and harvested."
+    },
+    "neutral": {
+      "title": "The Mercenary Clans",
+      "desc": "Those who belong to no realm but their own. Selling their blades and wits to the highest bidder."
+    }
+  },
+  "talent_tree": {
+    "title": "Hero Ascension",
+    "subtitle": "Awaken true power",
+    "ascended": "ASCENDED",
+    "ascend_cost": "Ascend ({{cost}} PT)"
+  },
+  "talents": {
+    "hero_commander": {
+      "t_cmd_1": {
+        "name": "Vanguard Spirit",
+        "desc": "+1 Hero Health"
+      },
+      "t_cmd_2": {
+        "name": "Inspiration",
+        "desc": "Start with +2 Mana"
+      },
+      "t_cmd_3": {
+        "name": "Order Mastery",
+        "desc": "Order units get +1 Attack"
+      }
+    },
+    "hero_darklord": {
+      "t_dark_1": {
+        "name": "Void Reach",
+        "desc": "Hero Power cooldown -1"
+      },
+      "t_dark_2": {
+        "name": "Dark Ritual",
+        "desc": "Start with +3 Mana"
+      }
+    },
+    "hero_archmage": {
+      "t_mage_1": {
+        "name": "Arcane Focus",
+        "desc": "Start with +3 Mana"
+      },
+      "t_mage_2": {
+        "name": "Mana Overflow",
+        "desc": "Card draw +1 at start of game"
+      }
+    },
+    "hero_ranger": {
+      "t_rng_1": {
+        "name": "Steady Aim",
+        "desc": "Nature units get +1 Attack"
+      },
+      "t_rng_2": {
+        "name": "Eagle Eye",
+        "desc": "Hero Power cooldown -1"
+      }
+    },
+    "hero_paladin": {
+      "t_pal_1": {
+        "name": "Holy Devotion",
+        "desc": "+2 Hero Health"
+      },
+      "t_pal_2": {
+        "name": "Aura of Guarding",
+        "desc": "Order units get +1 Attack"
+      }
+    },
+    "hero_druid": {
+      "t_dru_1": {
+        "name": "Forest bond",
+        "desc": "Nature units get +1 Attack"
+      },
+      "t_dru_2": {
+        "name": "Ancient Growth",
+        "desc": "Start with +2 Mana"
+      }
+    }
+  },
+  "events": {
+    "mysterious_encounter": "MYSTERIOUS ENCOUNTER",
+    "continue_journey": "CONTINUE JOURNEY",
+    "whispering_void": {
+      "title": "The Whispering Void",
+      "description": "A rift in reality hums with a low, vibrating frequency. It seems to react to your presence, offering a glimpse into another realm.",
+      "choices": {
+        "gift_gold_label": "Embrace the Echo",
+        "gift_gold_desc": "Accept the rift's blessing. Gain 50 Gold.",
+        "gift_card_label": "Siphon the Arcane",
+        "gift_card_desc": "Draw power from the rift. Gain a random Card."
+      },
+      "resolution": {
+        "gold": "As you step into the rift, pocketfuls of ancient coins materialize. The void whispers its gratitude.",
+        "card": "You reach into the shimmering energy and pull out a scroll: {{name}}. Your deck grows stronger."
+      }
+    },
+    "weeping_willow": {
+      "title": "The Weeping Willow",
+      "description": "An ancient, crystalline tree stands alone in a clearing. Its sap glows with a soft, azure light. Legend says it grants wisdom to those who offer a sacrifice.",
+      "choices": {
+        "offer_gold_label": "Make an Offering",
+        "offer_gold_desc": "Lose 25 Gold to find a hidden Relic.",
+        "ignore_label": "Leave it Be",
+        "ignore_desc": "Don't risk it. Proceed carefully."
+      },
+      "resolution": {
+        "not_enough_gold": "You don't have enough gold. The tree seems disappointed.",
+        "success": "The tree accepts your tribute. A hidden chamber opens at its roots, revealing a {{relic}}.",
+        "ignore": "You walk away, feeling the tree's cold gaze on your back. Safety is its own reward."
+      }
+    },
+    "abandoned_caravan": {
+      "title": "Abandoned Caravan",
+      "description": "You stumble upon a wrecked merchant wagon. Most of the goods are ruined, but something might still be salvageable among the wreckage.",
+      "choices": {
+        "scavenge_label": "Scavenge",
+        "scavenge_desc": "Look for valuables. Gain 30 Gold.",
+        "search_carefully_label": "Search Deeply",
+        "search_carefully_desc": "Risk a trap for a better reward. 50% chance for 60 Gold or 0."
+      },
+      "resolution": {
+        "scavenge": "You dig through the debris and find a hidden stash of coins. Victory belongs to the observant.",
+        "success": "Persistence pays off! You find a heavy chest of gold hidden beneath the floorboards.",
+        "failed": "A trap springs! You narrowly escape, but the remaining valuables are destroyed in the process."
+      }
+    }
+  }
+}

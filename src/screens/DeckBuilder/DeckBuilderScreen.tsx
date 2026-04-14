@@ -26,6 +26,7 @@ import { RootStackParamList, Card, CardType, Faction } from '../../types';
 import { Text } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing } from '../../theme';
+import { useTranslation } from 'react-i18next';
 import { useDeckStore } from '../../store/deckStore';
 import { getAllCards, AVAILABLE_HEROES } from '../../data/cardData';
 
@@ -57,20 +58,24 @@ const SigilIcon = ({ active, label, onPress, icon }: { active: boolean; label: s
     );
 };
 
-const DeckCardRow = ({ card, onRemove, index }: { card: Card; onRemove: () => void; index: number }) => (
-    <Animated.View entering={FadeInRight.delay(index * 20)} style={styles.deckCardRow}>
-        <View style={styles.deckCardMana}>
-            <Text style={styles.manaText}>{card.manaCost}</Text>
-        </View>
-        <Text style={styles.deckCardName} numberOfLines={1}>{card.name.toUpperCase()}</Text>
-        <Pressable onPress={onRemove} style={styles.removeBtn}>
-            <Text style={styles.removeText}>✕</Text>
-        </Pressable>
-    </Animated.View>
-);
+const DeckCardRow = ({ card, onRemove, index }: { card: Card; onRemove: () => void; index: number }) => {
+    const { t } = useTranslation();
+    return (
+        <Animated.View entering={FadeInRight.delay(index * 20)} style={styles.deckCardRow}>
+            <View style={styles.deckCardMana}>
+                <Text style={styles.manaText}>{card.manaCost}</Text>
+            </View>
+            <Text style={styles.deckCardName} numberOfLines={1}>{t(`cards.${card.name}`).toUpperCase()}</Text>
+            <Pressable onPress={onRemove} style={styles.removeBtn}>
+                <Text style={styles.removeText}>✕</Text>
+            </Pressable>
+        </Animated.View>
+    );
+};
 
 export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
+    const { t } = useTranslation();
     const { width: sw, height: sh } = useWindowDimensions();
     const {
         decks, activeDeckId,
@@ -99,7 +104,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     const handleCreateDeck = () => {
-        const id = createDeck(`Deck ${decks.length + 1}`);
+        const id = createDeck(t('deck_builder.default_deck_name', { num: decks.length + 1 }));
         setActiveDeck(id);
     };
 
@@ -129,10 +134,10 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                         style={{ flex: 1, width: '100%' }}
                         contentContainerStyle={styles.sigilScrollContent}
                     >
-                        <SigilIcon active={filter === 'hero'} label="HERO" icon="♆" onPress={() => setFilter('hero')} />
-                        <SigilIcon active={filter === 'all'} label="ALL" icon="◈" onPress={() => setFilter('all')} />
-                        <SigilIcon active={filter === 'unit'} label="UNITS" icon="⚔" onPress={() => setFilter('unit')} />
-                        <SigilIcon active={filter === 'spell'} label="SPELLS" icon="🝧" onPress={() => setFilter('spell')} />
+                        <SigilIcon active={filter === 'hero'} label={t('deck_builder.filters.hero')} icon="♆" onPress={() => setFilter('hero')} />
+                        <SigilIcon active={filter === 'all'} label={t('deck_builder.filters.all')} icon="◈" onPress={() => setFilter('all')} />
+                        <SigilIcon active={filter === 'unit'} label={t('deck_builder.filters.unit')} icon="⚔" onPress={() => setFilter('unit')} />
+                        <SigilIcon active={filter === 'spell'} label={t('deck_builder.filters.spell')} icon="🝧" onPress={() => setFilter('spell')} />
                     </ScrollView>
                 </View>
 
@@ -142,9 +147,9 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                 {/* 2. THE VAULT (Center Pillar - 60%) */}
                 <View style={[styles.vaultPillar, { flex: 0.75 }]} onLayout={(e) => setLibWidth(e.nativeEvent.layout.width)}>
                     <View style={styles.pillarHeader}>
-                        <Text style={styles.pillarTitle}>VAULT</Text>
+                        <Text style={styles.pillarTitle}>{t('deck_builder.vault_title')}</Text>
                         <Text style={styles.pillarCount}>
-                            {filter === 'hero' ? `${AVAILABLE_HEROES.length} HEROES` : `${filteredCards.length} ESSENCES`}
+                            {filter === 'hero' ? t('deck_builder.hero_count', { count: AVAILABLE_HEROES.length }) : t('deck_builder.essence_count', { count: filteredCards.length })}
                         </Text>
                     </View>
 
@@ -166,7 +171,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             {isSelected && <View style={styles.heroSelectedOverlay} />}
                                             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.heroGradient} />
 
-                                            <Text style={styles.heroClassName}>{item.className.toUpperCase()}</Text>
+                                            <Text style={styles.heroClassName}>{t(`hero_classes.${item.className}`).toUpperCase()}</Text>
 
                                             {item.faction && FactionSymbols[item.faction as ValidFaction] && (
                                                 <View style={[styles.heroFactionBadge, { borderColor: FactionSymbols[item.faction as ValidFaction].color }]}>
@@ -178,13 +183,13 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                                 </View>
                                             )}
 
-                                            <Text style={styles.heroNameTitle} numberOfLines={1}>{item.name.toUpperCase()}</Text>
+                                            <Text style={styles.heroNameTitle} numberOfLines={1}>{t(`cards.${item.name}`).toUpperCase()}</Text>
 
                                             <View style={styles.heroAbilityStrip}>
                                                 <Text style={styles.heroAbilityIconText}>⚡</Text>
                                                 <View style={{ flex: 1 }}>
-                                                    <Text style={styles.heroAbilityNameText} numberOfLines={1}>{item.ability.name}</Text>
-                                                    <Text style={styles.heroAbilityDescText} numberOfLines={2}>{item.ability.description}</Text>
+                                                    <Text style={styles.heroAbilityNameText} numberOfLines={1}>{t(`abilities.${item.ability.id}.name`)}</Text>
+                                                    <Text style={styles.heroAbilityDescText} numberOfLines={2}>{t(`abilities.${item.ability.id}.desc`)}</Text>
                                                 </View>
                                             </View>
                                         </Pressable>
@@ -241,10 +246,10 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                     <View style={styles.pillarHeader}>
                         <View style={styles.deckSwitchRow}>
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.pillarTitle}>CONSTRUCT</Text>
+                                <Text style={styles.pillarTitle}>{t('deck_builder.construct_title')}</Text>
                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                                     <Text style={[styles.pillarCount, isDeckFull && { color: colors.error }]}>
-                                        {activeDeck ? `${activeDeck.cards.length}/25 ESSENCES` : 'UNLINKED'}
+                                        {activeDeck ? t('deck_builder.deck_count', { count: activeDeck.cards.length }) : t('deck_builder.unlinked')}
                                     </Text>
                                     {activeDeck && (
                                         <Pressable
@@ -283,9 +288,9 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 
                     {!activeDeck ? (
                         <View style={styles.emptyEssence}>
-                            <Text style={styles.emptyText}>UNLINKED</Text>
+                            <Text style={styles.emptyText}>{t('deck_builder.unlinked')}</Text>
                             <Pressable onPress={handleCreateDeck} style={styles.forgeBtn}>
-                                <Text style={styles.forgeBtnText}>FORGE LINK</Text>
+                                <Text style={styles.forgeBtnText}>{t('deck_builder.forge_link')}</Text>
                             </Pressable>
                         </View>
                     ) : (
@@ -302,10 +307,10 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                             ListHeaderComponent={
                                 <View style={styles.deckHeroStrip}>
                                     <View style={styles.deckHeroStripInner}>
-                                        <Text style={styles.deckHeroStripLabel}>ACTIVE HERO</Text>
-                                        <Text style={styles.deckHeroStripName}>{activeHero?.name.toUpperCase()}</Text>
-                                        <Text style={styles.deckHeroStripAbility}>⚡ {activeHero?.ability.name}</Text>
-                                        <Text style={styles.deckHeroStripDesc}>{activeHero?.ability.description}</Text>
+                                        <Text style={styles.deckHeroStripLabel}>{t('deck_builder.active_hero')}</Text>
+                                        <Text style={styles.deckHeroStripName}>{t(`cards.${activeHero?.name}`).toUpperCase()}</Text>
+                                        <Text style={styles.deckHeroStripAbility}>⚡ {t(`abilities.${activeHero?.ability.id}.name`)}</Text>
+                                        <Text style={styles.deckHeroStripDesc}>{t(`abilities.${activeHero?.ability.id}.desc`)}</Text>
                                     </View>
                                 </View>
                             }
