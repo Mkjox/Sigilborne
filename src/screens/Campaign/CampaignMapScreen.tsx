@@ -115,10 +115,10 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
     // throttled windowing logic
     const viewportHeight = screenHeight;
     useAnimatedReaction(
-        () => scrollY.value,
-        (currentScroll) => {
-            if (!stageLayouts.totalHeight) return;
+        () => {
+            if (!stageLayouts.totalHeight) return [0, 30];
             const maxTop = stageLayouts.totalHeight - 200;
+            const currentScroll = scrollY.value;
 
             // Inverted logic: Level 1 is at scrollY = maxTop
             const topRow = (maxTop - currentScroll) / 114;
@@ -126,8 +126,13 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
 
             const startIdx = Math.max(0, Math.floor(Math.min(topRow, bottomRow)) - 10);
             const endIdx = Math.min(stages.length, Math.ceil(Math.max(topRow, bottomRow)) + 15);
-
-            runOnJS(setVisibleRange)({ start: startIdx, end: endIdx });
+            
+            return [startIdx, endIdx];
+        },
+        (next, prev) => {
+            if (!prev || next[0] !== prev[0] || next[1] !== prev[1]) {
+                runOnJS(setVisibleRange)({ start: next[0], end: next[1] });
+            }
         },
         [stageLayouts.totalHeight, stages.length, viewportHeight]
     );
@@ -452,7 +457,8 @@ const BiomeHeader: React.FC<{ scrollY: SharedValue<number>, totalHeight: number 
             if (!totalHeight) return '';
             const maxTop = totalHeight - 200;
             const logicScroll = Math.max(0, maxTop - scrollY.value);
-            const stage = Math.floor((logicScroll / Math.max(1, maxTop)) * 200);
+            // Each stage is roughly 114px plus some offset
+            const stage = Math.floor(logicScroll / 114) + 1;
             const biome = MAP_BIOMES.find(b => stage >= b.start && stage <= b.end);
             return biome ? biome.id : MAP_BIOMES[0].id;
         },
@@ -461,7 +467,7 @@ const BiomeHeader: React.FC<{ scrollY: SharedValue<number>, totalHeight: number 
                 runOnJS(updateBiomeName)(next);
             }
         },
-        [totalHeight, t]
+        [totalHeight]
     );
 
     const animatedStyle = useAnimatedStyle(() => {

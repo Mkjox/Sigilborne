@@ -53,7 +53,7 @@
       "desc": "En güçlü düşman birimine 2 hasar ver"
     },
     "ability_arcane_blast": {
-      "name": "Arkane Patlama",
+      "name": "Gizemli Patlama",
       "desc": "Tüm düşman birimlerine 1 hasar ver"
     },
     "ability_precision_strike": {
@@ -81,14 +81,14 @@
     "exit": "ÇIKIŞ",
     "ascend": "YÜKSELİŞ",
     "visit_merchant": "TÜCCARI ZİYARET ET",
-    "enter_void": "BOŞLUĞA GİR",
+    "enter_void": "HİÇLİĞE GİR",
     "completed": "TAMAMLANDI",
     "level": "SEVİYE {{num}}",
     "stage": "AŞAMA {{num}}",
     "boss": "BOSS {{num}}",
     "elite": "ELİT {{num}}",
     "back": "GERİ",
-    "back_void": "BOŞLUK",
+    "back_void": "HİÇLİK",
     "gold": "ALTIN",
     "points_abbr": "PT",
     "no_relics": "Kalıntı bulunamadı",
@@ -121,7 +121,7 @@
     "continue": "DEVAM ET",
     "end_turn": "SIRAYI BİTİR",
     "escape": "KAÇIŞ",
-    "void_keeper": "BOŞLUK MUHAFIZI",
+    "void_keeper": "HİÇLİK MUHAFIZI",
     "void_keeper_title": "Hancı'nın Gölgesi",
     "corruption": "YOZLAŞMA",
     "essence": "ÖZ",
@@ -155,7 +155,7 @@
     }
   },
   "shop": {
-    "title": "Boşluk Tüccarı",
+    "title": "HİÇLİK Tüccarı",
     "subtitle": "Unutulmuş zamanların kalıntıları...",
     "tabs": {
       "buy": "Satın Al",
@@ -168,10 +168,10 @@
     "acquired": "ALINDI",
     "removal_title": "Kurban edilecek bir sunu seç",
     "purged_title": "Arındırıldı",
-    "purged_msg": "Kart arkane toza dönüşerek yanıyor. Desten daha hafif hissediliyor.",
+    "purged_msg": "Kart gizemli toza dönüşerek yanıyor. Desten daha hafif hissediliyor.",
     "services": {
       "remove": {
-        "name": "Boşluk Temizliği",
+        "name": "HİÇLİK Temizliği",
         "desc": "Daha iyi çekişler için desteni inceltmek üzere bir kartı kalıcı olarak çıkar."
       }
     },
@@ -230,7 +230,7 @@
     "hero_label": "KAHRAMAN",
     "hero_subtitle": "{{class}} Kahramanı • {{ability}}",
     "hero_desc": "{{desc}} (Bekleme Süresi: {{cooldown}} Raunt)",
-    "no_flavor": "Boşluktan gelen gizemli bir yankı.",
+    "no_flavor": "Hiçlikten gelen gizemli bir yankı.",
     "stats": {
       "total": "TOPLAM",
       "decks": "DESTELER"
@@ -244,8 +244,8 @@
     }
   },
   "menu": {
-    "subtitle": "ARKANE GÜNCELERİ",
-    "enter_void": "Boşluğa Gir",
+    "subtitle": "GİZEMLİ GÜNCELER",
+    "enter_void": "Hiçliğe Gir",
     "collection": "Koleksiyon",
     "deck_builder": "Deste Oluşturucu",
     "settings": "Ayarlar"
@@ -257,7 +257,7 @@
       "sound_effects": "Ses Efektleri",
       "sound_sub": "Kart kullanımları, darbeler ve ortam sesleri",
       "music": "Arka Plan Müziği",
-      "music_sub": "Arkane boşluk melodileri",
+      "music_sub": "Gizemli hiçlik melodileri",
       "haptics": "Titreşim Geri Bildirimi",
       "haptics_sub": "Eylemlerde dokunsal tepki"
     },
@@ -276,8 +276,8 @@
       "en": "ENGLISH",
       "tr": "TÜRKÇE"
     },
-    "footer": "✧ BOŞLUKTA DÖVÜLDÜ ✧",
-    "version": "ARKANE PROTOKOLÜ v0.1.0"
+    "footer": "✧ HİÇLİKTE DÖVÜLDÜ ✧",
+    "version": "GİZEMLİ PROTOKOL v0.1.0"
   },
   "biome": {
     "verdant_echo": "Yeşil Yankı",
@@ -296,7 +296,7 @@
     "descriptions": {
       "boss": "Kozmik bir dehşet yolu kapatıyor. Ruhunu çağlar sürecek bir savaşa hazırla.",
       "shop": "Altını olanlar için saçılmış kalıntılar ve nadir kartlar.",
-      "event": "Boşlukta öngörülemeyen enerjiler dönüyor. Şans cesurdan yanadır.",
+      "event": "Hiçlikte öngörülemeyen enerjiler dönüyor. Şans cesurdan yanadır.",
       "battle": "Düşman kuvvetleri bu bölgede toplanıyor. İlerlemek için yolu temizle."
     }
   },
@@ -304,7 +304,7 @@
     "title": "Kahraman Yükselişi",
     "subtitle": "Gerçek gücü uyandır",
     "ascended": "YÜKSELDİ",
-    "ascend_cost": "Yüksel ({{cost}} PT)"
+    "ascend_cost": "Yükselt ({{cost}} PT)"
   },
   "talents": {
     "hero_commander": {
@@ -323,7 +323,7 @@
     },
     "hero_darklord": {
       "t_dark_1": {
-        "name": "Boşluk Erişimi",
+        "name": "Hiçlik Erişimi",
         "desc": "Kahraman Yeteneği bekleme süresi -1"
       },
       "t_dark_2": {
@@ -333,7 +333,7 @@
     },
     "hero_archmage": {
       "t_mage_1": {
-        "name": "Arkane Odak",
+        "name": "Gizemli Odak",
         "desc": "+3 Mana ile başla"
       },
       "t_mage_2": {
@@ -376,9 +376,55 @@
     "Swordsman": "Kılıç Ustası",
     "Knight": "Şövalye",
     "Berserker": "Berserker",
-    "Archer": "Okçu",
-    "Catapult": "Mancınık",
+    "Shield Captain": "Kalkan Kaptanı",
+    "Champion": "Şampiyon",
+    "Warlord": "Savaş Beyi",
     "Lich King": "Lich Kralı",
+    "Grave Ghoul": "Mezarlık Gulyabanisi",
+    "Wight": "Mezar Ruhu",
+    "Skeleton Warrior": "İskelet Savaşçı",
+    "Death Knight": "Ölüm Şövalyesi",
+    "Zombie Horde": "Zombi Ordusu",
+    "Crypt Guard": "Mahzen Muhafızı",
+    "Archer": "Okçu",
+    "Crossbowman": "Arbaletçi",
+    "Elven Marksman": "Elf Nişancısı",
+    "Scout": "İzci",
+    "Sniper": "Keskin Nişancı",
+    "Dragon Hunter": "Ejderha Avcısı",
+    "Dark Elf Archer": "Kara Elf Okçusu",
+    "Soul Harvester": "Ruh Hasatçısı",
+    "Banshee": "Banshee",
+    "Void Wizard": "Hiçlik Büyücüsü",
+    "Shadow Assassin": "Gölge Suikastçısı",
+    "Necromancer": "Nekroman",
+    "Dark Elf Matriarch": "Kara Elf Matriarkı",
+    "Catapult": "Mancınık",
+    "Ballista": "Balista",
+    "Trebuchet": "Trebuchet",
+    "War Elephant": "Savaş Fili",
+    "Siege Tower": "Kuşatma Kulesi",
+    "Dragon": "Ejderha",
+    "Bone Catapult": "Kemik Mancınığı",
+    "Plague Spreader": "Veba Yayıcı",
+    "Abomination": "Ucube",
+    "Demon Prince": "İblis Prensi",
+    "Hellhound": "Cehennem Köpeği",
+    "Gargoyle": "Gargoyle",
+    "Cursed Ballista": "Lanetli Balista",
+    "Commander's Horn": "Komutanın Borusu",
+    "Decoy": "Yem",
+    "Scorch": "Yakma",
+    "Resurrection": "Diriliş",
+    "Dark Pact": "Karanlık Anlaşma",
+    "Void Bolt": "Hiçlik Oku",
+    "Life Drain": "Yaşam Emilimi",
+    "Raise Dead": "Ölüleri Dirilt",
+    "Biting Frost": "Isıran Ayaz",
+    "Impenetrable Fog": "Geçit Vermez Sis",
+    "Clear Skies": "Açık Gökyüzü",
+    "Corrupt Ground": "Yozlaşmış Toprak",
+    "Wailing Fog": "İnleyen Sis",
     "descriptions": {
       "swordsman": "Temel yakın dövüş birimi",
       "knight": "Zırhlı yakın dövüş birimi",
@@ -390,7 +436,7 @@
       "grave_ghoul": "Savaş kalıntılarıyla beslenir",
       "wight": "Zırha hapsolmuş kadim ruhlar",
       "skeleton_warrior": "Yorulmak bilmeyen kemik yığınları",
-      "death_knight": "Boşluğa hizmet eden düşmüş bir kahraman",
+      "death_knight": "Hiçliğe hizmet eden düşmüş bir kahraman",
       "zombie_horde": "Geliyorlar...",
       "crypt_guard": "Mezarın ebedi koruyucuları",
       "archer": "Temel menzilli saldırıcı",
@@ -456,7 +502,7 @@
       "dark_elf_archer": "İki göz, tek hedef.",
       "soul_harvester": "Ruhun feda edildi.",
       "banshee": "Duyacağın son şey.",
-      "void_wizard": "Boşluk hepimizi çağırıyor.",
+      "void_wizard": "Hiçlik hepimizi çağırıyor.",
       "shadow_assassin": "Gövde yere düşmeden gitmişti.",
       "necromancer": "Mezar sadece bir kapıdır.",
       "dark_elf_matriarch": "Güç tek para birimidir.",
@@ -519,7 +565,7 @@
       "desc": "En güçlü düşman birimine 2 hasar ver"
     },
     "ability_arcane_blast": {
-      "name": "Arkane Patlama",
+      "name": "Gizemli Patlama",
       "desc": "Tüm düşman birimlerine 1 hasar ver"
     },
     "ability_precision_strike": {
@@ -547,16 +593,16 @@
     "mysterious_encounter": "GİZEMLİ KARŞILAŞMA",
     "continue_journey": "YOLCULUĞA DEVAM ET",
     "whispering_void": {
-      "title": "Fısıldayan Boşluk",
+      "title": "Fısıldayan Hiçlik",
       "description": "Gerçeklikteki bir yarık düşük, titreşimli bir frekansla uğulduyor. Varlığınıza tepki veriyor gibi görünüyor, başka bir aleme bakış sunuyor.",
       "choices": {
         "gift_gold_label": "Yankıyı Kucakla",
         "gift_gold_desc": "Yarığın kutsamasını kabul et. 50 Altın kazan.",
-        "gift_card_label": "Arkane Sifonla",
+        "gift_card_label": "Gizemli Sifonla",
         "gift_card_desc": "Yarıktan güç çek. Rastgele bir Kart kazan."
       },
       "resolution": {
-        "gold": "Yarığa adım attığınızda, avuç dolusu antik sikke maddeleşiyor. Boşluk minnettarlığını fısıldıyor.",
+        "gold": "Yarığa adım attığınızda, avuç dolusu antik sikke maddeleşiyor. Hiçlik minnettarlığını fısıldıyor.",
         "card": "Işıldayan enerjiye uzanıyor ve bir parşömen çıkarıyorsunuz: {{name}}. Desteniz güçleniyor."
       }
     },
