@@ -6,8 +6,8 @@ import {
     ScrollView,
     useWindowDimensions,
     FlatList,
-    Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -167,7 +167,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             style={[styles.heroCardPreview, isSelected && styles.heroCardPreviewSelected]}
                                             onPress={() => activeDeckId && setDeckHero(activeDeckId, item.id)}
                                         >
-                                            <Animated.Image source={item.artwork} style={styles.heroArtwork} />
+                                            <Image source={item.artwork} style={styles.heroArtwork} />
                                             {isSelected && <View style={styles.heroSelectedOverlay} />}
                                             <LinearGradient colors={['transparent', 'rgba(0,0,0,0.9)']} style={styles.heroGradient} />
 

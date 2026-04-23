@@ -46,6 +46,24 @@ const heroToCard = (hero: Hero): Card => ({
     isHero: true,
 });
 
+const CollectionCardItem = React.memo(({ item, width, height, isSelected, onPress }: any) => {
+    return (
+        <CardComponent
+            card={item}
+            width={width}
+            height={height}
+            isPlayable={true}
+            isSelected={isSelected}
+            onPress={() => onPress(item.id)}
+        />
+    );
+}, (prevProps, nextProps) => {
+    return prevProps.item.id === nextProps.item.id &&
+        prevProps.isSelected === nextProps.isSelected &&
+        prevProps.width === nextProps.width &&
+        prevProps.height === nextProps.height;
+});
+
 const AnimatedBackground: React.FC = () => {
     return (
         <View style={StyleSheet.absoluteFill}>
@@ -105,7 +123,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
             <View style={styles.headerBar}>
                 <View style={{ paddingTop: insets.top }}>
                     <Animated.View
-                        entering={SlideInLeft.duration(600).springify()}
+                        entering={FadeIn.duration(400)}
                         style={[styles.header, { paddingHorizontal: layout.contentPadding, paddingTop: spacing.sm }]}
                     >
                         <Pressable
@@ -130,7 +148,8 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                     keyExtractor={(item) => item.id}
                     numColumns={numColumns}
                     key={`grid-${numColumns}`}
-                    ListHeaderComponent={() => (
+                    initialNumToRender={12}
+                    ListHeaderComponent={
                         /* Categories & Stats Row (Area 2) - Now scrollable */
                         <View style={[styles.metaRow, { paddingHorizontal: layout.contentPadding, marginTop: spacing.md }]}>
                             <ScrollView
@@ -171,7 +190,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                                 </View>
                             </Animated.View>
                         </View>
-                    )}
+                    }
                     contentContainerStyle={{
                         paddingHorizontal: layout.contentPadding,
                         paddingBottom: spacing.xl + 100,
@@ -182,17 +201,14 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                         gap: 16,
                         marginBottom: 16
                     }}
-                    renderItem={({ item, index }) => (
-                        <Animated.View entering={FadeIn.delay(Math.min(index * 30, 1000))}>
-                            <CardComponent
-                                card={item}
-                                width={cardWidth}
-                                height={cardHeight}
-                                isPlayable={true}
-                                isSelected={selectedCardId === item.id}
-                                onPress={() => setSelectedCardId(selectedCardId === item.id ? null : item.id)}
-                            />
-                        </Animated.View>
+                    renderItem={({ item }) => (
+                        <CollectionCardItem
+                            item={item}
+                            width={cardWidth}
+                            height={cardHeight}
+                            isSelected={selectedCardId === item.id}
+                            onPress={(id: string) => setSelectedCardId(selectedCardId === id ? null : id)}
+                        />
                     )}
                     showsVerticalScrollIndicator={false}
                 />
@@ -201,9 +217,9 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
             {/* 3. OVERLAY LAYER (Absolute bottom of JSX = Top z-index) */}
             {selectedCardId && (() => {
                 // Search in all sources for the full data
-                const card = ALL_CARDS.find(c => c.id === selectedCardId) || 
-                             AVAILABLE_HEROES.map(heroToCard).find(c => c.id === selectedCardId);
-                
+                const card = ALL_CARDS.find(c => c.id === selectedCardId) ||
+                    AVAILABLE_HEROES.map(heroToCard).find(c => c.id === selectedCardId);
+
                 const hero = AVAILABLE_HEROES.find(h => h.id === selectedCardId);
                 const isHero = !!hero;
 

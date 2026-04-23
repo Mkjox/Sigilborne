@@ -126,7 +126,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
 
             const startIdx = Math.max(0, Math.floor(Math.min(topRow, bottomRow)) - 10);
             const endIdx = Math.min(stages.length, Math.ceil(Math.max(topRow, bottomRow)) + 15);
-            
+
             return [startIdx, endIdx];
         },
         (next, prev) => {
@@ -303,7 +303,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                         <Animated.View
                             entering={FadeIn.duration(300)}
                             exiting={FadeOut.duration(200)}
-                            style={styles.difficultyModalContainer}
+                            style={[styles.difficultyModalContainer, { width: screenWidth * 0.85, maxHeight: screenHeight * 0.7 }]}
                         >
                             <ExpoLinearGradient colors={['rgba(30, 30, 60, 0.98)', 'rgba(10, 10, 20, 0.98)']} style={styles.difficultyGradient}>
                                 <Text style={styles.difficultyHeader}>{t('campaign.select_difficulty')}</Text>
@@ -358,7 +358,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                         <Animated.View
                             entering={FadeIn.duration(300)}
                             exiting={FadeOut.duration(200)}
-                            style={styles.stagePortalContainer}
+                            style={[styles.stagePortalContainer, { width: screenWidth * 0.88, height: screenHeight * 0.8 }]}
                         >
                             <View style={styles.stagePortalHeader}>
                                 <Text style={styles.stageLevelName}>
@@ -777,8 +777,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     difficultyModalContainer: {
-        width: width * 0.85,
-        maxHeight: height * 0.7,
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
@@ -840,8 +838,6 @@ const styles = StyleSheet.create({
         marginLeft: spacing.sm,
     },
     stagePortalContainer: {
-        width: width * 0.88,
-        height: height * 0.8,
         backgroundColor: colors.arcane.obsidian,
         borderRadius: 32,
         overflow: 'hidden',

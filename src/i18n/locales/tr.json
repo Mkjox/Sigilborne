@@ -220,8 +220,13 @@
   },
   "hero_classes": {
     "Warrior": "Savaşçı",
+    "Warlock": "Kara Büyücü",
     "Mage": "Büyücü",
+    "Hunter": "Avcı",
+    "Cleric": "Ruhban",
     "Rogue": "Düzenbaz",
+    "Fighter": "Dövüşçü",
+    "Shaman": "Şaman",
     "Paladin": "Paladin",
     "Druid": "Druid"
   },
@@ -373,6 +378,13 @@
     }
   },
   "cards": {
+    "Commander": "Komutan",
+    "Dark Lord": "Karanlık Lord",
+    "Archmage": "Başbüyücü",
+    "Ranger": "Korucu",
+    "Paladin": "Paladin",
+    "Trickster": "Düzenbaz",
+    "Druid": "Druid",
     "Swordsman": "Kılıç Ustası",
     "Knight": "Şövalye",
     "Berserker": "Berserker",

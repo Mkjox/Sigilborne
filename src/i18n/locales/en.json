@@ -221,8 +221,13 @@
   },
   "hero_classes": {
     "Warrior": "Warrior",
+    "Warlock": "Warlock",
     "Mage": "Mage",
+    "Hunter": "Hunter",
+    "Cleric": "Cleric",
     "Rogue": "Rogue",
+    "Fighter": "Fighter",
+    "Shaman": "Shaman",
     "Paladin": "Paladin",
     "Druid": "Druid"
   },
@@ -302,6 +307,13 @@
     }
   },
   "cards": {
+    "Commander": "Commander",
+    "Dark Lord": "Dark Lord",
+    "Archmage": "Archmage",
+    "Ranger": "Ranger",
+    "Paladin": "Paladin",
+    "Trickster": "Trickster",
+    "Druid": "Druid",
     "Swordsman": "Swordsman",
     "Knight": "Knight",
     "Berserker": "Berserker",

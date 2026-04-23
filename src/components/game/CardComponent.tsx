@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, Pressable, useWindowDimensions, Image } from 'react-native';
+import { View, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, {
     useSharedValue,
     useAnimatedStyle,
@@ -269,7 +270,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                             card.category === 'ranged' ? require('../../assets/icons/ranged.png') :
                                             require('../../assets/icons/siege.png')
                                         }
-                                        style={{ width: '100%', height: '100%', tintColor: colors.arcane.white }}
+                                        style={{ width: '100%', height: '100%' }}
                                         resizeMode="contain"
                                     />
                                 </View>

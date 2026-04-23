@@ -73,6 +73,7 @@ const TalentNode = ({ talent, unlocked, selected, available, onPress, index }: a
                     name={talent.icon as any}
                     size={28}
                     color={unlocked || selected ? colors.arcane.white : 'rgba(255,255,255,0.3)'}
+                    style={{ transform: [{ rotate: '-45deg' }] }}
                 />
             </TouchableOpacity>
         </Animated.View>
@@ -221,8 +222,8 @@ export const TalentTreeScreen: React.FC = () => {
                     >
                         <View style={styles.talentInfoHeader}>
                             <View style={{ flex: 1, paddingRight: 20 }}>
-                                <Text style={styles.talentTitle}>{t(`talents.${selectedTalent.id}.name`).toUpperCase()}</Text>
-                                <Text style={styles.talentDescription} numberOfLines={3}>{t(`talents.${selectedTalent.id}.desc`)}</Text>
+                                <Text style={styles.talentTitle}>{t(selectedTalent.name).toUpperCase()}</Text>
+                                <Text style={styles.talentDescription} numberOfLines={3}>{t(selectedTalent.description)}</Text>
                             </View>
 
                             <TouchableOpacity

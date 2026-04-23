@@ -51,3 +51,8 @@ src/__tests__/CardComponent_smoke.test.tsx
 check_results_ascii.txt
 doctor_results.txt
 install_check_results.txt
+
+# local scripts
+debug-all.ps1
+create-apk.ps1
+scripts-guide.md

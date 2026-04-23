@@ -7,6 +7,7 @@ import {
     Dimensions,
     Modal,
     Pressable,
+    ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -112,7 +113,11 @@ export const ShopScreen: React.FC = () => {
                 style={StyleSheet.absoluteFillObject}
             />
 
-            <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+            <ScrollView 
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }} 
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Ionicons name="chevron-back" size={28} color={colors.arcane.white} />
                 </TouchableOpacity>
@@ -159,12 +164,10 @@ export const ShopScreen: React.FC = () => {
                 </View>
 
                 {activeTab === 'buy' ? (
-                    <FlatList
-                        data={shopStock}
-                        keyExtractor={item => item.id}
-                        numColumns={2}
-                        renderItem={({ item }) => (
+                    <View style={styles.shopGrid}>
+                        {shopStock.map(item => (
                             <TouchableOpacity
+                                key={item.id}
                                 style={[styles.shopItemCard, item.purchased && styles.shopItemPurchased]}
                                 onPress={() => handleBuyItem(item)}
                                 disabled={item.purchased}
@@ -172,7 +175,7 @@ export const ShopScreen: React.FC = () => {
                                 <View style={styles.itemIconContainer}>
                                     <Ionicons 
                                         name={item.type === 'card' ? 'card' : 'diamond'} 
-                                        size={32} 
+                                        size={24} 
                                         color={colors.arcane.emerald} 
                                     />
                                 </View>
@@ -182,9 +185,8 @@ export const ShopScreen: React.FC = () => {
                                     {!item.purchased && <Ionicons name="cash" size={12} color={colors.arcane.emerald} />}
                                 </View>
                             </TouchableOpacity>
-                        )}
-                        contentContainerStyle={styles.listContent}
-                    />
+                        ))}
+                    </View>
                 ) : (
                     <View style={styles.removeContainer}>
                         <TouchableOpacity 
@@ -206,6 +208,7 @@ export const ShopScreen: React.FC = () => {
                     </View>
                 )}
             </View>
+            </ScrollView>
 
             {/* Custom Alert Modal */}
             <Modal
@@ -373,16 +376,19 @@ const styles = StyleSheet.create({
         height: 1,
         backgroundColor: 'rgba(16,185,129,0.2)',
     },
-    listContent: {
+    shopGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'flex-start',
+        gap: spacing.md,
         paddingBottom: spacing['4xl'],
     },
     shopItemCard: {
-        flex: 1,
+        width: '30%',
         aspectRatio: 0.8,
         backgroundColor: 'rgba(0,0,0,0.3)',
         borderRadius: 4,
-        padding: spacing.md,
-        margin: spacing.xs,
+        padding: spacing.sm,
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.05)',
         alignItems: 'center',
@@ -392,16 +398,16 @@ const styles = StyleSheet.create({
         opacity: 0.3,
     },
     itemIconContainer: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         backgroundColor: 'rgba(16,185,129,0.05)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     itemName: {
         color: colors.arcane.white,
-        fontSize: 14,
+        fontSize: 11,
         fontWeight: '900',
         textAlign: 'center',
         marginTop: spacing.sm,
@@ -410,16 +416,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'rgba(16,185,129,0.1)',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 12,
-        marginTop: spacing.sm,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 10,
+        marginTop: spacing.xs,
         gap: 4,
     },
     priceText: {
         color: colors.arcane.emerald,
         fontWeight: '900',
-        fontSize: 12,
+        fontSize: 10,
     },
     removeContainer: {
         flex: 1,
