@@ -28,6 +28,7 @@ interface CardComponentProps {
     height?: number;
     hideStats?: boolean;
     isTargeted?: boolean;
+    effectivePower?: number;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -51,6 +52,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     width,
     height,
     hideStats,
+    effectivePower,
 }) => {
     const { t } = useTranslation();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
@@ -230,7 +232,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                 </View>
                             )}
 
-                            {/* Health (Bottom Right) */}
+                            {/* Health/Power (Bottom Right) */}
                             {card.type === 'unit' && (
                                 <View style={[
                                     styles.statOrb,
@@ -240,11 +242,21 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                         borderRadius: badgeSize / 2,
                                         bottom: padding,
                                         right: padding,
-                                        borderColor: colors.error
+                                        borderColor: effectivePower !== undefined 
+                                            ? (effectivePower < (card.power || 0) ? colors.error : (effectivePower > (card.power || 0) ? colors.arcane.emerald : 'rgba(255,255,255,0.2)'))
+                                            : 'rgba(255,255,255,0.2)'
                                     }
                                 ]}>
-                                    <Text style={[styles.statText, { fontSize: badgeFontSize, color: colors.error }]} numberOfLines={1}>
-                                        {card.power}
+                                    <Text style={[
+                                        styles.statText, 
+                                        { 
+                                            fontSize: badgeFontSize, 
+                                            color: effectivePower !== undefined 
+                                                ? (effectivePower < (card.power || 0) ? colors.error : (effectivePower > (card.power || 0) ? colors.arcane.emerald : colors.arcane.white))
+                                                : colors.arcane.white 
+                                        }
+                                    ]} numberOfLines={1}>
+                                        {effectivePower !== undefined ? effectivePower : card.power}
                                     </Text>
                                 </View>
                             )}

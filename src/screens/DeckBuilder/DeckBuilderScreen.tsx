@@ -104,7 +104,11 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     const handleCreateDeck = () => {
-        const id = createDeck(t('deck_builder.default_deck_name', { num: decks.length + 1 }));
+        let nextNum = 1;
+        while (decks.some(d => d.name === t('deck_builder.default_deck_name', { num: nextNum }))) {
+            nextNum++;
+        }
+        const id = createDeck(t('deck_builder.default_deck_name', { num: nextNum }));
         setActiveDeck(id);
     };
 

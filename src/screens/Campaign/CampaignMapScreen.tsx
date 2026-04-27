@@ -39,6 +39,7 @@ import { useTranslation } from 'react-i18next';
 import { colors, spacing, borderRadius, shadows, typography } from '../../theme';
 import { CampaignMapSkiaBackground } from './components/CampaignMapSkiaBackground';
 import { MapParallaxLayers } from './components/MapParallaxLayers';
+import { RelicTray } from '../../components/campaign/RelicTray';
 import { TOTAL_STAGES, MAP_BIOMES } from './constants';
 import { generateCampaignMap, MapNode as MapNodeTypeData } from '../../data/campaignData';
 import { useCampaignStore } from '../../store/campaignStore';
@@ -64,7 +65,6 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
         },
     });
 
-    const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('medium');
     const [difficultyModalVisible, setDifficultyModalVisible] = useState(false);
     const [selectedStage, setSelectedStage] = useState<number | null>(null);
     const [stageModalVisible, setStageModalVisible] = useState(false);
@@ -74,7 +74,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
     const stages = useMemo(() => generateCampaignMap(TOTAL_STAGES), []);
 
     // Campaign State
-    const { currentNodeId, completedNodes, advanceToNode, gold, talentPoints } = useCampaignStore();
+    const { currentNodeId, completedNodes, advanceToNode, gold, talentPoints, difficulty: selectedDifficulty, setDifficulty } = useCampaignStore();
 
     // Calculate logical row for each stage to determine vertical position
     const stageLayouts = useMemo(() => {
@@ -286,6 +286,11 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                 </View>
             </View>
 
+            {/* Relic Tray Overlay */}
+            <View style={[styles.relicTrayWrapper, { top: insets.top + 75 }]}>
+                <RelicTray />
+            </View>
+
             {/* Difficulty Selection Modal */}
             <Modal
                 transparent
@@ -318,7 +323,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                                     isActive && styles.difficultyItemActive
                                                 ]}
                                                 onPress={() => {
-                                                    setSelectedDifficulty(diff);
+                                                    setDifficulty(diff);
                                                     setDifficultyModalVisible(false);
                                                 }}
                                                 activeOpacity={0.7}
@@ -432,7 +437,9 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                     style={styles.portalActionGradient}
                                 >
                                     <Text style={styles.portalActionText}>
-                                        {stages.find(s => s.id === selectedStage)?.type === 'shop' ? t('common.visit_merchant') : t('common.enter_void')}
+                                        {selectedStage !== null && completedNodes.includes(selectedStage) 
+                                            ? t('common.replay').toUpperCase() 
+                                            : (stages.find(s => s.id === selectedStage)?.type === 'shop' ? t('common.visit_merchant') : t('common.enter_void'))}
                                     </Text>
                                 </ExpoLinearGradient>
                             </TouchableOpacity>
@@ -599,6 +606,11 @@ const MapNodeComponent = React.memo<{
                     {getIcon()}
                 </View>
             </ExpoLinearGradient>
+            {isCompleted && (
+                <View style={styles.completedBadge}>
+                    <Ionicons name="checkmark-circle" size={16} color={colors.arcane.emerald} />
+                </View>
+            )}
         </AnimatedPressable>
     );
 });
@@ -795,10 +807,24 @@ const styles = StyleSheet.create({
         padding: spacing.xl,
         alignItems: 'center',
     },
+    completedBadge: {
+        position: 'absolute',
+        top: -5,
+        right: -5,
+        backgroundColor: colors.arcane.obsidian,
+        borderRadius: 10,
+        zIndex: 10,
+    },
     difficultyList: {
         flexDirection: 'row',
         width: '100%',
         gap: spacing.xs,
+    },
+    relicTrayWrapper: {
+        position: 'absolute',
+        left: spacing.xl,
+        right: spacing.xl,
+        zIndex: 15,
     },
     difficultyItem: {
         flex: 1,

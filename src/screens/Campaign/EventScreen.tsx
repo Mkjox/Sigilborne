@@ -48,7 +48,8 @@ export const EventScreen: React.FC = () => {
     const { stageId } = route.params;
     const insets = useSafeAreaInsets();
 
-    const { gold, advanceToNode, addRelic, completeNode } = useCampaignStore();
+    const { gold, advanceToNode, addRelic, completeNode, completedNodes } = useCampaignStore();
+    const isAlreadyCompleted = useMemo(() => completedNodes.includes(stageId), [completedNodes, stageId]);
     const { getActiveDeck, addCardToDeck } = useDeckStore();
     const activeDeck = getActiveDeck();
 
@@ -209,13 +210,15 @@ export const EventScreen: React.FC = () => {
                     <Text variant="h2" style={styles.title}>{eventData.title.toUpperCase()}</Text>
                     <View style={styles.divider} />
                     <Text style={styles.description}>
-                        {resolved ? resolutionText : eventData.description}
+                        {isAlreadyCompleted && !resolved 
+                            ? "This place feels quiet. The echoes of your previous encounter still linger in the air, but the energies have dissipated. There is nothing more to be found here."
+                            : (resolved ? resolutionText : eventData.description)}
                     </Text>
                 </View>
 
                 {/* Choices Section */}
                 <View style={styles.choicesContainer}>
-                    {!resolved ? (
+                    {!resolved && !isAlreadyCompleted ? (
                         eventData.choices.map((choice, index) => (
                             <Animated.View 
                                 key={choice.id}
@@ -253,7 +256,7 @@ export const EventScreen: React.FC = () => {
                                     colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
                                     style={styles.continueGradient}
                                 >
-                                    <Text style={styles.continueText}>{t('events.continue_journey')}</Text>
+                                    <Text style={styles.continueText}>{isAlreadyCompleted ? t('common.back').toUpperCase() : t('events.continue_journey')}</Text>
                                 </ExpoLinearGradient>
                             </TouchableOpacity>
                         </Animated.View>

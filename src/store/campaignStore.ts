@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NodeRewards } from '../data/campaignData';
-import { CardRarity, Card } from '../types/card.types';
+import { CardRarity, Card, Difficulty } from '../types';
 import * as Rules from '../engine/rules';
 import { getAllCards } from '../data/cardData';
 import { getRelicById } from '../data/relicData';
@@ -43,6 +43,10 @@ export interface CampaignStore {
     // Talent Actions
     unlockCard: (cardId: string) => void;
     unlockTalent: (talentId: string) => { success: boolean, message: string };
+    
+    // Settings
+    difficulty: Difficulty;
+    setDifficulty: (difficulty: Difficulty) => void;
 }
 
 export const useCampaignStore = create<CampaignStore>()(
@@ -57,6 +61,9 @@ export const useCampaignStore = create<CampaignStore>()(
             talentPoints: 0,
             unlockedTalentIds: [],
             unlockedCardIds: [],
+            difficulty: 'medium',
+            
+            setDifficulty: (difficulty) => set({ difficulty }),
 
             advanceToNode: (nodeId) =>
                 set((state) => {
@@ -68,7 +75,10 @@ export const useCampaignStore = create<CampaignStore>()(
             completeNode: (nodeId, rewards, nextNodeIds = []) =>
                 set((state) => {
                     const alreadyCompleted = state.completedNodes.includes(nodeId);
-                    const newGold = state.gold + (rewards?.gold || 0);
+                    
+                    // Award rewards ONLY if not already completed
+                    const newGold = alreadyCompleted ? state.gold : state.gold + (rewards?.gold || 0);
+                    
                     const newCompletedNodes = alreadyCompleted 
                         ? state.completedNodes 
                         : [...state.completedNodes, nodeId];

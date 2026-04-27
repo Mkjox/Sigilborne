@@ -56,3 +56,5 @@ install_check_results.txt
 debug-all.ps1
 create-apk.ps1
 scripts-guide.md
+.vscode/launch.json
+faction-art-prompts.md

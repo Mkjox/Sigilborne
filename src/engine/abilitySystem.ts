@@ -26,6 +26,46 @@ export const getBoardCards = (state: GameState): { player: Card[]; ai: Card[] } 
     ai: state.ai.board,
 });
 
+// Calculate power for a single card accounting for weather and boosts
+export const calculateCardPower = (
+    card: Card,
+    board: BoardState,
+    activeWeather: { melee: boolean; ranged: boolean; siege: boolean },
+    factionBoosts: Record<string, number> = {}
+): number => {
+    let power = card.power || 0;
+
+    // Apply global weather
+    // HERO IMMUNITY: Legendary units and Hero cards are immune to weather
+    const isHero = card.isHero || card.rarity === 'legendary';
+    
+    const isWeatherAffected = !isHero && (
+        (card.category === 'melee' && activeWeather.melee) ||
+        (card.category === 'ranged' && activeWeather.ranged) ||
+        (card.category === 'siege' && activeWeather.siege)
+    );
+
+    if (isWeatherAffected) {
+        // Keep any boosts that were applied above the base power
+        const base = card.basePower || card.power || 0;
+        const boost = Math.max(0, power - base);
+        power = 1 + boost;
+    }
+
+    // Apply Faction Bonus from Talents
+    if (card.faction && factionBoosts[card.faction]) {
+        power += factionBoosts[card.faction];
+    }
+
+    // Bond (Tight Bond) - Check only within own board
+    const count = board.filter(c => c.name === card.name).length;
+    if (count > 1 && card.abilities.some(a => a.type === 'bond')) {
+        power *= BOND_MULTIPLIER;
+    }
+
+    return power;
+};
+
 // Calculate total board power for a player
 export const calculateBoardPower = (
     board: BoardState,
@@ -33,8 +73,6 @@ export const calculateBoardPower = (
     opponentBoard?: BoardState,
     talents: Talent[] = []
 ): number => {
-    let totalPower = 0;
-
     // Collect faction boosts from talents
     const factionBoosts: Record<string, number> = {};
     talents.forEach(t => {
@@ -43,42 +81,7 @@ export const calculateBoardPower = (
         }
     });
 
-    board.forEach(card => {
-        let power = card.power || 0;
-
-        // Apply global weather
-        // HERO IMMUNITY: Legendary units and Hero cards are immune to weather
-        const isHero = card.isHero || card.rarity === 'legendary';
-        
-        const isWeatherAffected = !isHero && (
-            (card.category === 'melee' && activeWeather.melee) ||
-            (card.category === 'ranged' && activeWeather.ranged) ||
-            (card.category === 'siege' && activeWeather.siege)
-        );
-
-        if (isWeatherAffected) {
-            // Keep any boosts that were applied above the base power
-            // If basePower is missing, assume current power is the base power
-            const base = card.basePower || card.power || 0;
-            const boost = Math.max(0, power - base);
-            power = 1 + boost;
-        }
-
-        // Apply Faction Bonus from Talents
-        if (card.faction && factionBoosts[card.faction]) {
-            power += factionBoosts[card.faction];
-        }
-
-        // Bond (Tight Bond) - Check only within own board
-        const count = board.filter(c => c.name === card.name).length;
-        if (count > 1 && card.abilities.some(a => a.type === 'bond')) {
-            power *= BOND_MULTIPLIER;
-        }
-
-        totalPower += power;
-    });
-
-    return totalPower;
+    return board.reduce((sum, card) => sum + calculateCardPower(card, board, activeWeather, factionBoosts), 0);
 };
 
 // Shuffle an array (Fisher-Yates)
@@ -429,12 +432,15 @@ export const abilityEffects = {
     // Weather - sets row weather to true
     weather: (context: AbilityContext): void => {
         const { state, card } = context;
-        const name = card.name.toLowerCase();
-        if (name.includes('frost') || name.includes('ground')) {
+        const ability = card.abilities.find(a => a.type === 'weather');
+        if (!ability) return;
+
+        const id = ability.id.toLowerCase();
+        if (id.includes('frost') || id.includes('ground')) {
             state.weather.melee = true;
-        } else if (name.includes('fog')) {
+        } else if (id.includes('fog')) {
             state.weather.ranged = true;
-        } else if (name.includes('rain') || name.includes('storm')) {
+        } else if (id.includes('rain') || id.includes('storm')) {
             state.weather.siege = true;
         }
     },

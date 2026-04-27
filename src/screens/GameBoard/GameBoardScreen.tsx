@@ -23,8 +23,10 @@ import { WeatherProvider, useWeather } from '../../context/WeatherContext';
 import { SpectralEffectType } from '../../components/game/vfx/SpectralEffect';
 import { UnifiedVFXManager } from '../../components/game';
 import { GameBoardSkiaBackground } from './components/GameBoardSkiaBackground';
-import { useCampaignStore } from '../../store/campaignStore';
+import { calculateCardPower } from '../../engine/abilitySystem';
 import { generateCampaignMap } from '../../data/campaignData';
+import { useCampaignStore } from '../../store/campaignStore';
+import { RelicTray } from '../../components/campaign/RelicTray';
 import { useTranslation } from 'react-i18next';
 
 type GameBoardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameBoard'>;
@@ -47,6 +49,18 @@ const BoardZone: React.FC<{
     highlightedCardIds?: string[];
     selectedCardId?: string | null;
 }> = ({ cards, isPlayer, cardWidth, cardHeight, onPress, onCardPress, isActive, highlightedCardIds = [], selectedCardId }) => {
+    const weather = useGameStore(state => state.weather);
+    const talents = useGameStore(state => (isPlayer ? state.player.unlockedTalents : state.ai.unlockedTalents) || []);
+
+    const factionBoosts = React.useMemo(() => {
+        return talents.reduce((acc: Record<string, number>, t: any) => {
+            if (t.effect.type === 'faction_bonus') {
+                acc[t.effect.faction] = (acc[t.effect.faction] || 0) + t.effect.attackBoost;
+            }
+            return acc;
+        }, {});
+    }, [talents]);
+
     return (
         <Pressable
             style={[
@@ -70,6 +84,7 @@ const BoardZone: React.FC<{
                 {cards.map((card, index) => {
                     const isHighlighted = highlightedCardIds.includes(card.id);
                     const isSelected = selectedCardId === card.id;
+                    const effectivePower = calculateCardPower(card, cards, weather, factionBoosts);
 
                     return (
                         <Animated.View
@@ -94,6 +109,7 @@ const BoardZone: React.FC<{
 
                                 <CardComponent
                                     card={card}
+                                    effectivePower={effectivePower}
                                     width={cardWidth}
                                     height={cardHeight}
                                     isPlayable={true}
@@ -138,7 +154,8 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
     } = useGameStore();
 
     // Campaign integration
-    const completeNode = useCampaignStore(state => state.completeNode);
+    const { completedNodes, completeNode } = useCampaignStore();
+    const isAlreadyCompleted = React.useMemo(() => stageId ? completedNodes.includes(stageId) : false, [completedNodes, stageId]);
     const hasCompletedCurrent = React.useRef(false);
 
     // Find current stage data for rewards and connections
@@ -355,6 +372,11 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                         </Pressable>
                     </View>
 
+                    {/* Relic Tray - HUD */}
+                    <View style={[styles.gameRelicTray, { top: insets.top + 65 }]}>
+                        <RelicTray />
+                    </View>
+
                     {/* MAIN CONTENT - BATTLEFIELD LAYER */}
                     <View style={[styles.mainRow, {
                         marginTop: 60,
@@ -533,6 +555,12 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     {winner === 'player' ? t('common.victory') : (winner === 'draw' ? t('common.draw') : t('common.defeat'))}
                                 </Text>
                                 
+                                {winner === 'player' && isAlreadyCompleted && (
+                                    <Text variant="caption" color={colors.text.disabled} style={{ marginBottom: 12, opacity: 0.7 }}>
+                                        {t('campaign.echo_victory_no_rewards').toUpperCase()}
+                                    </Text>
+                                )}
+                                
                                 {winner === 'player' && (
                                     <Pressable 
                                         onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} 
@@ -596,6 +624,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: 'transparent',
+    },
+    gameRelicTray: {
+        position: 'absolute',
+        left: 24,
+        right: 24,
+        zIndex: 15,
     },
     voidOverlay: {
         ...StyleSheet.absoluteFillObject,

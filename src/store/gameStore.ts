@@ -86,6 +86,7 @@ const createEmptyState = (): GameState => ({
             faction: 'order',
         },
         hasPassed: false,
+        unlockedTalents: [],
     },
     ai: {
         id: 'ai',
@@ -116,6 +117,7 @@ const createEmptyState = (): GameState => ({
             faction: 'shadow'
         },
         hasPassed: false,
+        unlockedTalents: [],
     },
     weather: { melee: false, ranged: false, siege: false },
     roundHistory: [],
