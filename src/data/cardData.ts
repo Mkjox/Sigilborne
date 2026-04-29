@@ -150,10 +150,10 @@ const ARCANE_MELEE: Card[] = [
 ].map(c => ({ ...c, faction: 'arcane' as Faction }));
 
 const NATURE_MELEE: Card[] = [
-    createCard('Dire Wolf', 'unit', 'common', 1, 2, [ABILITIES.MUSTER('Dire Wolf')], 'cards.descriptions.dire_wolf', '', ''),
-    createCard('Forest Guardian', 'unit', 'rare', 4, 7, [], 'cards.descriptions.forest_guardian', '', ''),
-    createCard('Shapeshifter', 'unit', 'epic', 5, 6, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.shapeshifter', '', ''),
-    createCard('Bear Spirit', 'unit', 'common', 2, 5, [], 'cards.descriptions.bear_spirit', '', ''),
+    createCard('Dire Wolf', 'unit', 'common', 1, 2, [ABILITIES.MUSTER('Dire Wolf')], 'cards.descriptions.dire_wolf', '', require('../../assets/units/melee/dire_wolf.jpg')),
+    createCard('Forest Guardian', 'unit', 'rare', 4, 7, [], 'cards.descriptions.forest_guardian', '', require('../../assets/units/melee/forest_guardian.jpg')),
+    createCard('Shapeshifter', 'unit', 'epic', 5, 6, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.shapeshifter', '', require('../../assets/units/melee/shapeshifter.jpg')),
+    createCard('Bear Spirit', 'unit', 'common', 2, 5, [], 'cards.descriptions.bear_spirit', '', require('../../assets/units/melee/bear_spirit.jpg')),
     createCard('Wolf Pack Alpha', 'unit', 'rare', 3, 4, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.wolf_alpha', '', ''),
     createCard('Elder Ent', 'unit', 'legendary', 8, 15, [], 'cards.descriptions.elder_ent', '', ''),
     createCard('Wild Boar', 'unit', 'common', 1, 3, [ABILITIES.MUSTER('Wild Boar')], 'cards.descriptions.wild_boar', '', ''),
@@ -249,11 +249,11 @@ const SHADOW_SIEGE: Card[] = [
 ].map(c => ({ ...c, faction: 'shadow' as Faction }));
 
 const ARCANE_SIEGE: Card[] = [
-    createCard('Mana Battery', 'unit', 'rare', 4, 4, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.mana_battery', '', ''),
-    createCard('Ether Dragon', 'unit', 'legendary', 9, 14, [], 'cards.descriptions.ether_dragon', '', ''),
-    createCard('Leyline Conduit', 'unit', 'rare', 3, 5, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.leyline_conduit', '', ''),
-    createCard('Prism Tower', 'unit', 'epic', 6, 8, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.prism_tower', '', ''),
-    createCard('Energy Pylon', 'unit', 'common', 2, 3, [], 'cards.descriptions.energy_pylon', '', ''),
+    createCard('Mana Battery', 'unit', 'rare', 4, 4, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.mana_battery', '', require('../../assets/units/siege/mana_battery.jpg')),
+    createCard('Ether Cannon', 'unit', 'legendary', 9, 14, [], 'cards.descriptions.ether_cannon', '', require('../../assets/units/siege/ether_cannon.jpg')),
+    createCard('Leyline Conduit', 'unit', 'rare', 3, 5, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.leyline_conduit', '', require('../../assets/units/siege/leyline_conduit.jpg')),
+    createCard('Prism Tower', 'unit', 'epic', 6, 8, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.prism_tower', '', require('../../assets/units/siege/prism_tower.jpg')),
+    createCard('Energy Pylon', 'unit', 'common', 2, 3, [], 'cards.descriptions.energy_pylon', '', require('../../assets/units/siege/energy_pylon.jpg')),
 ].map(c => ({ ...c, faction: 'arcane' as Faction }));
 
 const NATURE_SIEGE: Card[] = [
