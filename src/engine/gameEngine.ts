@@ -46,24 +46,25 @@ export const advanceTurnPhase = (state: GameState, eventBus?: EventBus): GameSta
 
 // Create initial player state
 const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: Hero, talents: Talent[] = []): PlayerState => {
-    const shuffledDeck = shuffleArray(deck);
-    const { newDeck, newHand } = drawCards(shuffledDeck, [], STARTING_HAND_SIZE);
-
-    // Apply Talent Stat Boosts
     let healthBonus = 0;
     let manaBonus = 0;
     let cooldownReduction = 0;
+    let startingHandBonus = 0;
 
     talents.forEach(talent => {
         if (talent.effect.type === 'stat_boost') {
             if (talent.effect.target === 'hero_health') healthBonus += talent.effect.value;
             if (talent.effect.target === 'starting_mana') manaBonus += talent.effect.value;
             if (talent.effect.target === 'hero_power_cooldown') cooldownReduction += talent.effect.value;
+            if (talent.effect.target === 'starting_hand_size') startingHandBonus += talent.effect.value;
         }
     });
 
     const baseHealth = STARTING_HEALTH + healthBonus;
     const baseMana = MANA_PER_ROUND + manaBonus;
+
+    const shuffledDeck = shuffleArray(deck);
+    const { newDeck, newHand } = drawCards(shuffledDeck, [], STARTING_HAND_SIZE + startingHandBonus);
 
     const heroState: Hero = hero ? { 
         ...hero, 

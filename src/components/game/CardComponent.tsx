@@ -29,6 +29,7 @@ interface CardComponentProps {
     hideStats?: boolean;
     isTargeted?: boolean;
     effectivePower?: number;
+    onInfoPress?: () => void;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -39,6 +40,7 @@ const rarityColors: Record<CardRarity, string[]> = {
     rare: ['#3b82f6', '#1d4ed8'],
     epic: ['#a855f7', '#7e22ce'],
     legendary: [colors.arcane.emerald, colors.arcane.emeraldDark],
+    boss: ['#DAA520', '#B8860B'],
 };
 
 export const CardComponent: React.FC<CardComponentProps> = ({
@@ -53,6 +55,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     height,
     hideStats,
     effectivePower,
+    onInfoPress,
 }) => {
     const { t } = useTranslation();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
@@ -109,233 +112,257 @@ export const CardComponent: React.FC<CardComponentProps> = ({
         transform: [{ scale: interpolate(energyPulse.value, [0, 1], [1, isTargeted ? 1.05 : 1.02]) }],
     }));
 
-    if (faceDown) {
-        return (
-            <Animated.View style={[styles.cardContainer, { width: cardWidth, height: cardHeight }]}>
-                <LinearGradient
-                    colors={[colors.arcane.obsidian, colors.arcane.graphite]}
-                    style={[styles.card, { width: cardWidth, height: cardHeight }]}
-                >
-                    <View style={styles.cardBack}>
-                        <View style={[styles.cardBackPattern, { borderColor: colors.arcane.emeraldDark }]} />
-                        <View style={styles.voidSigil}>
-                            <Text style={{ fontSize: cardHeight * 0.2, color: colors.arcane.emerald, opacity: 0.4 }}>✧</Text>
-                        </View>
-                    </View>
-                </LinearGradient>
-            </Animated.View>
-        );
-    }
-
     const gradientColors = isTargeted ? [colors.error, '#991111'] : (isSelected ? [colors.arcane.emerald, colors.arcane.emeraldDark] : rarityColors[card.rarity]);
 
     return (
-        <AnimatedPressable
-            onPress={onPress}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
-            style={[styles.cardContainer, { width: cardWidth, height: cardHeight }, animatedStyle]}
-            disabled={!onPress}
+        <Animated.View 
+            style={[
+                styles.cardContainer, 
+                animatedStyle,
+                { width: cardWidth, height: cardHeight }
+            ]}
         >
-            {/* Spectral Energy Glow - Tightened Radius */}
-            {(card.rarity !== 'common' || isSelected || isTargeted) && (
-                <Animated.View
-                    pointerEvents="none"
+            <Pressable 
+                onPress={onPress}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                disabled={!isPlayable}
+                style={[styles.card, { width: cardWidth, height: cardHeight }]}
+            >
+                {/* Spectral Energy Glow */}
+                {(card.rarity !== 'common' || isSelected || isTargeted) && !faceDown && (
+                    <Animated.View
+                        pointerEvents="none"
+                        style={[
+                            styles.glowEffect,
+                            energyStyle,
+                            {
+                                backgroundColor: isTargeted ? colors.error : (isSelected ? colors.arcane.emerald : rarityColors[card.rarity][0]),
+                                borderRadius: 2,
+                                top: -2, left: -2, right: -2, bottom: -2,
+                                zIndex: -1,
+                            }
+                        ]}
+                    />
+                )}
+
+                <LinearGradient
+                    colors={gradientColors as [string, string]}
                     style={[
-                        styles.glowEffect,
-                        energyStyle,
-                        {
-                            backgroundColor: isTargeted ? colors.error : (isSelected ? colors.arcane.emerald : rarityColors[card.rarity][0]),
-                            borderRadius: 2,
-                            top: -2, left: -2, right: -2, bottom: -2,
+                        styles.cardBorder, 
+                        { 
+                            width: cardWidth, 
+                            height: cardHeight,
+                            padding: isSelected || isTargeted ? 2 : 1
                         }
                     ]}
-                />
-            )}
-
-            {/* Arcane Frame */}
-            <LinearGradient
-                colors={gradientColors as [string, string]}
-                style={[
-                    styles.cardBorder,
-                    {
-                        width: cardWidth,
-                        height: cardHeight,
-                        padding: isSelected || isTargeted ? 2 : 1
-                    }
-                ]}
-            >
-                <View style={[
-                    styles.cardInner,
-                    {
-                        width: cardWidth - (isSelected || isTargeted ? 4 : 2),
-                        height: cardHeight - (isSelected || isTargeted ? 4 : 2)
-                    }
-                ]}>
-
-                    {/* Art Layer */}
-                    <View style={styles.artContainer}>
-                        {card.artwork ? (
-                            <Image source={card.artwork} style={styles.cardImage} resizeMode="cover" />
-                        ) : (
-                            <LinearGradient
-                                colors={[colors.arcane.graphite, colors.arcane.obsidian]}
-                                style={styles.artPlaceholder}
-                            >
-                                <Text style={{ fontSize: cardHeight * 0.3, opacity: 0.2, color: colors.arcane.emerald }}>
-                                    {card.type === 'unit' ? '⚔' : (card.type === 'spell' ? '✨' : '☁')}
-                                </Text>
-                            </LinearGradient>
-                        )}
-                        <LinearGradient
-                            colors={['transparent', 'rgba(0,0,0,0.8)']}
-                            style={styles.artOverlay}
-                        />
-                    </View>
-
-                    {/* Stats HUD */}
-                    {!hideStats && !card.isHero && (
-                        <>
-                            {/* Mana (Top Left) */}
-                            <View style={[
-                                styles.statOrb,
-                                {
-                                    width: badgeSize,
-                                    height: badgeSize,
-                                    borderRadius: badgeSize / 2,
-                                    top: padding,
-                                    left: padding,
-                                    borderColor: colors.arcane.cyan
-                                }
-                            ]}>
-                                <Text style={[styles.statText, { fontSize: badgeFontSize, color: colors.arcane.cyan }]} numberOfLines={1}>
-                                    {card.manaCost}
-                                </Text>
+                >
+                    <View style={[
+                        styles.cardInner, 
+                        { 
+                            width: cardWidth - (isSelected || isTargeted ? 4 : 2), 
+                            height: cardHeight - (isSelected || isTargeted ? 4 : 2) 
+                        }
+                    ]}>
+                        {faceDown ? (
+                            <View style={[styles.cardBack, { backgroundColor: colors.arcane.obsidian }]}>
+                                <View style={[styles.cardBackPattern, { borderColor: colors.arcane.emeraldDark }]} />
+                                <View style={styles.voidSigil}>
+                                    <Text style={{ fontSize: cardHeight * 0.2, color: colors.arcane.emerald, opacity: 0.4 }}>✧</Text>
+                                </View>
                             </View>
-
-                            {/* Attack (Bottom Left) */}
-                            {card.type === 'unit' && (
-                                <View style={[
-                                    styles.statOrb,
-                                    {
-                                        width: badgeSize,
-                                        height: badgeSize,
-                                        borderRadius: badgeSize / 2,
-                                        bottom: padding,
-                                        left: padding,
-                                        borderColor: colors.warning
-                                    }
-                                ]}>
-                                    <Text style={[styles.statText, { fontSize: badgeFontSize, color: colors.warning }]} numberOfLines={1}>
-                                        {card.attack}
-                                    </Text>
-                                </View>
-                            )}
-
-                            {/* Health/Power (Bottom Right) */}
-                            {card.type === 'unit' && (
-                                <View style={[
-                                    styles.statOrb,
-                                    {
-                                        width: badgeSize,
-                                        height: badgeSize,
-                                        borderRadius: badgeSize / 2,
-                                        bottom: padding,
-                                        right: padding,
-                                        borderColor: effectivePower !== undefined 
-                                            ? (effectivePower < (card.power || 0) ? colors.error : (effectivePower > (card.power || 0) ? colors.arcane.emerald : 'rgba(255,255,255,0.2)'))
-                                            : 'rgba(255,255,255,0.2)'
-                                    }
-                                ]}>
-                                    <Text style={[
-                                        styles.statText, 
-                                        { 
-                                            fontSize: badgeFontSize, 
-                                            color: effectivePower !== undefined 
-                                                ? (effectivePower < (card.power || 0) ? colors.error : (effectivePower > (card.power || 0) ? colors.arcane.emerald : colors.arcane.white))
-                                                : colors.arcane.white 
-                                        }
-                                    ]} numberOfLines={1}>
-                                        {effectivePower !== undefined ? effectivePower : card.power}
-                                    </Text>
-                                </View>
-                            )}
-
-                            {/* Class/Row Indicator (Top Right) */}
-                            {card.type === 'unit' && card.category && (
-                                <View style={[
-                                    styles.statOrb,
-                                    {
-                                        width: badgeSize,
-                                        height: badgeSize,
-                                        borderRadius: badgeSize / 2,
-                                        top: padding,
-                                        right: padding,
-                                        borderColor: colors.arcane.emerald,
-                                        backgroundColor: 'rgba(0,0,0,0.85)',
-                                        padding: badgeSize * 0.15,
-                                    }
-                                ]}>
-                                    <Image 
-                                        source={
-                                            card.category === 'melee' ? require('../../assets/icons/melee.png') :
-                                            card.category === 'ranged' ? require('../../assets/icons/ranged.png') :
-                                            require('../../assets/icons/siege.png')
-                                        }
-                                        style={{ width: '100%', height: '100%' }}
-                                        resizeMode="contain"
+                        ) : (
+                            <View style={styles.artContainer}>
+                                {card.artwork ? (
+                                    <Image
+                                        source={card.artwork}
+                                        style={styles.cardImage}
+                                        contentFit="cover"
+                                        transition={200}
                                     />
+                                ) : (
+                                    <LinearGradient
+                                        colors={[colors.arcane.graphite, colors.arcane.obsidian]}
+                                        style={styles.artPlaceholder}
+                                    >
+                                        <Text style={{ fontSize: cardHeight * 0.3, opacity: 0.2, color: colors.arcane.emerald }}>
+                                            {card.type === 'unit' ? '⚔' : (card.type === 'spell' ? '✨' : '☁')}
+                                        </Text>
+                                    </LinearGradient>
+                                )}
+                                <LinearGradient
+                                    colors={['transparent', 'rgba(0,0,0,0.8)']}
+                                    style={styles.artOverlay}
+                                />
+                                
+                                {!hideStats && (
+                                    <>
+                                        {/* Mana Cost (Top Left) */}
+                                        <View style={[
+                                            styles.statOrb,
+                                            {
+                                                width: badgeSize,
+                                                height: badgeSize,
+                                                borderRadius: badgeSize / 2,
+                                                top: padding,
+                                                left: padding,
+                                                borderColor: colors.arcane.cyan
+                                            }
+                                        ]}>
+                                            <Text style={[styles.statText, { fontSize: badgeFontSize, color: colors.arcane.cyan }]} numberOfLines={1}>
+                                                {card.manaCost}
+                                            </Text>
+                                        </View>
+
+                                        {/* Attack (Bottom Left) */}
+                                        {card.type === 'unit' && (
+                                            <View style={[
+                                                styles.statOrb,
+                                                {
+                                                    width: badgeSize,
+                                                    height: badgeSize,
+                                                    borderRadius: badgeSize / 2,
+                                                    bottom: padding,
+                                                    left: padding,
+                                                    borderColor: colors.warning
+                                                }
+                                            ]}>
+                                                <Text style={[styles.statText, { fontSize: badgeFontSize, color: colors.warning }]} numberOfLines={1}>
+                                                    {card.attack}
+                                                </Text>
+                                            </View>
+                                        )}
+
+                                        {/* Health/Power (Bottom Right) */}
+                                        {card.type === 'unit' && (
+                                            <View style={[
+                                                styles.statOrb,
+                                                {
+                                                    width: badgeSize,
+                                                    height: badgeSize,
+                                                    borderRadius: badgeSize / 2,
+                                                    bottom: padding,
+                                                    right: padding,
+                                                    borderColor: effectivePower !== undefined 
+                                                        ? (effectivePower < (card.power || 0) ? colors.error : (effectivePower > (card.power || 0) ? colors.arcane.emerald : 'rgba(255,255,255,0.2)'))
+                                                        : 'rgba(255,255,255,0.2)'
+                                                }
+                                            ]}>
+                                                <Text style={[
+                                                    styles.statText, 
+                                                    { 
+                                                        fontSize: badgeFontSize, 
+                                                        color: effectivePower !== undefined 
+                                                            ? (effectivePower < (card.power || 0) ? colors.error : (effectivePower > (card.power || 0) ? colors.arcane.emerald : colors.arcane.white))
+                                                            : colors.arcane.white
+                                                    }
+                                                ]} numberOfLines={1}>
+                                                    {effectivePower ?? card.power}
+                                                </Text>
+                                            </View>
+                                        )}
+
+                                        {/* Class/Row Indicator (Top Right) */}
+                                        {card.type === 'unit' && card.category && (
+                                            <View style={[
+                                                styles.statOrb,
+                                                {
+                                                    width: badgeSize,
+                                                    height: badgeSize,
+                                                    borderRadius: badgeSize / 2,
+                                                    top: padding,
+                                                    right: padding,
+                                                    borderColor: colors.arcane.emerald,
+                                                    backgroundColor: 'rgba(0,0,0,0.85)',
+                                                    padding: badgeSize * 0.15,
+                                                }
+                                            ]}>
+                                                <Image 
+                                                    source={
+                                                        card.category === 'melee' ? require('../../assets/icons/melee.png') :
+                                                        card.category === 'ranged' ? require('../../assets/icons/ranged.png') :
+                                                        require('../../assets/icons/siege.png')
+                                                    }
+                                                    style={{ width: '100%', height: '100%' }}
+                                                    contentFit="contain"
+                                                />
+                                            </View>
+                                        )}
+                                    </>
+                                )}
+
+                                {/* Hero Indicator */}
+                                {card.isHero && (
+                                    <View style={[
+                                        styles.statOrb,
+                                        {
+                                            width: badgeSize,
+                                            height: badgeSize,
+                                            borderRadius: badgeSize / 2,
+                                            top: padding,
+                                            left: padding,
+                                            borderColor: colors.warning,
+                                            backgroundColor: 'rgba(218, 165, 32, 0.2)', // Golden mist
+                                        }
+                                    ]}>
+                                        <Text style={[
+                                            styles.statText,
+                                            { 
+                                                fontSize: badgeFontSize * 0.8,
+                                                color: undefined, 
+                                                fontFamily: undefined 
+                                            }
+                                        ]}>👑</Text>
+                                    </View>
+                                )}
+
+                                {/* Info Button (Spells Only - Top Right) */}
+                                {!faceDown && card.type === 'spell' && onInfoPress && (
+                                    <Pressable 
+                                        onPress={onInfoPress} 
+                                        style={[
+                                            styles.statOrb,
+                                            {
+                                                width: badgeSize,
+                                                height: badgeSize,
+                                                borderRadius: badgeSize / 2,
+                                                top: padding,
+                                                right: padding,
+                                                borderColor: colors.arcane.emerald,
+                                                backgroundColor: 'rgba(0,0,0,0.85)',
+                                            }
+                                        ]}
+                                    >
+                                        <Text style={[styles.infoIconText, { fontSize: badgeFontSize * 0.7 }]}>i</Text>
+                                    </Pressable>
+                                )}
+
+                                {/* Name Bar */}
+                                <View style={[styles.nameBar, { bottom: cardHeight * 0.26 }]}>
+                                    <Text style={[styles.cardName, { fontSize: Math.max(6, cardHeight * 0.075) }]} numberOfLines={1}>
+                                        {t(`cards.${card.name}`).toUpperCase()}
+                                    </Text>
                                 </View>
-                            )}
-                        </>
-                    )}
 
-                    {/* Hero Indicator */}
-                    {card.isHero && !hideStats && (
-                        <View style={[
-                            styles.statOrb,
-                            {
-                                width: badgeSize,
-                                height: badgeSize,
-                                borderRadius: badgeSize / 2,
-                                top: padding,
-                                left: padding,
-                                borderColor: colors.warning,
-                                backgroundColor: 'rgba(218, 165, 32, 0.2)', // Golden mist
-                            }
-                        ]}>
-                            <Text style={[
-                                styles.statText,
-                                { 
-                                    fontSize: badgeFontSize * 0.8,
-                                    color: undefined, // Don't override with statText color
-                                    fontFamily: undefined // Don't override with statText font
-                                }
-                            ]}>👑</Text>
-                        </View>
-                    )}
-
-                    {/* Name Bar */}
-                    <View style={[styles.nameBar, { bottom: cardHeight * 0.26 }]}>
-                        <Text style={[styles.cardName, { fontSize: Math.max(6, cardHeight * 0.075) }]} numberOfLines={1}>
-                            {t(`cards.${card.name}`).toUpperCase()}
-                        </Text>
+                                {/* Energy Seams */}
+                                <View style={[styles.energySeam, { left: 0, top: '25%', bottom: '25%' }]} />
+                                <View style={[styles.energySeam, { right: 0, top: '25%', bottom: '25%' }]} />
+                            </View>
+                        )}
                     </View>
+                </LinearGradient>
 
-                    {/* Energy Seams */}
-                    <View style={[styles.energySeam, { left: 0, top: '25%', bottom: '25%' }]} />
-                    <View style={[styles.energySeam, { right: 0, top: '25%', bottom: '25%' }]} />
-                </View>
-            </LinearGradient>
+                {/* Inactive Overlay */}
+                {!isPlayable && (
+                    <View
+                        pointerEvents="none"
+                        style={[styles.disabledOverlay, { width: cardWidth, height: cardHeight }]}
+                    />
+                )}
+            </Pressable>
 
-            {/* Inactive Overlay */}
-            {!isPlayable && (
-                <View
-                    pointerEvents="none"
-                    style={[styles.disabledOverlay, { width: cardWidth, height: cardHeight }]}
-                />
-            )}
-        </AnimatedPressable>
+
+        </Animated.View>
     );
 };
 
@@ -350,12 +377,10 @@ const styles = StyleSheet.create({
     },
     glowEffect: {
         position: 'absolute',
-        top: -4, left: -4, right: -4, bottom: -4,
         filter: 'blur(8px)',
     },
     cardBorder: {
         borderRadius: 2,
-        padding: 1,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -395,7 +420,6 @@ const styles = StyleSheet.create({
         includeFontPadding: false,
         textAlign: 'center',
         textAlignVertical: 'center',
-        lineHeight: undefined, // Override variant-level lineHeight
     },
     nameBar: {
         position: 'absolute',
@@ -444,5 +468,23 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(16, 185, 129, 0.2)',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    infoButton: {
+        position: 'absolute',
+        backgroundColor: colors.arcane.obsidian,
+        borderWidth: 1,
+        borderColor: colors.arcane.emerald,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100, // Ensure it's above everything
+        shadowColor: colors.arcane.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 3,
+    },
+    infoIconText: {
+        color: colors.arcane.emerald,
+        fontWeight: '900',
+        fontFamily: 'serif',
     }
 });

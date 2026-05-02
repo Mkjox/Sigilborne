@@ -149,7 +149,7 @@ export const useCampaignStore = create<CampaignStore>()(
                             id: `shop_card_${i}_${Date.now()}`,
                             type: 'card',
                             itemId: card.id,
-                            name: card.name,
+                            name: `cards.${card.name}`,
                             price,
                             description: card.description,
                             rarity: card.rarity,

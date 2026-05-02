@@ -154,9 +154,9 @@ const NATURE_MELEE: Card[] = [
     createCard('Forest Guardian', 'unit', 'rare', 4, 7, [], 'cards.descriptions.forest_guardian', '', require('../../assets/units/melee/forest_guardian.jpg')),
     createCard('Shapeshifter', 'unit', 'epic', 5, 6, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.shapeshifter', '', require('../../assets/units/melee/shapeshifter.jpg')),
     createCard('Bear Spirit', 'unit', 'common', 2, 5, [], 'cards.descriptions.bear_spirit', '', require('../../assets/units/melee/bear_spirit.jpg')),
-    createCard('Wolf Pack Alpha', 'unit', 'rare', 3, 4, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.wolf_alpha', '', ''),
-    createCard('Elder Ent', 'unit', 'legendary', 8, 15, [], 'cards.descriptions.elder_ent', '', ''),
-    createCard('Wild Boar', 'unit', 'common', 1, 3, [ABILITIES.MUSTER('Wild Boar')], 'cards.descriptions.wild_boar', '', ''),
+    createCard('Wolf Pack Alpha', 'unit', 'rare', 3, 4, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.wolf_alpha', '', require('../../assets/units/melee/wolf_pack_alpha.jpg')),
+    createCard('Elder Ent', 'unit', 'legendary', 8, 15, [], 'cards.descriptions.elder_ent', '', require('../../assets/units/melee/elder_ent.jpg')),
+    createCard('Wild Boar', 'unit', 'common', 1, 3, [ABILITIES.MUSTER('Wild Boar')], 'cards.descriptions.wild_boar', '', require('../../assets/units/melee/wild_boar.jpg')),
 ].map(c => ({ ...c, faction: 'nature' as Faction }));
 
 const NEUTRAL_MELEE: Card[] = [
@@ -205,8 +205,8 @@ const ARCANE_RANGED: Card[] = [
 ].map(c => ({ ...c, faction: 'arcane' as Faction }));
 
 const NATURE_RANGED: Card[] = [
-    createCard('Elven Scout', 'unit', 'common', 1, 2, [ABILITIES.SPY(2)], 'cards.descriptions.elven_scout', '', ''),
-    createCard('Dryad', 'unit', 'rare', 3, 5, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.dryad', '', ''),
+    createCard('Elven Scout', 'unit', 'common', 1, 2, [ABILITIES.SPY(2)], 'cards.descriptions.elven_scout', '', require('../../assets/units/ranged/elven_scout.jpg')),
+    createCard('Dryad', 'unit', 'rare', 3, 5, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.dryad', '', require('../../assets/units/ranged/dryad.jpg')),
     createCard('Centaur Archer', 'unit', 'rare', 4, 6, [], 'cards.descriptions.centaur_archer', '', ''),
     createCard('Satyr Skirmisher', 'unit', 'common', 2, 3, [], 'cards.descriptions.satyr_skirmisher', '', ''),
     createCard('Elven Warden', 'unit', 'rare', 3, 4, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.elven_warden', '', ''),
@@ -599,6 +599,24 @@ export const TALENT_TREES: Record<string, TalentTree> = {
                 requirements: ['t_cmd_2'],
                 position: { x: 100, y: 400 }
             },
+            {
+                id: 't_cmd_4',
+                name: 'talents.hero_commander.t_cmd_4.name',
+                description: 'talents.hero_commander.t_cmd_4.desc',
+                icon: 'fitness',
+                effect: { type: 'stat_boost', target: 'hero_health', value: 2 },
+                requirements: ['t_cmd_3'],
+                position: { x: 250, y: 100 }
+            },
+            {
+                id: 't_cmd_5',
+                name: 'talents.hero_commander.t_cmd_5.name',
+                description: 'talents.hero_commander.t_cmd_5.desc',
+                icon: 'documents',
+                effect: { type: 'stat_boost', target: 'starting_hand_size', value: 1 },
+                requirements: ['t_cmd_4'],
+                position: { x: 250, y: 250 }
+            },
         ]
     },
     hero_darklord: {
@@ -621,6 +639,33 @@ export const TALENT_TREES: Record<string, TalentTree> = {
                 requirements: ['t_dark_1'],
                 position: { x: 100, y: 250 }
             },
+            {
+                id: 't_dark_3',
+                name: 'talents.hero_darklord.t_dark_3.name',
+                description: 'talents.hero_darklord.t_dark_3.desc',
+                icon: 'skull',
+                effect: { type: 'faction_bonus', faction: 'shadow', attackBoost: 1 },
+                requirements: ['t_dark_2'],
+                position: { x: 100, y: 400 }
+            },
+            {
+                id: 't_dark_4',
+                name: 'talents.hero_darklord.t_dark_4.name',
+                description: 'talents.hero_darklord.t_dark_4.desc',
+                icon: 'timer',
+                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
+                requirements: ['t_dark_3'],
+                position: { x: 250, y: 100 }
+            },
+            {
+                id: 't_dark_5',
+                name: 'talents.hero_darklord.t_dark_5.name',
+                description: 'talents.hero_darklord.t_dark_5.desc',
+                icon: 'book',
+                effect: { type: 'stat_boost', target: 'starting_mana', value: 2 },
+                requirements: ['t_dark_4'],
+                position: { x: 250, y: 250 }
+            },
         ]
     },
     hero_archmage: {
@@ -639,9 +684,36 @@ export const TALENT_TREES: Record<string, TalentTree> = {
                 name: 'talents.hero_archmage.t_mage_2.name',
                 description: 'talents.hero_archmage.t_mage_2.desc',
                 icon: 'documents',
-                effect: { type: 'stat_boost', target: 'starting_mana', value: 2 }, // Placeholder
+                effect: { type: 'stat_boost', target: 'starting_hand_size', value: 1 },
                 requirements: ['t_mage_1'],
                 position: { x: 100, y: 250 }
+            },
+            {
+                id: 't_mage_3',
+                name: 'talents.hero_archmage.t_mage_3.name',
+                description: 'talents.hero_archmage.t_mage_3.desc',
+                icon: 'color-wand',
+                effect: { type: 'faction_bonus', faction: 'arcane', attackBoost: 1 },
+                requirements: ['t_mage_2'],
+                position: { x: 100, y: 400 }
+            },
+            {
+                id: 't_mage_4',
+                name: 'talents.hero_archmage.t_mage_4.name',
+                description: 'talents.hero_archmage.t_mage_4.desc',
+                icon: 'battery-charging',
+                effect: { type: 'stat_boost', target: 'starting_mana', value: 2 },
+                requirements: ['t_mage_3'],
+                position: { x: 250, y: 100 }
+            },
+            {
+                id: 't_mage_5',
+                name: 'talents.hero_archmage.t_mage_5.name',
+                description: 'talents.hero_archmage.t_mage_5.desc',
+                icon: 'stopwatch',
+                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
+                requirements: ['t_mage_4'],
+                position: { x: 250, y: 250 }
             },
         ]
     },
@@ -665,6 +737,33 @@ export const TALENT_TREES: Record<string, TalentTree> = {
                 requirements: ['t_rng_1'],
                 position: { x: 100, y: 250 }
             },
+            {
+                id: 't_rng_3',
+                name: 'talents.hero_ranger.t_rng_3.name',
+                description: 'talents.hero_ranger.t_rng_3.desc',
+                icon: 'heart',
+                effect: { type: 'stat_boost', target: 'hero_health', value: 2 },
+                requirements: ['t_rng_2'],
+                position: { x: 100, y: 400 }
+            },
+            {
+                id: 't_rng_4',
+                name: 'talents.hero_ranger.t_rng_4.name',
+                description: 'talents.hero_ranger.t_rng_4.desc',
+                icon: 'copy',
+                effect: { type: 'stat_boost', target: 'starting_hand_size', value: 1 },
+                requirements: ['t_rng_3'],
+                position: { x: 250, y: 100 }
+            },
+            {
+                id: 't_rng_5',
+                name: 'talents.hero_ranger.t_rng_5.name',
+                description: 'talents.hero_ranger.t_rng_5.desc',
+                icon: 'speedometer',
+                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
+                requirements: ['t_rng_4'],
+                position: { x: 250, y: 250 }
+            },
         ]
     },
     hero_paladin: {
@@ -687,6 +786,33 @@ export const TALENT_TREES: Record<string, TalentTree> = {
                 requirements: ['t_pal_1'],
                 position: { x: 100, y: 250 }
             },
+            {
+                id: 't_pal_3',
+                name: 'talents.hero_paladin.t_pal_3.name',
+                description: 'talents.hero_paladin.t_pal_3.desc',
+                icon: 'medkit',
+                effect: { type: 'stat_boost', target: 'hero_health', value: 1 },
+                requirements: ['t_pal_2'],
+                position: { x: 100, y: 400 }
+            },
+            {
+                id: 't_pal_4',
+                name: 'talents.hero_paladin.t_pal_4.name',
+                description: 'talents.hero_paladin.t_pal_4.desc',
+                icon: 'time',
+                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
+                requirements: ['t_pal_3'],
+                position: { x: 250, y: 100 }
+            },
+            {
+                id: 't_pal_5',
+                name: 'talents.hero_paladin.t_pal_5.name',
+                description: 'talents.hero_paladin.t_pal_5.desc',
+                icon: 'ribbon',
+                effect: { type: 'faction_bonus', faction: 'order', attackBoost: 1 },
+                requirements: ['t_pal_4'],
+                position: { x: 250, y: 250 }
+            },
         ]
     },
     hero_druid: {
@@ -708,6 +834,33 @@ export const TALENT_TREES: Record<string, TalentTree> = {
                 effect: { type: 'stat_boost', target: 'starting_mana', value: 2 },
                 requirements: ['t_dru_1'],
                 position: { x: 100, y: 250 }
+            },
+            {
+                id: 't_dru_3',
+                name: 'talents.hero_druid.t_dru_3.name',
+                description: 'talents.hero_druid.t_dru_3.desc',
+                icon: 'mail-open',
+                effect: { type: 'stat_boost', target: 'starting_hand_size', value: 1 },
+                requirements: ['t_dru_2'],
+                position: { x: 100, y: 400 }
+            },
+            {
+                id: 't_dru_4',
+                name: 'talents.hero_druid.t_dru_4.name',
+                description: 'talents.hero_druid.t_dru_4.desc',
+                icon: 'heart-circle',
+                effect: { type: 'stat_boost', target: 'hero_health', value: 2 },
+                requirements: ['t_dru_3'],
+                position: { x: 250, y: 100 }
+            },
+            {
+                id: 't_dru_5',
+                name: 'talents.hero_druid.t_dru_5.name',
+                description: 'talents.hero_druid.t_dru_5.desc',
+                icon: 'infinite',
+                effect: { type: 'stat_boost', target: 'hero_power_cooldown', value: -1 },
+                requirements: ['t_dru_4'],
+                position: { x: 250, y: 250 }
             },
         ]
     }

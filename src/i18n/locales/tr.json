@@ -113,6 +113,13 @@
     "deck": "DESTE",
     "turn": "SIRA",
     "passed": "PAS GEÇİLDİ",
+    "rarities": {
+      "common": "Yaygın",
+      "rare": "Nadir",
+      "epic": "Destansı",
+      "legendary": "Efsanevi",
+      "boss": "Boss"
+    },
     "used": "KULLANILDI",
     "leader": "LİDER",
     "victory": "ZAFER",
@@ -465,6 +472,28 @@
     "Energy Pylon": "Enerji Direği",
     "Vine Catapult": "Sarmaşık Mancınığı",
     "Junk Launcher": "Hurda Fırlatıcı",
+    "Arcane Golem": "Arcane Golem",
+    "Spellblade": "Büyübiçer",
+    "Mirror Image": "Ayna Görüntüsü",
+    "Dire Wolf": "Ulu Kurt",
+    "Forest Guardian": "Orman Muhafızı",
+    "Shapeshifter": "Şekil Değiştiren",
+    "Sellsword": "Kiralık Kılıç",
+    "Bounty Hunter": "Ödül Avcısı",
+    "Apprentice": "Çırak",
+    "Sorceress": "Büyücü Kadın",
+    "Archon": "Archon",
+    "Elven Scout": "Elf İzci",
+    "Dryad": "Dryad",
+    "Centaur Archer": "Sentor Okçu",
+    "Caravan Guard": "Kervan Muhafızı",
+    "Traveling Merchant": "Gezgin Tüccar",
+    "Mana Battery": "Mana Bataryası",
+    "Ether Cannon": "Ether Topu",
+    "Ancient Treant": "Kadim Treant",
+    "Nature Wrath": "Doğanın Gazabı",
+    "Old Catapult": "Eski Mancınık",
+    "Supply Wagon": "İkmal Arabası",
     "descriptions": {
       "swordsman": "Temel yakın dövüş birimi",
       "knight": "Zırhlı yakın dövüş birimi",
@@ -545,7 +574,29 @@
       "supply_balloon": "Yukarıdan destek",
       "energy_pylon": "Kararlı güç kaynağı",
       "vine_catapult": "Dolanmış dikenler fırlatır",
-      "junk_launcher": "Elinde ne varsa onu fırlatır"
+      "junk_launcher": "Elinde ne varsa onu fırlatır",
+      "arcane_golem": "Arşivlerin mekanik muhafızı",
+      "spellblade": "Dokunmuş çelik ve büyü",
+      "mirror_image": "Gerçekliğin ele avuca sığmaz bir kopyası",
+      "dire_wolf": "Muazzam büyüklükte bir yırtıcı",
+      "forest_guardian": "Kutsal koruların koruyucusu",
+      "shapeshifter": "Öldürdüğü şeyin formunu alır",
+      "sellsword": "Kiralık kılıç, soru sorulmaz",
+      "bounty_hunter": "En güçlü olanı bulur ve alt eder",
+      "apprentice": "Büyünün ilk adımlarını öğreniyor",
+      "sorceress": "Mistik sanatların ustası",
+      "archon": "Saf ışıktan yükselmiş varlık",
+      "elven_scout": "Çalıların arasından görünmeden ilerler",
+      "dryad": "Dryad",
+      "centaur_archer": "Sentor Okçu",
+      "caravan_guard": "Ticaret yollarını korur",
+      "traveling_merchant": "Nadir eşya tedarikçisi",
+      "mana_battery": "Fazla büyülü enerjiyi depolar",
+      "ether_cannon": "Yoğunlaştırılmış büyü fırlatır",
+      "ancient_treant": "Kadim bilgelikle yaşayan odun",
+      "nature_wrath": "Orman karşı saldırıya geçiyor",
+      "old_catapult": "Kadim kuşatma silahı, hala güvenilir",
+      "supply_wagon": "Ön hatları besli tutar"
     },
     "flavor": {
       "swordsman": "Çelik, tanıdığı tek gerçektir.",
@@ -655,6 +706,146 @@
     "ability_nature_growth": {
       "name": "Vahşi Büyüme",
       "desc": "Rastgele bir dost birimi +2 güçlendirir"
+    }
+  },
+  "talent_tree": {
+    "title": "Kahraman Yükselişi",
+    "subtitle": "Gerçek gücü uyandır",
+    "ascended": "YÜKSELDİ",
+    "ascend_cost": "Yüksel ({{cost}} PT)"
+  },
+  "talents": {
+    "hero_commander": {
+      "t_cmd_1": {
+        "name": "Öncü Ruhu",
+        "desc": "+1 Kahraman Sağlığı"
+      },
+      "t_cmd_2": {
+        "name": "İlham",
+        "desc": "+2 Mana ile başla"
+      },
+      "t_cmd_3": {
+        "name": "Düzen Ustalığı",
+        "desc": "Düzen birimleri +1 Saldırı kazanır"
+      },
+      "t_cmd_4": {
+        "name": "Çelik Kararlılık",
+        "desc": "+2 Kahraman Sağlığı"
+      },
+      "t_cmd_5": {
+        "name": "Taktiksel Avantaj",
+        "desc": "+1 Başlangıç El Boyutu"
+      }
+    },
+    "hero_darklord": {
+      "t_dark_1": {
+        "name": "Hiçlik Erişimi",
+        "desc": "Kahraman Gücü bekleme süresi -1"
+      },
+      "t_dark_2": {
+        "name": "Karanlık Ritüel",
+        "desc": "+3 Mana ile başla"
+      },
+      "t_dark_3": {
+        "name": "Ruh Hasadı",
+        "desc": "Gölge birimleri +1 Saldırı kazanır"
+      },
+      "t_dark_4": {
+        "name": "Ebedi Gece",
+        "desc": "Kahraman Gücü bekleme süresi -1"
+      },
+      "t_dark_5": {
+        "name": "Dipsiz Bilgelik",
+        "desc": "+2 Başlangıç Manası"
+      }
+    },
+    "hero_archmage": {
+      "t_mage_1": {
+        "name": "Gizemli Odak",
+        "desc": "+3 Mana ile başla"
+      },
+      "t_mage_2": {
+        "name": "Mana Taşkını",
+        "desc": "+1 Başlangıç El Boyutu"
+      },
+      "t_mage_3": {
+        "name": "Büyü Dokuma",
+        "desc": "Gizemli birimler +1 Saldırı kazanır"
+      },
+      "t_mage_4": {
+        "name": "Astral Kanalizasyon",
+        "desc": "+2 Başlangıç Manası"
+      },
+      "t_mage_5": {
+        "name": "Ley Hattı Ustası",
+        "desc": "Kahraman Gücü bekleme süresi -1"
+      }
+    },
+    "hero_ranger": {
+      "t_rng_1": {
+        "name": "Kararlı Nişan",
+        "desc": "Doğa birimleri +1 Saldırı kazanır"
+      },
+      "t_rng_2": {
+        "name": "Kartal Gözü",
+        "desc": "Kahraman Gücü bekleme süresi -1"
+      },
+      "t_rng_3": {
+        "name": "Vahşi Direnç",
+        "desc": "+2 Kahraman Sağlığı"
+      },
+      "t_rng_4": {
+        "name": "Orman Gözcüsü",
+        "desc": "+1 Başlangıç El Boyutu"
+      },
+      "t_rng_5": {
+        "name": "Hızlı Refleksler",
+        "desc": "Kahraman Gücü bekleme süresi -1"
+      }
+    },
+    "hero_paladin": {
+      "t_pal_1": {
+        "name": "Kutsal Adanmışlık",
+        "desc": "+2 Kahraman Sağlığı"
+      },
+      "t_pal_2": {
+        "name": "Adil Öfke",
+        "desc": "Düzen birimleri +1 Saldırı kazanır"
+      },
+      "t_pal_3": {
+        "name": "İlahi Lütuf",
+        "desc": "+1 Kahraman Sağlığı"
+      },
+      "t_pal_4": {
+        "name": "Koruyucu Ruh",
+        "desc": "Kahraman Gücü bekleme süresi -1"
+      },
+      "t_pal_5": {
+        "name": "Cesaret Aurası",
+        "desc": "Düzen birimleri +1 Saldırı kazanır"
+      }
+    },
+    "hero_druid": {
+      "t_dru_1": {
+        "name": "Yemyeşil Büyüme",
+        "desc": "Doğa birimleri +1 Saldırı kazanır"
+      },
+      "t_dru_2": {
+        "name": "Doğanın Cömertliği",
+        "desc": "+2 Mana ile başla"
+      },
+      "t_dru_3": {
+        "name": "Ruh Bağı",
+        "desc": "+1 Başlangıç El Boyutu"
+      },
+      "t_dru_4": {
+        "name": "Toprak Kalkanı",
+        "desc": "+2 Kahraman Sağlığı"
+      },
+      "t_dru_5": {
+        "name": "Yaşam Döngüsü",
+        "desc": "Kahraman Gücü bekleme süresi -1"
+      }
     }
   },
   "events": {

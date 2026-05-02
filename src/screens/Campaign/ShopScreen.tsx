@@ -179,7 +179,7 @@ export const ShopScreen: React.FC = () => {
                                         color={colors.arcane.emerald} 
                                     />
                                 </View>
-                                <Text style={styles.itemName}>{item.name}</Text>
+                                <Text style={styles.itemName}>{t(item.name)}</Text>
                                 <View style={styles.priceTag}>
                                     <Text style={styles.priceText}>{item.purchased ? 'SOLD' : item.price}</Text>
                                     {!item.purchased && <Ionicons name="cash" size={12} color={colors.arcane.emerald} />}

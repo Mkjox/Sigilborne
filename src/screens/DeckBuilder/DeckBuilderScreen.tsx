@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     View,
     StyleSheet,
@@ -6,6 +6,8 @@ import {
     ScrollView,
     useWindowDimensions,
     FlatList,
+    Modal,
+    TouchableWithoutFeedback,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -19,13 +21,14 @@ import Animated, {
     useSharedValue,
     useAnimatedStyle,
     withRepeat,
-    withTiming,
-    Easing,
+    FadeOut,
+    ScaleInCenter,
+    ScaleOutCenter,
 } from 'react-native-reanimated';
-import { RootStackParamList, Card, CardType, Faction } from '../../types';
+import { RootStackParamList, Card, CardType } from '../../types';
 import { Text } from '../../components/ui';
 import { CardComponent } from '../../components/game';
-import { colors, spacing } from '../../theme';
+import { colors } from '../../theme';
 import { useTranslation } from 'react-i18next';
 import { useDeckStore } from '../../store/deckStore';
 import { getAllCards, AVAILABLE_HEROES } from '../../data/cardData';
@@ -53,7 +56,13 @@ const SigilIcon = ({ active, label, onPress, icon }: { active: boolean; label: s
             <View style={[styles.sigilHex, active && styles.sigilHexActive]}>
                 <Text style={[styles.sigilIconText, active && styles.sigilTextActive]}>{icon}</Text>
             </View>
-            <Text style={[styles.sigilLabel, active && styles.sigilTextActive]}>{label}</Text>
+            <Text 
+                style={[styles.sigilLabel, active && styles.sigilTextActive]} 
+                numberOfLines={1} 
+                adjustsFontSizeToFit
+            >
+                {label}
+            </Text>
         </Pressable>
     );
 };
@@ -84,6 +93,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 
     const [filter, setFilter] = useState<'all' | CardType | 'hero'>('hero');
     const [libWidth, setLibWidth] = useState(0);
+    const [selectedDetailCard, setSelectedDetailCard] = useState<Card | null>(null);
 
     const activeDeck = useMemo(() => decks.find(d => d.id === activeDeckId), [decks, activeDeckId]);
     const filteredCards = useMemo(() => {
@@ -128,7 +138,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 
             <View style={[styles.layout, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
 
-                {/* 1. THE SIGILS (Left Pillar - 15%) */}
+                {/* 1. THE SIGILS (Left Pillar) */}
                 <View style={styles.sigilPillar}>
                     <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
                         <Text style={styles.backText}>‹</Text>
@@ -148,7 +158,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                 {/* Vertical Void Line */}
                 <View style={styles.voidLine} />
 
-                {/* 2. THE VAULT (Center Pillar - 60%) */}
+                {/* 2. THE VAULT (Center Pillar) */}
                 <View style={[styles.vaultPillar, { flex: 0.75 }]} onLayout={(e) => setLibWidth(e.nativeEvent.layout.width)}>
                     <View style={styles.pillarHeader}>
                         <Text style={styles.pillarTitle}>{t('deck_builder.vault_title')}</Text>
@@ -159,11 +169,11 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 
                     {filter === 'hero' ? (
                         <FlatList
-                            key="hero-list" // Helps React differentiate this list
+                            key="hero-list"
                             data={AVAILABLE_HEROES}
-                            numColumns={3} // Changed from 4 to 3 for larger hero cards
+                            numColumns={3}
                             keyExtractor={item => item.id}
-                            renderItem={({ item, index }) => {
+                            renderItem={({ item }) => {
                                 const isSelected = activeDeck?.heroId === item.id;
                                 return (
                                     <View style={styles.vaultCardWrapper}>
@@ -213,7 +223,13 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                             data={filteredCards}
                             numColumns={4}
                             keyExtractor={item => item.id}
-                            renderItem={({ item, index }) => {
+                            contentContainerStyle={styles.vaultList}
+                            showsVerticalScrollIndicator={false}
+                            windowSize={5}
+                            initialNumToRender={12}
+                            maxToRenderPerBatch={10}
+                            removeClippedSubviews={true}
+                            renderItem={({ item }) => {
                                 const count = cardCountInDeck(item.id);
                                 const isMaxCopies = count >= 2;
                                 const isFactionValid = !item.faction || item.faction === 'neutral' || !activeHero || item.faction === activeHero.faction;
@@ -226,6 +242,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             width={cardW}
                                             height={cardH}
                                             onPress={isLinkable ? () => addCardToDeck(activeDeckId!, item) : undefined}
+                                            onInfoPress={() => setSelectedDetailCard(item)}
                                             isPlayable={isLinkable}
                                         />
                                         {count > 0 && (
@@ -236,94 +253,140 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                     </View>
                                 );
                             }}
-                            contentContainerStyle={styles.vaultList}
-                            showsVerticalScrollIndicator={false}
                         />
                     )}
                 </View>
 
-                {/* Vertical Void Line */}
-                <View style={styles.voidLine} />
-
-                {/* 3. THE CONSTRUCT (Right Pillar - 30%) */}
+                {/* 3. THE CONSTRUCT (Right Pillar) */}
                 <View style={styles.essencePillar}>
                     <View style={styles.pillarHeader}>
                         <View style={styles.deckSwitchRow}>
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.pillarTitle}>{t('deck_builder.construct_title')}</Text>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                                    <Text style={[styles.pillarCount, isDeckFull && { color: colors.error }]}>
-                                        {activeDeck ? t('deck_builder.deck_count', { count: activeDeck.cards.length }) : t('deck_builder.unlinked')}
-                                    </Text>
-                                    {activeDeck && (
-                                        <Pressable
-                                            onPress={() => deleteDeck(activeDeck.id)}
-                                            hitSlop={8}
-                                        >
-                                            <Text style={styles.deleteDeckText}>✕</Text>
-                                        </Pressable>
-                                    )}
-                                </View>
-                            </View>
+                            <Text style={styles.pillarTitle}>{activeDeck ? activeDeck.name.toUpperCase() : t('deck_builder.active_hero').toUpperCase()}</Text>
+                            <View style={styles.spacer} />
                             <Pressable onPress={handleCreateDeck} style={styles.actionIcon}>
                                 <Text style={styles.actionIconText}>+</Text>
                             </Pressable>
                         </View>
+                        <Text style={styles.pillarCount}>
+                            {activeDeck ? t('deck_builder.deck_count', { count: activeDeck.cards.length }) : t('deck_builder.unlinked').toUpperCase()}
+                        </Text>
                     </View>
 
-                    {/* Deck Selector Strip (if multiple decks exist) */}
-                    {decks.length > 1 && (
-                        <View style={styles.deckSelectorContainer}>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.deckSelectorList}>
-                                {decks.map(d => (
-                                    <Pressable
-                                        key={d.id}
-                                        onPress={() => setActiveDeck(d.id)}
-                                        style={[styles.deckTab, d.id === activeDeckId && styles.deckTabActive]}
-                                    >
-                                        <Text style={[styles.deckTabText, d.id === activeDeckId && styles.deckTabTextActive]}>
-                                            {d.name.split(' ')[1] || '•'}
-                                        </Text>
-                                    </Pressable>
-                                ))}
-                            </ScrollView>
-                        </View>
-                    )}
+                    <View style={styles.deckSelectorContainer}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.deckSelectorList}>
+                            {decks.map((deck) => (
+                                <Pressable
+                                    key={deck.id}
+                                    onPress={() => setActiveDeck(deck.id)}
+                                    style={[styles.deckTab, activeDeckId === deck.id && styles.deckTabActive]}
+                                >
+                                    <Text style={[styles.deckTabText, activeDeckId === deck.id && styles.deckTabTextActive]}>
+                                        {deck.name.substring(deck.name.length - 1)}
+                                    </Text>
+                                </Pressable>
+                            ))}
+                        </ScrollView>
+                    </View>
 
-                    {!activeDeck ? (
+                    {activeDeck ? (
+                        <>
+                            <View style={styles.deckHeroStrip}>
+                                <View style={styles.deckHeroStripInner}>
+                                    <Text style={styles.deckHeroStripLabel}>{t('deck_builder.active_hero').toUpperCase()}</Text>
+                                    <Text style={styles.deckHeroStripName}>{activeHero ? t(`cards.${activeHero.name}`).toUpperCase() : '???'}</Text>
+                                    {activeHero && (
+                                        <>
+                                            <Text style={styles.deckHeroStripAbility}>{t(`abilities.${activeHero.ability.id}.name`)}</Text>
+                                            <Text style={styles.deckHeroStripDesc}>{t(`abilities.${activeHero.ability.id}.desc`)}</Text>
+                                        </>
+                                    )}
+                                </View>
+                            </View>
+
+                            <FlatList
+                                data={activeDeck.cards}
+                                keyExtractor={(item, index) => `${item.id}-${index}`}
+                                renderItem={({ item, index }) => (
+                                    <DeckCardRow
+                                        card={item}
+                                        index={index}
+                                        onRemove={() => removeCardFromDeck(activeDeck.id, index)}
+                                    />
+                                )}
+                                contentContainerStyle={styles.essenceList}
+                                showsVerticalScrollIndicator={false}
+                            />
+                            
+                            <Pressable 
+                                style={{ marginTop: 10, alignSelf: 'center' }} 
+                                onPress={() => deleteDeck(activeDeck.id)}
+                            >
+                                <Text style={styles.deleteDeckText}>- {t('common.exit').toUpperCase()}</Text>
+                            </Pressable>
+                        </>
+                    ) : (
                         <View style={styles.emptyEssence}>
-                            <Text style={styles.emptyText}>{t('deck_builder.unlinked')}</Text>
-                            <Pressable onPress={handleCreateDeck} style={styles.forgeBtn}>
-                                <Text style={styles.forgeBtnText}>{t('deck_builder.forge_link')}</Text>
+                            <Text style={styles.emptyText}>{t('deck_builder.unlinked').toUpperCase()}</Text>
+                            <Pressable style={styles.forgeBtn} onPress={handleCreateDeck}>
+                                <Text style={styles.forgeBtnText}>{t('deck_builder.forge_link').toUpperCase()}</Text>
                             </Pressable>
                         </View>
-                    ) : (
-                        <FlatList
-                            data={activeDeck.cards}
-                            keyExtractor={(item, i) => `${item.id}-${i}`}
-                            renderItem={({ item, index }) => (
-                                <DeckCardRow
-                                    card={item}
-                                    index={index}
-                                    onRemove={() => removeCardFromDeck(activeDeckId!, item.id)}
-                                />
-                            )}
-                            ListHeaderComponent={
-                                <View style={styles.deckHeroStrip}>
-                                    <View style={styles.deckHeroStripInner}>
-                                        <Text style={styles.deckHeroStripLabel}>{t('deck_builder.active_hero')}</Text>
-                                        <Text style={styles.deckHeroStripName}>{t(`cards.${activeHero?.name}`).toUpperCase()}</Text>
-                                        <Text style={styles.deckHeroStripAbility}>⚡ {t(`abilities.${activeHero?.ability.id}.name`)}</Text>
-                                        <Text style={styles.deckHeroStripDesc}>{t(`abilities.${activeHero?.ability.id}.desc`)}</Text>
-                                    </View>
-                                </View>
-                            }
-                            contentContainerStyle={styles.essenceList}
-                            showsVerticalScrollIndicator={false}
-                        />
                     )}
                 </View>
             </View>
+
+            {/* Card Detail Modal */}
+            <Modal
+                visible={!!selectedDetailCard}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setSelectedDetailCard(null)}
+            >
+                <TouchableWithoutFeedback onPress={() => setSelectedDetailCard(null)}>
+                    <View style={styles.modalOverlay}>
+                        <TouchableWithoutFeedback>
+                            <Animated.View 
+                                entering={ScaleInCenter} 
+                                exiting={ScaleOutCenter}
+                                style={styles.detailModal}
+                            >
+                                {selectedDetailCard && (
+                                    <>
+                                        <View style={styles.detailHeader}>
+                                            <Text style={styles.detailName}>{t(`cards.${selectedDetailCard.name}`).toUpperCase()}</Text>
+                                            <Text style={styles.detailType}>{t(`common.rarities.${selectedDetailCard.rarity}`).toUpperCase()} • {selectedDetailCard.type.toUpperCase()}</Text>
+                                        </View>
+                                        
+                                        <View style={styles.detailContent}>
+                                            <Text style={styles.detailDesc}>{t(selectedDetailCard.description)}</Text>
+                                            {selectedDetailCard.flavorText && (
+                                                <Text style={styles.detailFlavor}>"{t(selectedDetailCard.flavorText)}"</Text>
+                                            )}
+                                        </View>
+
+                                        <View style={styles.detailStats}>
+                                            <View style={styles.detailStatItem}>
+                                                <Text style={styles.detailStatValue}>{selectedDetailCard.manaCost}</Text>
+                                                <Text style={styles.detailStatLabel}>MANA</Text>
+                                            </View>
+                                            {selectedDetailCard.power > 0 && (
+                                                <View style={styles.detailStatItem}>
+                                                    <Text style={styles.detailStatValue}>{selectedDetailCard.power}</Text>
+                                                    <Text style={styles.detailStatLabel}>POWER</Text>
+                                                </View>
+                                            )}
+                                        </View>
+
+                                        <Pressable style={styles.closeModalBtn} onPress={() => setSelectedDetailCard(null)}>
+                                            <Text style={styles.closeModalText}>{t('common.back').toUpperCase()}</Text>
+                                        </Pressable>
+                                    </>
+                                )}
+                            </Animated.View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
         </View>
     );
 };
@@ -339,12 +402,8 @@ const styles = StyleSheet.create({
     },
     voidLine: {
         width: 1,
-        backgroundColor: 'rgba(16,185,129,0.15)',
+        backgroundColor: 'rgba(16,185,129,0.1)',
         marginVertical: 20,
-        shadowColor: colors.arcane.emerald,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
     },
 
     // --- Sigil Pillar ---
@@ -401,14 +460,16 @@ const styles = StyleSheet.create({
         fontSize: 8,
         color: 'rgba(16,185,129,0.5)',
         marginTop: 10,
-        letterSpacing: 2,
+        letterSpacing: 1,
         fontWeight: '900',
+        textAlign: 'center',
+        width: '100%',
+        paddingHorizontal: 4,
     },
     spacer: { flex: 1 },
 
     // --- Vault Pillar ---
-    vaultPillar: {
-    },
+    vaultPillar: {},
     pillarHeader: {
         height: 60,
         justifyContent: 'center',
@@ -586,7 +647,7 @@ const styles = StyleSheet.create({
     // --- Hero Select Styles ---
     heroCardPreview: {
         width: 140,
-        height: 220, // Increased height to fit description
+        height: 220,
         borderRadius: 4,
         overflow: 'hidden',
         borderWidth: 2,
@@ -615,7 +676,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        height: '70%', // Boosted gradient slightly
+        height: '70%',
     },
     heroClassName: {
         position: 'absolute',
@@ -644,7 +705,7 @@ const styles = StyleSheet.create({
     },
     heroNameTitle: {
         position: 'absolute',
-        bottom: 65, // Adjusted position to clear the taller ability strip
+        bottom: 65,
         left: 10,
         right: 10,
         fontSize: 14,
@@ -726,5 +787,97 @@ const styles = StyleSheet.create({
         fontSize: 8,
         color: 'rgba(255,255,255,0.6)',
         lineHeight: 11,
+    },
+
+    // --- Modal Styles ---
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.85)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    detailModal: {
+        width: '90%',
+        maxWidth: 400,
+        backgroundColor: colors.arcane.obsidian,
+        borderWidth: 1,
+        borderColor: colors.arcane.emerald,
+        padding: 24,
+        borderRadius: 4,
+        shadowColor: colors.arcane.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 20,
+    },
+    detailHeader: {
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(16,185,129,0.2)',
+        paddingBottom: 15,
+        marginBottom: 20,
+    },
+    detailName: {
+        fontSize: 24,
+        color: colors.arcane.white,
+        fontFamily: 'serif',
+        fontWeight: '900',
+        letterSpacing: 2,
+    },
+    detailType: {
+        fontSize: 10,
+        color: colors.arcane.emerald,
+        fontWeight: '700',
+        letterSpacing: 1,
+        marginTop: 4,
+    },
+    detailContent: {
+        marginBottom: 25,
+    },
+    detailDesc: {
+        fontSize: 14,
+        color: colors.arcane.white,
+        lineHeight: 22,
+        marginBottom: 15,
+    },
+    detailFlavor: {
+        fontSize: 12,
+        color: 'rgba(255,255,255,0.5)',
+        fontStyle: 'italic',
+        lineHeight: 18,
+    },
+    detailStats: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 40,
+        marginBottom: 30,
+    },
+    detailStatItem: {
+        alignItems: 'center',
+    },
+    detailStatValue: {
+        fontSize: 28,
+        color: colors.arcane.white,
+        fontWeight: '900',
+        fontFamily: 'serif',
+    },
+    detailStatLabel: {
+        fontSize: 9,
+        color: colors.arcane.cyan,
+        fontWeight: '900',
+        letterSpacing: 2,
+        marginTop: 4,
+    },
+    closeModalBtn: {
+        paddingVertical: 12,
+        borderWidth: 1,
+        borderColor: 'rgba(16,185,129,0.3)',
+        alignItems: 'center',
+        backgroundColor: 'rgba(16,185,129,0.05)',
+    },
+    closeModalText: {
+        color: colors.arcane.emerald,
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 3,
     },
 });

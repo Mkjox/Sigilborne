@@ -108,7 +108,7 @@ export const RelicTray: React.FC = () => {
                                                 styles.rarityText,
                                                 { color: selectedRelic.rarity === 'boss' ? '#fbbf24' : (selectedRelic.rarity === 'rare' ? colors.arcane.cyan : colors.arcane.emerald) }
                                             ]}>
-                                                {selectedRelic.rarity.toUpperCase()}
+                                                {t(`common.rarities.${selectedRelic.rarity}`).toUpperCase()}
                                             </Text>
                                         </View>
                                     </View>

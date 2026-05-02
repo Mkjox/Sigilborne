@@ -113,6 +113,13 @@
     "deck": "DECK",
     "turn": "TURN",
     "passed": "PASSED",
+    "rarities": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary",
+      "boss": "Boss"
+    },
     "used": "USED",
     "leader": "LEADER",
     "victory": "VICTORY",
@@ -395,6 +402,28 @@
     "Energy Pylon": "Energy Pylon",
     "Vine Catapult": "Vine Catapult",
     "Junk Launcher": "Junk Launcher",
+    "Arcane Golem": "Arcane Golem",
+    "Spellblade": "Spellblade",
+    "Mirror Image": "Mirror Image",
+    "Dire Wolf": "Dire Wolf",
+    "Forest Guardian": "Forest Guardian",
+    "Shapeshifter": "Shapeshifter",
+    "Sellsword": "Sellsword",
+    "Bounty Hunter": "Bounty Hunter",
+    "Apprentice": "Apprentice",
+    "Sorceress": "Sorceress",
+    "Archon": "Archon",
+    "Elven Scout": "Elven Scout",
+    "Dryad": "Dryad",
+    "Centaur Archer": "Centaur Archer",
+    "Caravan Guard": "Caravan Guard",
+    "Traveling Merchant": "Traveling Merchant",
+    "Mana Battery": "Mana Battery",
+    "Ether Cannon": "Ether Cannon",
+    "Ancient Treant": "Ancient Treant",
+    "Nature Wrath": "Nature Wrath",
+    "Old Catapult": "Old Catapult",
+    "Supply Wagon": "Supply Wagon",
     "descriptions": {
       "swordsman": "Basic melee unit",
       "knight": "Armored melee unit",
@@ -475,7 +504,29 @@
       "supply_balloon": "Support from above",
       "energy_pylon": "Stable source of power",
       "vine_catapult": "Flings tangled thorns",
-      "junk_launcher": "Shoots whatever is available"
+      "junk_launcher": "Shoots whatever is available",
+      "arcane_golem": "Mechanical guardian of the archives",
+      "spellblade": "Woven steel and magic",
+      "mirror_image": "An elusive copy of reality",
+      "dire_wolf": "A predator of immense size",
+      "forest_guardian": "Protector of the sacred groves",
+      "shapeshifter": "Takes the form of what it kills",
+      "sellsword": "Sword for hire, no questions asked",
+      "bounty_hunter": "Finds the strongest and takes them down",
+      "apprentice": "Learning the first steps of the arcane",
+      "sorceress": "Master of the mystic arts",
+      "archon": "Ascended being of pure light",
+      "elven_scout": "Moves unseen through the brush",
+      "dryad": "Spirit of the ancient trees",
+      "centaur_archer": "Speed and precision combined",
+      "caravan_guard": "Protects the trade routes",
+      "traveling_merchant": "Supplier of rare goods",
+      "mana_battery": "Stores excess magical energy",
+      "ether_cannon": "Fires concentrated magic",
+      "ancient_treant": "Living wood with ancient wisdom",
+      "nature_wrath": "The forest strikes back",
+      "old_catapult": "Ancient siege weapon, still reliable",
+      "supply_wagon": "Keeps the front lines fed"
     },
     "flavor": {
       "swordsman": "Steel is the only truth he knows.",
@@ -566,6 +617,14 @@
       "t_cmd_3": {
         "name": "Order Mastery",
         "desc": "Order units get +1 Attack"
+      },
+      "t_cmd_4": {
+        "name": "Steel Resolve",
+        "desc": "+2 Hero Health"
+      },
+      "t_cmd_5": {
+        "name": "Tactical Advantage",
+        "desc": "+1 Starting Hand Size"
       }
     },
     "hero_darklord": {
@@ -576,6 +635,18 @@
       "t_dark_2": {
         "name": "Dark Ritual",
         "desc": "Start with +3 Mana"
+      },
+      "t_dark_3": {
+        "name": "Soul Harvest",
+        "desc": "Shadow units get +1 Attack"
+      },
+      "t_dark_4": {
+        "name": "Eternal Night",
+        "desc": "Hero Power cooldown -1"
+      },
+      "t_dark_5": {
+        "name": "Abyssal Wisdom",
+        "desc": "+2 Starting Mana"
       }
     },
     "hero_archmage": {
@@ -585,7 +656,19 @@
       },
       "t_mage_2": {
         "name": "Mana Overflow",
-        "desc": "Card draw +1 at start of game"
+        "desc": "+1 Starting Hand Size"
+      },
+      "t_mage_3": {
+        "name": "Spellweaving",
+        "desc": "Arcane units get +1 Attack"
+      },
+      "t_mage_4": {
+        "name": "Astral Channeling",
+        "desc": "+2 Starting Mana"
+      },
+      "t_mage_5": {
+        "name": "Ley Line Master",
+        "desc": "Hero Power cooldown -1"
       }
     },
     "hero_ranger": {
@@ -596,6 +679,18 @@
       "t_rng_2": {
         "name": "Eagle Eye",
         "desc": "Hero Power cooldown -1"
+      },
+      "t_rng_3": {
+        "name": "Wild Resilience",
+        "desc": "+2 Hero Health"
+      },
+      "t_rng_4": {
+        "name": "Forest Scout",
+        "desc": "+1 Starting Hand Size"
+      },
+      "t_rng_5": {
+        "name": "Swift Reflexes",
+        "desc": "Hero Power cooldown -1"
       }
     },
     "hero_paladin": {
@@ -604,18 +699,42 @@
         "desc": "+2 Hero Health"
       },
       "t_pal_2": {
-        "name": "Aura of Guarding",
+        "name": "Righteous Fury",
+        "desc": "Order units get +1 Attack"
+      },
+      "t_pal_3": {
+        "name": "Divine Grace",
+        "desc": "+1 Hero Health"
+      },
+      "t_pal_4": {
+        "name": "Guardian Spirit",
+        "desc": "Hero Power cooldown -1"
+      },
+      "t_pal_5": {
+        "name": "Aura of Courage",
         "desc": "Order units get +1 Attack"
       }
     },
     "hero_druid": {
       "t_dru_1": {
-        "name": "Forest bond",
+        "name": "Verdant Growth",
         "desc": "Nature units get +1 Attack"
       },
       "t_dru_2": {
-        "name": "Ancient Growth",
+        "name": "Nature's Bounty",
         "desc": "Start with +2 Mana"
+      },
+      "t_dru_3": {
+        "name": "Spirit Link",
+        "desc": "+1 Starting Hand Size"
+      },
+      "t_dru_4": {
+        "name": "Earth Shield",
+        "desc": "+2 Hero Health"
+      },
+      "t_dru_5": {
+        "name": "Cycle of Life",
+        "desc": "Hero Power cooldown -1"
       }
     }
   },

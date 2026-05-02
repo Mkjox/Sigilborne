@@ -21,7 +21,7 @@ export interface Hero {
 // ─── Talent System ───────────────────────────────────────────────
 
 export type TalentEffect = 
-    | { type: 'stat_boost'; target: 'hero_health' | 'starting_mana' | 'hero_power_cooldown'; value: number }
+    | { type: 'stat_boost'; target: 'hero_health' | 'starting_mana' | 'hero_power_cooldown' | 'starting_hand_size'; value: number }
     | { type: 'passive_ability'; abilityId: string }
     | { type: 'faction_bonus'; faction: Faction; attackBoost: number };
 
