@@ -447,6 +447,24 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                     </BlurView>
                 </Animated.View>
             </Modal>
+
+            {/* Lore Chronicles Button */}
+            <Animated.View 
+                entering={FadeIn.delay(1000)}
+                style={[styles.loreButtonContainer, { bottom: insets.bottom + 20 }]}
+            >
+                <TouchableOpacity 
+                    style={styles.loreButton}
+                    onPress={() => navigation.navigate('Lore')}
+                    activeOpacity={0.8}
+                >
+                    <ExpoLinearGradient 
+                        colors={['rgba(16, 185, 129, 0.2)', 'rgba(0, 0, 0, 0.4)']}
+                        style={StyleSheet.absoluteFill}
+                    />
+                    <MaterialCommunityIcons name="book-open-variant" size={26} color={colors.arcane.emerald} />
+                </TouchableOpacity>
+            </Animated.View>
         </View>
     );
 };
@@ -963,5 +981,26 @@ const styles = StyleSheet.create({
         fontSize: 16,
         letterSpacing: 4,
     },
-},
-);
+    // --- Lore Button ---
+    loreButtonContainer: {
+        position: 'absolute',
+        right: 20,
+        zIndex: 100,
+    },
+    loreButton: {
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        borderWidth: 1,
+        borderColor: colors.arcane.emerald,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+        shadowColor: colors.arcane.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 10,
+        elevation: 10,
+    },
+});

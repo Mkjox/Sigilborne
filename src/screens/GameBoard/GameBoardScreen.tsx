@@ -561,22 +561,24 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     </Text>
                                 )}
                                 
-                                {winner === 'player' && (
-                                    <Pressable 
-                                        onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} 
-                                        style={[styles.overlayBtn, { backgroundColor: colors.arcane.emerald, marginBottom: 12 }]}
-                                    >
-                                        <Text variant="button" color={colors.arcane.obsidian} style={{ letterSpacing: 4, fontWeight: '900' }}>{t('common.continue_expedition')}</Text>
+                                <View style={styles.overlayBtnGroup}>
+                                    {winner === 'player' && (
+                                        <Pressable 
+                                            onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} 
+                                            style={[styles.overlayBtn, { backgroundColor: colors.arcane.emerald }]}
+                                        >
+                                            <Text variant="button" color={colors.arcane.obsidian} style={{ letterSpacing: 4, fontWeight: '900' }}>{t('common.continue_expedition')}</Text>
+                                        </Pressable>
+                                    )}
+
+                                    <Pressable onPress={() => startGame(difficulty)} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: winner === 'player' ? 'rgba(255,255,255,0.2)' : colors.arcane.emerald }]}>
+                                        <Text variant="button" color={winner === 'player' ? colors.arcane.white : colors.arcane.emerald} style={{ letterSpacing: 4 }}>{winner === 'player' ? t('common.replay') : t('common.reawaken')}</Text>
                                     </Pressable>
-                                )}
 
-                                <Pressable onPress={() => startGame(difficulty)} style={[styles.overlayBtn, winner === 'player' && { backgroundColor: 'transparent', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' }]}>
-                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>{winner === 'player' ? t('common.replay') : t('common.reawaken')}</Text>
-                                </Pressable>
-
-                                <Pressable onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald, marginTop: 16 }]}>
-                                    <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>{t('common.abandon')}</Text>
-                                </Pressable>
+                                    <Pressable onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald }]}>
+                                        <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>{t('common.abandon')}</Text>
+                                    </Pressable>
+                                </View>
                             </View>
                         </View>
                     )}
@@ -887,7 +889,9 @@ const styles = StyleSheet.create({
     },
     overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center', zIndex: 200 },
     overlayCard: {
-        padding: 48,
+        width: 300,
+        paddingVertical: 40,
+        paddingHorizontal: 32,
         backgroundColor: colors.arcane.obsidian,
         borderRadius: 2,
         alignItems: 'center',
@@ -897,13 +901,19 @@ const styles = StyleSheet.create({
         shadowRadius: 30,
         shadowOpacity: 0.2,
     },
+    overlayBtnGroup: {
+        width: '100%',
+        gap: 12,
+        marginTop: 8,
+        alignSelf: 'stretch',
+    },
     overlayBtn: {
         backgroundColor: colors.arcane.emerald,
-        paddingHorizontal: 32,
-        paddingVertical: 12,
+        paddingVertical: 14,
         borderRadius: 4,
-        minWidth: 160,
+        alignSelf: 'stretch',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     roundEndScores: {
         flexDirection: 'row',

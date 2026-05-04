@@ -10,7 +10,7 @@ import { GameBoardScreen } from '../screens/GameBoard';
 import { DeckBuilderScreen } from '../screens/DeckBuilder';
 import { CollectionScreen } from '../screens/Collection';
 import { SettingsScreen } from '../screens/Settings';
-import { CampaignMapScreen, ShopScreen, TalentTreeScreen, EventScreen } from '../screens/Campaign';
+import { CampaignMapScreen, ShopScreen, TalentTreeScreen, EventScreen, LoreScreen } from '../screens/Campaign';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -103,6 +103,13 @@ export const RootNavigator: React.FC = () => {
                 <Stack.Screen
                     name="Event"
                     component={EventScreen}
+                    options={{
+                        animationEnabled: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="Lore"
+                    component={LoreScreen}
                     options={{
                         animationEnabled: true,
                     }}

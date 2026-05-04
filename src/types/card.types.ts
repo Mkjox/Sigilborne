@@ -20,6 +20,8 @@ export type TargetSelector =
     | { type: 'weakest_enemy' }
     | { type: 'random_enemy' }
     | { type: 'random_ally' }
+    | { type: 'strongest_enemies' } // All enemy units with max power
+    | { type: 'weakest_enemies' }   // All enemy units with min power
     | { type: 'all_units' }; // Both boards
 
 /**

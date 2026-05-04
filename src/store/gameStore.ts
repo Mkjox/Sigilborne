@@ -20,7 +20,7 @@ import {
 import { makeAIDecision, getAIDelay } from '../engine/aiEngine';
 import { useDeckStore } from './deckStore';
 import { useCampaignStore } from './campaignStore';
-import { createStarterDeck, AVAILABLE_HEROES, getTalentTreeForHero } from '../data/cardData';
+import { createStarterDeck, AVAILABLE_HEROES, getTalentTreeForHero, getAllCards } from '../data/cardData';
 import { getRelicById } from '../data/relicData';
 import { Card } from '../types';
 import i18n from '../i18n';
@@ -139,9 +139,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
         // Check for custom deck
         const activeDeck = useDeckStore.getState().getActiveDeck();
         // If deck has at least 10 cards, use it. Otherwise uses default starter deck logic in engine
+        // Build a lookup of canonical artwork by card name so we can re-attach
+        // artwork references that were lost when cards were persisted to JSON storage.
+        // require() returns non-serializable numbers that AsyncStorage drops on save.
+        const canonicalCards = getAllCards();
+        const artworkByName = new Map(canonicalCards.map(c => [c.name, c.artwork]));
+
         const playerDeck = activeDeck && activeDeck.cards.length >= 10
-            ? activeDeck.cards.map(c => ({ ...c, id: Math.random().toString(36).substring(2, 11) }))
+            ? activeDeck.cards.map(c => ({
+                ...c,
+                id: Math.random().toString(36).substring(2, 11),
+                artwork: artworkByName.get(c.name) ?? c.artwork, // re-hydrate lost artwork
+            }))
             : [];
+
 
         // Get selected hero
         const playerHero = activeDeck && activeDeck.heroId

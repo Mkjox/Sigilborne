@@ -209,7 +209,11 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                                 borderColor: colors.arcane.cyan
                                             }
                                         ]}>
-                                            <Text style={[styles.statText, { fontSize: badgeFontSize, color: colors.arcane.cyan }]} numberOfLines={1}>
+                                            <Text 
+                                                variant="caption"
+                                                style={[styles.statText, { fontSize: badgeFontSize, color: colors.arcane.cyan, lineHeight: badgeFontSize }]} 
+                                                numberOfLines={1}
+                                            >
                                                 {card.manaCost}
                                             </Text>
                                         </View>
@@ -227,7 +231,11 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                                     borderColor: colors.warning
                                                 }
                                             ]}>
-                                                <Text style={[styles.statText, { fontSize: badgeFontSize, color: colors.warning }]} numberOfLines={1}>
+                                                <Text 
+                                                    variant="caption"
+                                                    style={[styles.statText, { fontSize: badgeFontSize, color: colors.warning, lineHeight: badgeFontSize }]} 
+                                                    numberOfLines={1}
+                                                >
                                                     {card.attack}
                                                 </Text>
                                             </View>
@@ -248,15 +256,20 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                                         : 'rgba(255,255,255,0.2)'
                                                 }
                                             ]}>
-                                                <Text style={[
-                                                    styles.statText, 
-                                                    { 
-                                                        fontSize: badgeFontSize, 
-                                                        color: effectivePower !== undefined 
-                                                            ? (effectivePower < (card.power || 0) ? colors.error : (effectivePower > (card.power || 0) ? colors.arcane.emerald : colors.arcane.white))
-                                                            : colors.arcane.white
-                                                    }
-                                                ]} numberOfLines={1}>
+                                                <Text 
+                                                    variant="caption"
+                                                    style={[
+                                                        styles.statText, 
+                                                        { 
+                                                            fontSize: badgeFontSize, 
+                                                            lineHeight: badgeFontSize,
+                                                            color: effectivePower !== undefined 
+                                                                ? (effectivePower < (card.power || 0) ? colors.error : (effectivePower > (card.power || 0) ? colors.arcane.emerald : colors.arcane.white))
+                                                                : colors.arcane.white
+                                                        }
+                                                    ]} 
+                                                    numberOfLines={1}
+                                                >
                                                     {effectivePower ?? card.power}
                                                 </Text>
                                             </View>
@@ -305,14 +318,18 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                             backgroundColor: 'rgba(218, 165, 32, 0.2)', // Golden mist
                                         }
                                     ]}>
-                                        <Text style={[
-                                            styles.statText,
-                                            { 
-                                                fontSize: badgeFontSize * 0.8,
-                                                color: undefined, 
-                                                fontFamily: undefined 
-                                            }
-                                        ]}>👑</Text>
+                                        <Text 
+                                            variant="caption"
+                                            style={[
+                                                styles.statText,
+                                                { 
+                                                    fontSize: badgeFontSize * 0.8,
+                                                    lineHeight: badgeFontSize * 0.8,
+                                                    color: undefined, 
+                                                    fontFamily: undefined 
+                                                }
+                                            ]}
+                                        >👑</Text>
                                     </View>
                                 )}
 
@@ -413,6 +430,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         zIndex: 10,
+        elevation: 5,
+        overflow: 'hidden',
     },
     statText: {
         fontWeight: '900',

@@ -22,8 +22,8 @@ import Animated, {
     useAnimatedStyle,
     withRepeat,
     FadeOut,
-    ScaleInCenter,
-    ScaleOutCenter,
+    ZoomIn,
+    ZoomOut,
 } from 'react-native-reanimated';
 import { RootStackParamList, Card, CardType } from '../../types';
 import { Text } from '../../components/ui';
@@ -56,9 +56,9 @@ const SigilIcon = ({ active, label, onPress, icon }: { active: boolean; label: s
             <View style={[styles.sigilHex, active && styles.sigilHexActive]}>
                 <Text style={[styles.sigilIconText, active && styles.sigilTextActive]}>{icon}</Text>
             </View>
-            <Text 
-                style={[styles.sigilLabel, active && styles.sigilTextActive]} 
-                numberOfLines={1} 
+            <Text
+                style={[styles.sigilLabel, active && styles.sigilTextActive]}
+                numberOfLines={1}
                 adjustsFontSizeToFit
             >
                 {label}
@@ -189,10 +189,10 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 
                                             {item.faction && FactionSymbols[item.faction as ValidFaction] && (
                                                 <View style={[styles.heroFactionBadge, { borderColor: FactionSymbols[item.faction as ValidFaction].color }]}>
-                                                    <MaterialCommunityIcons 
-                                                        name={FactionSymbols[item.faction as ValidFaction].icon} 
-                                                        size={14} 
-                                                        color={FactionSymbols[item.faction as ValidFaction].color} 
+                                                    <MaterialCommunityIcons
+                                                        name={FactionSymbols[item.faction as ValidFaction].icon}
+                                                        size={14}
+                                                        color={FactionSymbols[item.faction as ValidFaction].color}
                                                     />
                                                 </View>
                                             )}
@@ -207,11 +207,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                                 </View>
                                             </View>
                                         </Pressable>
-                                        {isSelected && (
-                                            <View style={styles.countBadge}>
-                                                <Text style={styles.countBadgeText}>✓</Text>
-                                            </View>
-                                        )}
+                                        {/* Selection is indicated by the border and scale in heroCardPreviewSelected */}
                                     </View>
                                 );
                             }}
@@ -295,10 +291,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                     <Text style={styles.deckHeroStripLabel}>{t('deck_builder.active_hero').toUpperCase()}</Text>
                                     <Text style={styles.deckHeroStripName}>{activeHero ? t(`cards.${activeHero.name}`).toUpperCase() : '???'}</Text>
                                     {activeHero && (
-                                        <>
-                                            <Text style={styles.deckHeroStripAbility}>{t(`abilities.${activeHero.ability.id}.name`)}</Text>
-                                            <Text style={styles.deckHeroStripDesc}>{t(`abilities.${activeHero.ability.id}.desc`)}</Text>
-                                        </>
+                                        <View style={{ height: 4 }} />
                                     )}
                                 </View>
                             </View>
@@ -310,19 +303,14 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                     <DeckCardRow
                                         card={item}
                                         index={index}
-                                        onRemove={() => removeCardFromDeck(activeDeck.id, index)}
+                                        onRemove={() => removeCardFromDeck(activeDeck.id, item.id)}
                                     />
                                 )}
                                 contentContainerStyle={styles.essenceList}
                                 showsVerticalScrollIndicator={false}
                             />
-                            
-                            <Pressable 
-                                style={{ marginTop: 10, alignSelf: 'center' }} 
-                                onPress={() => deleteDeck(activeDeck.id)}
-                            >
-                                <Text style={styles.deleteDeckText}>- {t('common.exit').toUpperCase()}</Text>
-                            </Pressable>
+
+
                         </>
                     ) : (
                         <View style={styles.emptyEssence}>
@@ -345,9 +333,9 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                 <TouchableWithoutFeedback onPress={() => setSelectedDetailCard(null)}>
                     <View style={styles.modalOverlay}>
                         <TouchableWithoutFeedback>
-                            <Animated.View 
-                                entering={ScaleInCenter} 
-                                exiting={ScaleOutCenter}
+                            <Animated.View
+                                entering={ZoomIn}
+                                exiting={ZoomOut}
                                 style={styles.detailModal}
                             >
                                 {selectedDetailCard && (
@@ -356,7 +344,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             <Text style={styles.detailName}>{t(`cards.${selectedDetailCard.name}`).toUpperCase()}</Text>
                                             <Text style={styles.detailType}>{t(`common.rarities.${selectedDetailCard.rarity}`).toUpperCase()} • {selectedDetailCard.type.toUpperCase()}</Text>
                                         </View>
-                                        
+
                                         <View style={styles.detailContent}>
                                             <Text style={styles.detailDesc}>{t(selectedDetailCard.description)}</Text>
                                             {selectedDetailCard.flavorText && (
@@ -637,12 +625,7 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         letterSpacing: 2,
     },
-    deleteDeckText: {
-        fontSize: 10,
-        color: colors.error,
-        opacity: 0.5,
-        fontWeight: '900',
-    },
+
 
     // --- Hero Select Styles ---
     heroCardPreview: {
@@ -656,10 +639,12 @@ const styles = StyleSheet.create({
     },
     heroCardPreviewSelected: {
         borderColor: colors.arcane.emerald,
+        borderWidth: 2,
         shadowColor: colors.arcane.emerald,
         shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.8,
-        shadowRadius: 15,
+        shadowOpacity: 0.6,
+        shadowRadius: 12,
+        elevation: 8,
         transform: [{ scale: 1.05 }],
     },
     heroArtwork: {
@@ -776,18 +761,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
         marginBottom: 4,
     },
-    deckHeroStripAbility: {
-        fontSize: 9,
-        color: colors.arcane.emerald,
-        fontWeight: '700',
-        letterSpacing: 0.5,
-        marginBottom: 2,
-    },
-    deckHeroStripDesc: {
-        fontSize: 8,
-        color: 'rgba(255,255,255,0.6)',
-        lineHeight: 11,
-    },
+
 
     // --- Modal Styles ---
     modalOverlay: {

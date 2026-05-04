@@ -225,6 +225,75 @@
       "spell": "BÜYÜLER"
     }
   },
+  "biome": {
+    "verdant_echo": "Yeşil Yankı",
+    "azure_spire": "Gök Kulesi",
+    "twilight_rift": "Alacakaranlık Yarığı",
+    "crimson_wake": "Kızıl İz",
+    "obsidian_heart": "Obsidyen Kalp"
+  },
+  "lore": {
+    "title": "Vakayiname",
+    "locked": "Bilinmeyen Kayıt",
+    "locked_desc": "Bu kaydı açmak için {{biome}} bölgesine ulaş.",
+    "entries": {
+      "verdant_echo_1": {
+        "title": "İlk Tutulma",
+        "content": "Işıktan önceki çağda, Boşluk bir düşman değil, bir beşikti. Denge ancak ilk yıldız doğduğunda bozuldu ve gölgeler acıkmayı öğrendi."
+      },
+      "verdant_echo_2": {
+        "title": "Yeşil Pakt",
+        "content": "Yeşil Yankı, Boşluğun Çekilmesinin ardından ilk yaşamı barındıran topraktı. Kadim düzenler paktlarını burada kurdu ve kendilerini yosunların altında derinlere uzanan ley hatlarına bağladı."
+      },
+      "azure_spire_1": {
+        "title": "Mühürler Savaşı",
+        "content": "Yüzyıllar boyunca Düzen ve Gölge, Ley hatlarının kontrolü için savaştı. Arkane yıldızlardan izledi, Doğa ise sadece çapraz ateşten sağ kurtuldu."
+      },
+      "azure_spire_2": {
+        "title": "Kanal Ustaları'nın Kuleleri",
+        "content": "Gök Kuleleri, alemler arasındaki perdeyi delmek isteyen ilk Büyücü-Mimarlar tarafından inşa edildi. Başardılar; ancak yanıt veren, bekledikleri değildi."
+      },
+      "twilight_rift_1": {
+        "title": "Siyan Alevi",
+        "content": "Arkane ustaları, büyünün harcanacak bir kaynak değil, kozmosla yapılan bir konuşma olduğunu keşfettiler. Siyan Alevi onların ilk başarılı yanıtıydı."
+      },
+      "twilight_rift_2": {
+        "title": "Yarık Açıldı",
+        "content": "Alacakaranlık Yarığı'nda gerçeklik çözülür. Akademisyenler bunun bir silah mı, kaza mı yoksa davet mi olduğunu tartışır. Çok yaklaşanlar değişmiş olarak geri döner — eğer dönerlerse."
+      },
+      "crimson_wake_1": {
+        "title": "Kan Andı",
+        "content": "Gölge fraksiyonu Ley hatlarından kovulduğunda kaçmadı. Geri çekilirken her şeyi yaktı; lanetli bir tohum serperek nehirleri bir nesil boyunca kırmızıya boyattı."
+      },
+      "crimson_wake_2": {
+        "title": "Savaş Beyi'nin Tahtı",
+        "content": "Kızıl İz, tartışmalı bir güçle yönetilir. Obsidyen tahta oturan her savaş beyi tam olarak bir mevsim boyunca onu elinde tuttu. Tahtın kendisi aç gibi görünüyor."
+      },
+      "obsidian_heart_1": {
+        "title": "Boşluğun Kalbi",
+        "content": "Obsidyen Kalp bir yer değil, bir yaradır. Son büyük ley hattı içe çöktüğünde toprak parçalanmadı. Kristalleşerek büyünün son anını sonsuza dek korudu."
+      },
+      "obsidian_heart_2": {
+        "title": "Boşluk Bekçisi'nin Kökeni",
+        "content": "Boşluk Bekçisi olarak bilinen varlık bir zamanlar bilinen dünyanın sınırlarını haritalayan bir kartograftu. Bir kenar fazla haritalarken Boşluk onu geri dönmeden önce yakaladı."
+      }
+    }
+  },
+  "campaign": {
+    "select_difficulty": "ZORLUK SEÇİN",
+    "difficulty": {
+      "easy": "KOLAY",
+      "medium": "ORTA",
+      "hard": "ZOR"
+    },
+    "descriptions": {
+      "boss": "Kozmik bir dehşet yolu koruyor. Ruhunu çağların savaşına hazırla.",
+      "shop": "Altın ödeyebilecekler için nadir kartlar ve kalıntılar.",
+      "event": "Boşlukta öngörülemeyen enerjiler dönüyor. Şans cesurdan yanadır.",
+      "battle": "Düşman kuvvetleri bu bölgede toplanıyor. İlerlemek için yolu temizle."
+    },
+    "echo_victory_no_rewards": "Zafer Yankısı (Ödül Yok)"
+  },
   "hero_classes": {
     "Warrior": "Savaşçı",
     "Warlock": "Kara Büyücü",
@@ -290,27 +359,6 @@
     },
     "footer": "✧ HİÇLİKTE DÖVÜLDÜ ✧",
     "version": "GİZEMLİ PROTOKOL v0.1.0"
-  },
-  "biome": {
-    "verdant_echo": "Yeşil Yankı",
-    "azure_spire": "Mavi Kule",
-    "twilight_rift": "Alacakaranlık Yarığı",
-    "crimson_wake": "Kızıl İz",
-    "obsidian_heart": "Obsidyen Kalp"
-  },
-  "campaign": {
-    "select_difficulty": "ZORLUK SEÇ",
-    "difficulty": {
-      "easy": "KOLAY",
-      "medium": "ORTA",
-      "hard": "ZOR"
-    },
-    "descriptions": {
-      "boss": "Kozmik bir dehşet yolu kapatıyor. Ruhunu çağlar sürecek bir savaşa hazırla.",
-      "shop": "Altını olanlar için saçılmış kalıntılar ve nadir kartlar.",
-      "event": "Hiçlikte öngörülemeyen enerjiler dönüyor. Şans cesurdan yanadır.",
-      "battle": "Düşman kuvvetleri bu bölgede toplanıyor. İlerlemek için yolu temizle."
-    }
   },
   "talent_tree": {
     "title": "Kahraman Yükselişi",
@@ -539,7 +587,7 @@
       "scorch_spell": "En güçlü birimleri yok eder",
       "resurrection": "Mezarlıktan bir birimi canlandırır",
       "dark_pact": "Bir birimi canlandırmak için öz feda et",
-      "void_bolt": "En güçlü birimleri siler",
+      "void_bolt": "En güçlü düşman birimini siler",
       "life_drain": "Dostları güçlendirmek için güç çeker",
       "raise_dead": "Ölüler efendilerine itaat eder.",
       "frost": "Yakın dövüş birimlerini 1 güce sabitler",

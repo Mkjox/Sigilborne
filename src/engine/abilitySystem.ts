@@ -452,6 +452,28 @@ export const abilityEffects = {
         state.weather.ranged = false;
         state.weather.siege = false;
     },
+
+    // Failsafe for Void Bolt
+    destroy_enemy: (context: AbilityContext): void => {
+        const { state, player } = context;
+        const enemyPlayer = player === 'player' ? 'ai' : 'player';
+        const board = state[enemyPlayer].board;
+
+        if (board.length === 0) return;
+
+        const maxPower = Math.max(...board.map(c => c.power || 0));
+        const targets = board.filter(c => c.power === maxPower);
+
+        if (targets.length > 0) {
+            const target = targets[0];
+            const idx = board.findIndex(c => c.id === target.id);
+            if (idx !== -1) {
+                const [dead] = board.splice(idx, 1);
+                state[enemyPlayer].graveyard.push(dead);
+                context.eventBus?.emit('CARD_DESTROYED', { cardId: dead.id, player: enemyPlayer });
+            }
+        }
+    },
 };
 
 // ─── Effect Graph Resolution ────────────────────────────────────
@@ -498,6 +520,18 @@ const resolveTargets = (
             if (enemyBoard.length === 0) return [];
             const minPower = Math.min(...enemyBoard.map(c => c.power || 0));
             return enemyBoard.filter(c => c.power === minPower).slice(0, 1);
+        }
+
+        case 'strongest_enemies': {
+            if (enemyBoard.length === 0) return [];
+            const maxPower = Math.max(...enemyBoard.map(c => c.power || 0));
+            return enemyBoard.filter(c => c.power === maxPower);
+        }
+
+        case 'weakest_enemies': {
+            if (enemyBoard.length === 0) return [];
+            const minPower = Math.min(...enemyBoard.map(c => c.power || 0));
+            return enemyBoard.filter(c => c.power === minPower);
         }
 
         case 'random_enemy': {
@@ -651,7 +685,15 @@ export const executeAbility = (
     }
 
     // Legacy fallback
-    const effect = abilityEffects[ability.type as keyof typeof abilityEffects];
+    let typeToUse = ability.type;
+    
+    // NUCLEAR FIX: Force Void Bolt to use the safe enemy-only logic 
+    // even if the card data in the user's deck is old/cached.
+    if (context.card.name === 'Void Bolt' && typeToUse === 'destroy') {
+        typeToUse = 'destroy_enemy';
+    }
+
+    const effect = (abilityEffects as any)[typeToUse];
     if (effect) {
         effect(context);
     }

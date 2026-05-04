@@ -138,6 +138,7 @@
     "replay": "REPLAY",
     "reawaken": "REAWAKEN",
     "abandon": "ABANDON",
+    "selected": "Selected",
     "messages": {
       "game_started": "Game Started",
       "cannot_play": "Cannot play card",
@@ -225,6 +226,60 @@
       "unit": "UNITS",
       "spell": "SPELLS"
     }
+  },
+  "lore": {
+    "title": "Chronicles",
+    "locked": "Unknown Chronicle",
+    "locked_desc": "Reach {{biome}} to unlock this entry.",
+    "entries": {
+      "verdant_echo_1": {
+        "title": "The First Eclipse",
+        "content": "In the age before light, the Void was not an enemy, but a cradle. It was only when the first star was born that the balance shifted, and the shadows learned to hunger."
+      },
+      "verdant_echo_2": {
+        "title": "The Green Covenant",
+        "content": "The Verdant Echo was the first land to bear life after the Void Receding. The ancient orders formed their pacts here, binding themselves to the leylines that root deep beneath the moss."
+      },
+      "azure_spire_1": {
+        "title": "The War of Sigils",
+        "content": "For centuries, the Order and the Shadow fought for control over the Leylines. The Arcane watched from the stars, while Nature simply survived the crossfire."
+      },
+      "azure_spire_2": {
+        "title": "Towers of the Channelers",
+        "content": "The Azure Spires were raised by the first Mage-Architects, who sought to pierce the veil between realms. They succeeded — though what answered was not what they expected."
+      },
+      "twilight_rift_1": {
+        "title": "The Cyan Flame",
+        "content": "The Arcane masters discovered that magic is not a resource to be spent, but a conversation with the cosmos. The Cyan Flame was their first successful reply."
+      },
+      "twilight_rift_2": {
+        "title": "The Rift Opened",
+        "content": "At the Twilight Rift, reality frays. Scholars argue whether it was a weapon, an accident, or an invitation. Those who wander too close return changed — if they return at all."
+      },
+      "crimson_wake_1": {
+        "title": "The Blood Concordat",
+        "content": "When the Shadow faction was driven from the Leylines, they did not flee. They burned their retreat, salting the earth with a curse that turned rivers to crimson for a generation."
+      },
+      "crimson_wake_2": {
+        "title": "The Warlord's Throne",
+        "content": "The Crimson Wake is ruled by contested power. Every warlord who has claimed the obsidian throne has held it for exactly one season. The throne itself seems to hunger."
+      },
+      "obsidian_heart_1": {
+        "title": "Heart of the Void",
+        "content": "The Obsidian Heart is not a place — it is a wound. When the last great leyline collapsed inward, the land did not shatter. It crystallized, preserving the final moment of magic for eternity."
+      },
+      "obsidian_heart_2": {
+        "title": "The Void Keeper's Origin",
+        "content": "The entity known as the Void Keeper was once a cartographer, mapping the edges of the known world. He mapped one edge too many, and the Void claimed him before he could turn back."
+      }
+    }
+  },
+  "biome": {
+    "verdant_echo": "Verdant Echo",
+    "azure_spire": "Azure Spire",
+    "twilight_rift": "Twilight Rift",
+    "crimson_wake": "Crimson Wake",
+    "obsidian_heart": "Obsidian Heart"
   },
   "hero_classes": {
     "Warrior": "Warrior",
@@ -469,7 +524,7 @@
       "scorch_spell": "Destroy the strongest units",
       "resurrection": "Revive a unit from graveyard",
       "dark_pact": "Sacrifice essence to revive a unit",
-      "void_bolt": "Obliterate the strongest units",
+      "void_bolt": "Obliterate the strongest enemy unit",
       "life_drain": "Siphon power to boost allies",
       "raise_dead": "The dead obey their master.",
       "frost": "Sets melee units to 1 power",

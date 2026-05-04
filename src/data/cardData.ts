@@ -86,6 +86,18 @@ export const ABILITIES = {
         trigger: 'onPlay',
         description: 'abilities.decoy.desc',
     }),
+    VOID_BOLT: (): Ability => ({
+        id: 'void_bolt',
+        name: 'Void Bolt',
+        type: 'destroy_enemy',
+        trigger: 'onPlay',
+        description: 'cards.descriptions.void_bolt',
+        effectGraph: {
+            trigger: 'onPlay',
+            target: { type: 'strongest_enemy' },
+            operation: { type: 'destroy' }
+        }
+    }),
 };
 
 // Create a card helper
@@ -207,10 +219,10 @@ const ARCANE_RANGED: Card[] = [
 const NATURE_RANGED: Card[] = [
     createCard('Elven Scout', 'unit', 'common', 1, 2, [ABILITIES.SPY(2)], 'cards.descriptions.elven_scout', '', require('../../assets/units/ranged/elven_scout.jpg')),
     createCard('Dryad', 'unit', 'rare', 3, 5, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.dryad', '', require('../../assets/units/ranged/dryad.jpg')),
-    createCard('Centaur Archer', 'unit', 'rare', 4, 6, [], 'cards.descriptions.centaur_archer', '', ''),
-    createCard('Satyr Skirmisher', 'unit', 'common', 2, 3, [], 'cards.descriptions.satyr_skirmisher', '', ''),
-    createCard('Elven Warden', 'unit', 'rare', 3, 4, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.elven_warden', '', ''),
-    createCard('Wind Runner', 'unit', 'epic', 5, 8, [], 'cards.descriptions.wind_runner', '', ''),
+    createCard('Centaur Archer', 'unit', 'rare', 4, 6, [], 'cards.descriptions.centaur_archer', '', require('../../assets/units/ranged/centaur_archer.jpg')),
+    createCard('Satyr Skirmisher', 'unit', 'common', 2, 3, [], 'cards.descriptions.satyr_skirmisher', '', require('../../assets/units/ranged/satyr_skirmisher.jpg')),
+    createCard('Elven Warden', 'unit', 'rare', 3, 4, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.elven_warden', '', require('../../assets/units/ranged/elven_warden.jpg')),
+    createCard('Wind Runner', 'unit', 'epic', 5, 8, [], 'cards.descriptions.wind_runner', '', require('../../assets/units/ranged/wind_runner.jpg')),
 ].map(c => ({ ...c, faction: 'nature' as Faction }));
 
 const NEUTRAL_RANGED: Card[] = [
@@ -257,7 +269,7 @@ const ARCANE_SIEGE: Card[] = [
 ].map(c => ({ ...c, faction: 'arcane' as Faction }));
 
 const NATURE_SIEGE: Card[] = [
-    createCard('Ancient Treant', 'unit', 'epic', 6, 10, [], 'cards.descriptions.ancient_treant', '', ''),
+    createCard('Ancient Treant', 'unit', 'epic', 6, 10, [], 'cards.descriptions.ancient_treant', '', require('../../assets/units/siege/ancient_treant.jpg')),
     createCard('Nature Wrath', 'unit', 'legendary', 10, 16, [], 'cards.descriptions.nature_wrath', '', ''),
     createCard('Ancient Oak', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.ancient_oak', '', ''),
     createCard('Thorn Thrower', 'unit', 'common', 2, 4, [], 'cards.descriptions.thorn_thrower', '', ''),
@@ -289,7 +301,7 @@ export const SPELL_CARDS: Card[] = [
     createCard('Resurrection', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'cards.descriptions.resurrection', undefined, require('../../assets/units/spell/resurrection.jpg')),
     // Sinister Expansion
     createCard('Dark Pact', 'spell', 'rare', 2, undefined, [ABILITIES.MEDIC()], 'cards.descriptions.dark_pact', undefined, require('../../assets/units/spell/dark_pact.jpg')),
-    createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.SCORCH()], 'cards.descriptions.void_bolt', undefined, require('../../assets/units/spell/void_bolt.jpg')),
+    createCard('Void Bolt', 'spell', 'epic', 3, undefined, [ABILITIES.VOID_BOLT()], 'cards.descriptions.void_bolt', undefined, require('../../assets/units/spell/void_bolt.jpg')),
     createCard('Life Drain', 'spell', 'rare', 2, undefined, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.life_drain', undefined, require('../../assets/units/spell/life_drain.jpg')),
     createCard('Raise Dead', 'spell', 'common', 2, undefined, [ABILITIES.MEDIC()], 'cards.descriptions.raise_dead', undefined, require('../../assets/units/spell/raise_dead.jpg')),
 ].map((c, i) => ({ ...c, faction: (i < 4 ? 'neutral' : 'shadow') as Faction }));
