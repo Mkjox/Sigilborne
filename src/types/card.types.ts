@@ -1,5 +1,5 @@
 export type CardType = 'unit' | 'spell' | 'weather';
-export type CardRarity = 'common' | 'rare' | 'epic' | 'legendary';
+export type CardRarity = 'common' | 'rare' | 'epic' | 'legendary' | 'boss';
 // RowType removed
 export type AbilityTrigger = 'onPlay' | 'onDeath' | 'passive' | 'activate';
 
