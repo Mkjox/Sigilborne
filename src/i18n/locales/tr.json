@@ -360,78 +360,6 @@
     "footer": "✧ HİÇLİKTE DÖVÜLDÜ ✧",
     "version": "GİZEMLİ PROTOKOL v0.1.0"
   },
-  "talent_tree": {
-    "title": "Kahraman Yükselişi",
-    "subtitle": "Gerçek gücü uyandır",
-    "ascended": "YÜKSELDİ",
-    "ascend_cost": "Yükselt ({{cost}} PT)"
-  },
-  "talents": {
-    "hero_commander": {
-      "t_cmd_1": {
-        "name": "Öncü Ruhu",
-        "desc": "+1 Kahraman Canı"
-      },
-      "t_cmd_2": {
-        "name": "İlham",
-        "desc": "+2 Mana ile başla"
-      },
-      "t_cmd_3": {
-        "name": "Düzen Ustalığı",
-        "desc": "Düzen birimleri +1 Saldırı alır"
-      }
-    },
-    "hero_darklord": {
-      "t_dark_1": {
-        "name": "Hiçlik Erişimi",
-        "desc": "Kahraman Yeteneği bekleme süresi -1"
-      },
-      "t_dark_2": {
-        "name": "Karanlık Ritüel",
-        "desc": "+3 Mana ile başla"
-      }
-    },
-    "hero_archmage": {
-      "t_mage_1": {
-        "name": "Gizemli Odak",
-        "desc": "+3 Mana ile başla"
-      },
-      "t_mage_2": {
-        "name": "Mana Taşması",
-        "desc": "Oyun başında +1 kart çek"
-      }
-    },
-    "hero_ranger": {
-      "t_rng_1": {
-        "name": "Kararlı Nişan",
-        "desc": "Doğa birimleri +1 Saldırı alır"
-      },
-      "t_rng_2": {
-        "name": "Kartal Gözü",
-        "desc": "Kahraman Yeteneği bekleme süresi -1"
-      }
-    },
-    "hero_paladin": {
-      "t_pal_1": {
-        "name": "Kutsal Adanmışlık",
-        "desc": "+2 Kahraman Canı"
-      },
-      "t_pal_2": {
-        "name": "Koruma Haresi",
-        "desc": "Düzen birimleri +1 Saldırı alır"
-      }
-    },
-    "hero_druid": {
-      "t_dru_1": {
-        "name": "Orman Bağı",
-        "desc": "Doğa birimleri +1 Saldırı alır"
-      },
-      "t_dru_2": {
-        "name": "Kadim Büyüme",
-        "desc": "+2 Mana ile başla"
-      }
-    }
-  },
   "cards": {
     "Commander": "Komutan",
     "Dark Lord": "Karanlık Lord",
@@ -694,68 +622,6 @@
       "druid": "Ağaçlar, taşın unuttuğunu hatırlar. O, uyanan dünyanın sesidir."
     }
   },
-  "abilities": {
-    "scorch": {
-      "name": "Kavur",
-      "desc": "Savaş alanındaki en güçlü birim(ler)i yok eder"
-    },
-    "muster": {
-      "name": "Toplan",
-      "desc": "Destendeki tüm {{name}} kopyalarını oyna"
-    },
-    "commander_horn": {
-      "name": "Komutanın Boynuzu",
-      "desc": "Bitişik birimlerin gücünü ikiye katlar"
-    },
-    "frost": {
-      "name": "Dondurucu Ayaz",
-      "desc": "Yakın dövüş birimlerini 1 güce sabitler"
-    },
-    "fog": {
-      "name": "Geçilmez Sis",
-      "desc": "Menzilli birimleri 1 güce sabitler"
-    },
-    "clear_weather": {
-      "name": "Hava Temizleme",
-      "desc": "Tüm hava durumu efektlerini kaldırır"
-    },
-    "decoy": {
-      "name": "Tuzak",
-      "desc": "Rastgele bir dost birimi eline döndürür"
-    },
-    "ability_rally": {
-      "name": "Toplanma",
-      "desc": "Tüm dost birimleri +1 güçlendirir"
-    },
-    "ability_dark_command": {
-      "name": "Karanlık Emir",
-      "desc": "En güçlü düşman birimine 2 hasar ver"
-    },
-    "ability_arcane_blast": {
-      "name": "Gizemli Patlama",
-      "desc": "Tüm düşman birimlerine 1 hasar ver"
-    },
-    "ability_precision_strike": {
-      "name": "Hassas Vuruş",
-      "desc": "En zayıf düşman birimini yok eder"
-    },
-    "ability_divine_shield": {
-      "name": "Kutsal Işık",
-      "desc": "Kahramanına 2 sağlık kazandırır"
-    },
-    "ability_quick_draw": {
-      "name": "Hızlı Çekiş",
-      "desc": "Bir kart çek"
-    },
-    "ability_bloodlust": {
-      "name": "Kanasusamışlık",
-      "desc": "Rastgele bir düşman birimine 1 hasar ver"
-    },
-    "ability_nature_growth": {
-      "name": "Vahşi Büyüme",
-      "desc": "Rastgele bir dost birimi +2 güçlendirir"
-    }
-  },
   "talent_tree": {
     "title": "Kahraman Yükselişi",
     "subtitle": "Gerçek gücü uyandır",
@@ -942,6 +808,29 @@
         "success": "Israr karşılığını veriyor! Döşeme tahtalarının altına gizlenmiş ağır bir altın sandığı buluyorsunuz.",
         "failed": "Bir tuzak fırlıyor! Kıl payı kurtuluyorsunuz, ancak bu süreçte kalan değerli eşyalar yok oluyor."
       }
+    }
+  },
+  "tutorial": {
+    "slide1": {
+      "title": "Sigilborne'a Hoş Geldin",
+      "desc": "Strateji ve yerleşimin önemli olduğu bir roguelike deste kurma oyunu. Kazanmak için düşman kahramanı yen."
+    },
+    "slide2": {
+      "title": "Kaynaklar",
+      "desc": "Kart oynamak için Mana gerekir. Her tur daha fazla Maksimum Mana kazanırsın. Altın ise dükkanda kullanılır."
+    },
+    "slide3": {
+      "title": "Kart Anatomisi",
+      "desc": "Sol Üst: Mana Bedeli. Sol Alt: Saldırı Gücü. Sağ Alt: Sağlık Puanı. Kartlarını iyi tanı!"
+    },
+    "slide4": {
+      "title": "Savaşa Hazır",
+      "desc": "Birimleri tahtaya sürükle. Düşman birimlerine saldır veya doğrudan düşman kahramanını hedef al. İyi şanslar!"
+    },
+    "btn": {
+      "play": "Anladım! Başla",
+      "next": "İleri",
+      "skip": "Atla"
     }
   }
 }

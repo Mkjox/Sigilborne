@@ -127,7 +127,6 @@
     "draw": "STALEMATE",
     "continue": "CONTINUE",
     "end_turn": "END TURN",
-    "stage": "STAGE {{num}}",
     "escape": "ESCAPE",
     "void_keeper": "VOID KEEPER",
     "void_keeper_title": "The Innkeeper's Shadow",
@@ -346,13 +345,6 @@
     },
     "footer": "✧ FORGED IN THE VOID ✧",
     "version": "ARCANE PROTOCOL v0.1.0"
-  },
-  "biome": {
-    "verdant_echo": "Verdant Echo",
-    "azure_spire": "Azure Spire",
-    "twilight_rift": "Twilight Rift",
-    "crimson_wake": "Crimson Wake",
-    "obsidian_heart": "Obsidian Heart"
   },
   "campaign": {
     "select_difficulty": "SELECT DIFFICULTY",
@@ -839,6 +831,29 @@
         "success": "Persistence pays off! You find a heavy chest of gold hidden beneath the floorboards.",
         "failed": "A trap springs! You narrowly escape, but the remaining valuables are destroyed in the process."
       }
+    }
+  },
+  "tutorial": {
+    "slide1": {
+      "title": "Welcome to Sigilborne",
+      "desc": "A roguelike deckbuilder where strategy and placement matter. Defeat the enemy hero to win."
+    },
+    "slide2": {
+      "title": "The Resources",
+      "desc": "Mana is required to play cards. You gain more Max Mana each turn. Gold is used in the shop."
+    },
+    "slide3": {
+      "title": "Card Anatomy",
+      "desc": "Top Left: Mana Cost. Bottom Left: Attack Power. Bottom Right: Health Points. Know your cards!"
+    },
+    "slide4": {
+      "title": "Ready for Battle",
+      "desc": "Drag units to the board. Attack enemy units or go straight for the enemy hero. Good luck!"
+    },
+    "btn": {
+      "play": "Got it! Let's Play",
+      "next": "Next",
+      "skip": "Skip"
     }
   }
 }

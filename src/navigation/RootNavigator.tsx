@@ -11,6 +11,7 @@ import { DeckBuilderScreen } from '../screens/DeckBuilder';
 import { CollectionScreen } from '../screens/Collection';
 import { SettingsScreen } from '../screens/Settings';
 import { CampaignMapScreen, ShopScreen, TalentTreeScreen, EventScreen, LoreScreen } from '../screens/Campaign';
+import { TutorialScreen } from '../screens/Tutorial';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -112,6 +113,15 @@ export const RootNavigator: React.FC = () => {
                     component={LoreScreen}
                     options={{
                         animationEnabled: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="Tutorial"
+                    component={TutorialScreen}
+                    options={{
+                        animationEnabled: true,
+                        presentation: 'modal',
+                        cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
                     }}
                 />
             </Stack.Navigator>

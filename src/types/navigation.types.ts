@@ -12,6 +12,7 @@ export type RootStackParamList = {
     TalentTree: undefined;
     Event: { stageId: number };
     Lore: undefined;
+    Tutorial: undefined;
     Victory: { rewards: any }; // Will be properly typed in Phase 8
     Defeat: undefined;
 };

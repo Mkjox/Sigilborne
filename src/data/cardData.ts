@@ -172,11 +172,11 @@ const NATURE_MELEE: Card[] = [
 ].map(c => ({ ...c, faction: 'nature' as Faction }));
 
 const NEUTRAL_MELEE: Card[] = [
-    createCard('Sellsword', 'unit', 'common', 2, 4, [], 'cards.descriptions.sellsword', '', ''),
-    createCard('Bounty Hunter', 'unit', 'rare', 4, 5, [ABILITIES.SCORCH()], 'cards.descriptions.bounty_hunter', '', ''),
-    createCard('Town Guard', 'unit', 'common', 1, 3, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.town_guard', '', ''),
-    createCard('Bandit', 'unit', 'common', 1, 2, [ABILITIES.SPY(1)], 'cards.descriptions.bandit', '', ''),
-    createCard('Knight Errant', 'unit', 'rare', 3, 6, [], 'cards.descriptions.knight_errant', '', ''),
+    createCard('Sellsword', 'unit', 'common', 2, 4, [], 'cards.descriptions.sellsword', '', require('../../assets/units/melee/sellsword.jpg')),
+    createCard('Bounty Hunter', 'unit', 'rare', 4, 5, [ABILITIES.SCORCH()], 'cards.descriptions.bounty_hunter', '', require('../../assets/units/melee/bounty_hunter.jpg')),
+    createCard('Town Guard', 'unit', 'common', 1, 3, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.town_guard', '', require('../../assets/units/melee/town_guard.jpg')),
+    createCard('Bandit', 'unit', 'common', 1, 2, [ABILITIES.SPY(1)], 'cards.descriptions.bandit', '', require('../../assets/units/melee/bandit.jpg')),
+    createCard('Knight Errant', 'unit', 'rare', 3, 6, [], 'cards.descriptions.knight_errant', '', require('../../assets/units/melee/knight_errant.jpg')),
 ].map(c => ({ ...c, faction: 'neutral' as Faction }));
 
 export const MELEE_UNITS: Card[] = [
@@ -226,10 +226,10 @@ const NATURE_RANGED: Card[] = [
 ].map(c => ({ ...c, faction: 'nature' as Faction }));
 
 const NEUTRAL_RANGED: Card[] = [
-    createCard('Caravan Guard', 'unit', 'common', 2, 3, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.caravan_guard', '', ''),
-    createCard('Traveling Merchant', 'unit', 'rare', 3, 1, [ABILITIES.SPY(2)], 'cards.descriptions.traveling_merchant', '', ''),
-    createCard('Hired Crossbow', 'unit', 'common', 2, 4, [], 'cards.descriptions.hired_crossbow', '', ''),
-    createCard('Traveling Bard', 'unit', 'rare', 2, 2, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.traveling_bard', '', ''),
+    createCard('Caravan Guard', 'unit', 'common', 2, 3, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.caravan_guard', '', require('../../assets/units/ranged/caravan_guard.jpg')),
+    createCard('Traveling Merchant', 'unit', 'rare', 3, 1, [ABILITIES.SPY(2)], 'cards.descriptions.traveling_merchant', '', require('../../assets/units/ranged/traveling_merchant.jpg')),
+    createCard('Hired Crossbow', 'unit', 'common', 2, 4, [], 'cards.descriptions.hired_crossbow', '', require('../../assets/units/ranged/hired_crossbow.jpg')),
+    createCard('Traveling Bard', 'unit', 'rare', 2, 2, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.traveling_bard', '', require('../../assets/units/ranged/traveling_bard.jpg')),
 ].map(c => ({ ...c, faction: 'neutral' as Faction }));
 
 export const RANGED_UNITS: Card[] = [
@@ -270,14 +270,14 @@ const ARCANE_SIEGE: Card[] = [
 
 const NATURE_SIEGE: Card[] = [
     createCard('Ancient Treant', 'unit', 'epic', 6, 10, [], 'cards.descriptions.ancient_treant', '', require('../../assets/units/siege/ancient_treant.jpg')),
-    createCard('Nature Wrath', 'unit', 'legendary', 10, 16, [], 'cards.descriptions.nature_wrath', '', ''),
-    createCard('Ancient Oak', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.ancient_oak', '', ''),
-    createCard('Thorn Thrower', 'unit', 'common', 2, 4, [], 'cards.descriptions.thorn_thrower', '', ''),
-    createCard('Vine Catapult', 'unit', 'common', 3, 5, [], 'cards.descriptions.vine_catapult', '', ''),
+    createCard('Nature Wrath', 'unit', 'legendary', 10, 16, [], 'cards.descriptions.nature_wrath', '', require('../../assets/units/siege/nature_wrath.jpg')),
+    createCard('Ancient Oak', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.ancient_oak', '', require('../../assets/units/siege/ancient_oak.jpg')),
+    createCard('Thorn Thrower', 'unit', 'common', 2, 4, [], 'cards.descriptions.thorn_thrower', '', require('../../assets/units/siege/thorn_thrower.jpg')),
+    createCard('Vine Catapult', 'unit', 'common', 3, 5, [], 'cards.descriptions.vine_catapult', '', require('../../assets/units/siege/vine_catapult.jpg')),
 ].map(c => ({ ...c, faction: 'nature' as Faction }));
 
 const NEUTRAL_SIEGE: Card[] = [
-    createCard('Old Catapult', 'unit', 'common', 3, 5, [], 'cards.descriptions.old_catapult', '', ''),
+    createCard('Old Catapult', 'unit', 'common', 3, 5, [], 'cards.descriptions.old_catapult', '', require('../../assets/units/siege/old_catapult.jpg')),
     createCard('Supply Wagon', 'unit', 'rare', 2, 2, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.supply_wagon', '', ''),
     createCard('Ram', 'unit', 'common', 4, 8, [], 'cards.descriptions.ram', '', ''),
     createCard('Supply Balloon', 'unit', 'epic', 5, 4, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.supply_balloon', '', ''),

@@ -20,7 +20,8 @@ import { RootStackParamList } from '../../types';
 import { Text } from '../../components/ui';
 import { colors, spacing } from '../../theme';
 import { useTranslation } from 'react-i18next';
-
+import { useSettingsStore } from '../../store/settingsStore';
+import { useFocusEffect } from '@react-navigation/native';
 // Components
 import { MainMenuSkiaBackground } from './components/MainMenuSkiaBackground';
 import { MenuPanel } from './components/MenuPanel';
@@ -44,6 +45,15 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
 
     const titleScale = useSharedValue(0.9);
     const titleGlow = useSharedValue(0.4);
+    const hasSeenTutorial = useSettingsStore(state => state.hasSeenTutorial);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            if (!hasSeenTutorial) {
+                navigation.navigate('Tutorial');
+            }
+        }, [hasSeenTutorial, navigation])
+    );
 
     React.useEffect(() => {
         titleScale.value = withSpring(1);

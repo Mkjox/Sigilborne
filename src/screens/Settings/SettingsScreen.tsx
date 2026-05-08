@@ -254,6 +254,27 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                         </View>
                     </Section>
                 </View>
+                {/* OTHER */}
+                <View style={isLandscape ? styles.columnHalf : styles.columnFull}>
+                    <Section title={t('settings.other.title', 'OTHER')} delay={500}>
+                        <Pressable 
+                            style={styles.replayButton}
+                            onPress={() => {
+                                const reset = useSettingsStore.getState().resetTutorial;
+                                reset();
+                                navigation.navigate('Tutorial');
+                            }}
+                        >
+                            <LinearGradient
+                                colors={['rgba(16,185,129,0.1)', 'rgba(16,185,129,0.02)']}
+                                style={StyleSheet.absoluteFill}
+                            />
+                            <Text style={styles.replayButtonText}>
+                                {t('settings.other.replay_tutorial', '📖 How to Play')}
+                            </Text>
+                        </Pressable>
+                    </Section>
+                </View>
             </ScrollView>
 
             {/* ── FOOTER ── */}
@@ -486,6 +507,25 @@ const styles = StyleSheet.create({
     speedBtnTextActive: {
         color: colors.arcane.obsidian,
         opacity: 1,
+    },
+    
+    // Replay Button
+    replayButton: {
+        width: '100%',
+        paddingVertical: 12,
+        alignItems: 'center',
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: 'rgba(16,185,129,0.18)',
+        overflow: 'hidden',
+    },
+    replayButtonText: {
+        fontSize: 12,
+        color: colors.arcane.emerald,
+        fontWeight: '900',
+        letterSpacing: 2,
+        fontFamily: 'serif',
+        opacity: 0.9,
     },
 
     // Footer
