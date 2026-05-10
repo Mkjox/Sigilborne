@@ -120,8 +120,6 @@ export const RootNavigator: React.FC = () => {
                     component={TutorialScreen}
                     options={{
                         animationEnabled: true,
-                        presentation: 'modal',
-                        cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS,
                     }}
                 />
             </Stack.Navigator>

@@ -18,7 +18,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { RootStackParamList } from '../../types';
 import { Text } from '../../components/ui';
-import { colors, spacing } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '../../store/settingsStore';
 import { useFocusEffect } from '@react-navigation/native';
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     title: {
         fontWeight: '900',
         color: colors.arcane.white,
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
         textShadowColor: colors.arcane.emerald,
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 15,

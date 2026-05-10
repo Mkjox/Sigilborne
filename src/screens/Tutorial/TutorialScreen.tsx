@@ -3,7 +3,7 @@ import {
     View,
     StyleSheet,
     TouchableOpacity,
-    ScrollView,
+    useWindowDimensions,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,6 +23,7 @@ interface Props {
 
 export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
+    const { height: screenHeight } = useWindowDimensions();
     const { t } = useTranslation();
     const [currentIndex, setCurrentIndex] = useState(0);
     const completeTutorial = useSettingsStore(state => state.completeTutorial);
@@ -30,27 +31,33 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
     const SLIDES = [
         {
             id: '1',
-            title: t('tutorial.slide1.title', 'Welcome to Sigilborne'),
-            description: t('tutorial.slide1.desc', 'A roguelike deckbuilder where strategy and placement matter. Defeat the enemy hero to win.'),
-            icon: '⚔️'
+            title: t('tutorial.slide1.title', 'The Journey Begins'),
+            description: t('tutorial.slide1.desc', 'Welcome to Sigilborne, a world where strategy is your greatest weapon. Build your deck, place your units wisely, and defeat the enemy Hero to claim victory.'),
+            icon: '📜'
         },
         {
             id: '2',
-            title: t('tutorial.slide2.title', 'The Resources'),
-            description: t('tutorial.slide2.desc', 'Mana is required to play cards. You gain more Max Mana each turn. Gold is used in the shop.'),
-            icon: '💎'
+            title: t('tutorial.slide2.title', 'Mana & Wealth'),
+            description: t('tutorial.slide2.desc', 'Mana powers your spells and summons. You gain more Max Mana each turn. Collect Gold during your run to buy powerful artifacts in the Shop.'),
+            icon: '✨'
         },
         {
             id: '3',
-            title: t('tutorial.slide3.title', 'Card Anatomy'),
-            description: t('tutorial.slide3.desc', 'Top Left: Mana Cost. Bottom Left: Attack Power. Bottom Right: Health Points. Know your cards!'),
+            title: t('tutorial.slide3.title', 'Reading the Sigils'),
+            description: t('tutorial.slide3.desc', 'Every card has three keys: Mana Cost (Top Left), Attack Power (Bottom Left), and Vitality (Bottom Right). Know your deck to master the board.'),
             icon: '🃏'
         },
         {
             id: '4',
-            title: t('tutorial.slide4.title', 'Ready for Battle'),
-            description: t('tutorial.slide4.desc', 'Drag units to the board. Attack enemy units or go straight for the enemy hero. Good luck!'),
-            icon: '🔥'
+            title: t('tutorial.slide4.title', 'Factions & Synergy'),
+            description: t('tutorial.slide4.desc', 'Command the Arcane, Nature, and Neutral factions. Combining units from the same faction can unlock powerful synergies and hidden abilities.'),
+            icon: '🌀'
+        },
+        {
+            id: '5',
+            title: t('tutorial.slide5.title', 'Tactical Combat'),
+            description: t('tutorial.slide5.desc', 'Drag units to the battlefield. They attack enemies directly in front of them. Will you focus on their units, or strike the enemy Hero directly?'),
+            icon: '⚔️'
         }
     ];
 
@@ -79,17 +86,10 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
         <View style={styles.container}>
             <Animated.View entering={FadeIn.duration(1000)} style={styles.backgroundOverlay} />
 
-            <ScrollView
-                contentContainerStyle={[
-                    styles.scrollContent,
-                    {
-                        paddingTop: Math.max(insets.top + spacing.xl, spacing.xl),
-                        paddingBottom: Math.max(insets.bottom + spacing.xl, spacing.xl)
-                    }
-                ]}
-                showsVerticalScrollIndicator={false}
-                bounces={false}
-            >
+            <View style={styles.contentWrapper}>
+                {/* Top Spacer to position the card roughly 10% from the top */}
+                <View style={{ height: screenHeight * 0.01 }} />
+
                 <Animated.View
                     key={currentSlide.id}
                     entering={FadeInRight.duration(400)}
@@ -105,8 +105,8 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                     {/* Body */}
                     <Text style={styles.description}>{currentSlide.description}</Text>
 
-                    {/* Spacer to push footer down if card is tall, though it naturally flows */}
-                    <View style={{ height: spacing.lg }} />
+                    {/* Spacer */}
+                    <View style={{ height: spacing.xl }} />
 
                     {/* Pagination Dots */}
                     <Animated.View layout={LinearTransition} style={styles.pagination}>
@@ -122,26 +122,32 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                         ))}
                     </Animated.View>
 
-                    {/* Navigation Button */}
-                    <TouchableOpacity style={styles.button} onPress={handleNext} activeOpacity={0.8}>
-                        <Text style={styles.buttonText}>
-                            {currentIndex === SLIDES.length - 1 ? t('tutorial.btn.play', 'Got it! Let\'s Play') : t('tutorial.btn.next', 'Next')}
-                        </Text>
-                    </TouchableOpacity>
-
-                    {/* Skip Button */}
-                    <View style={styles.skipContainer}>
-                        {currentIndex < SLIDES.length - 1 ? (
-                            <TouchableOpacity style={styles.skipButton} onPress={handleComplete}>
+                    {/* Button Row */}
+                    <View style={styles.buttonRow}>
+                        {currentIndex < SLIDES.length - 1 && (
+                            <TouchableOpacity
+                                style={styles.skipButton}
+                                onPress={handleComplete}
+                                activeOpacity={0.7}
+                            >
                                 <Text style={styles.skipText}>{t('tutorial.btn.skip', 'Skip')}</Text>
                             </TouchableOpacity>
-                        ) : (
-                            <View style={styles.skipPlaceholder} />
                         )}
-                    </View>
 
+                        <TouchableOpacity
+                            style={styles.primaryButton}
+                            onPress={handleNext}
+                            activeOpacity={0.8}
+                        >
+                            <Text style={styles.primaryButtonText}>
+                                {currentIndex === SLIDES.length - 1
+                                    ? t('tutorial.btn.play', "Let's Play")
+                                    : t('tutorial.btn.next', 'Next')}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </Animated.View>
-            </ScrollView>
+            </View>
         </View>
     );
 };
@@ -155,48 +161,45 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(5, 7, 12, 0.98)',
     },
-    scrollContent: {
-        flexGrow: 1,
-        justifyContent: 'center',
+    contentWrapper: {
+        flex: 1,
         alignItems: 'center',
         paddingHorizontal: spacing.xl,
     },
     cardContainer: {
         width: '100%',
         maxWidth: 420,
-        backgroundColor: colors.background.secondary,
+        backgroundColor: colors.arcane.graphite,
         borderRadius: 24,
         paddingHorizontal: spacing.xl,
-        paddingVertical: spacing.lg,
+        paddingVertical: spacing.xl,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: colors.border.subtle,
+        borderColor: colors.glass.border,
         shadowColor: colors.arcane.emerald,
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.15,
         shadowRadius: 30,
         elevation: 10,
-        top: -45,
     },
     iconContainer: {
         marginBottom: spacing.sm,
-        paddingTop: spacing.xs, // Prevents emoji clipping on Android
+        paddingTop: spacing.xs,
     },
     icon: {
         fontSize: 48,
-        lineHeight: 56, // Explicit line height to prevent clipping
+        lineHeight: 56,
         textAlign: 'center',
     },
     title: {
         fontSize: typography.sizes.xl,
-        fontFamily: typography.fonts.bold,
+        fontFamily: typography.fonts.heading,
         color: colors.text.primary,
         textAlign: 'center',
         marginBottom: spacing.md,
     },
-
     description: {
-        fontSize: typography.sizes.md,
+        fontSize: typography.sizes.base,
         color: colors.text.secondary,
         textAlign: 'center',
         lineHeight: 24,
@@ -220,11 +223,17 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(16, 185, 129, 0.2)',
         width: 8,
     },
-    button: {
+    buttonRow: {
+        flexDirection: 'row',
         width: '100%',
+        alignItems: 'center',
+        gap: spacing.md,
+    },
+    primaryButton: {
+        flex: 1,
         backgroundColor: colors.arcane.emerald,
-        paddingVertical: spacing.sm,
-        borderRadius: 12,
+        paddingVertical: spacing.md,
+        borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
         shadowColor: colors.arcane.emerald,
@@ -233,28 +242,25 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 6,
     },
-    buttonText: {
-        color: colors.background.primary,
-        fontFamily: typography.fonts.bold,
-        fontSize: typography.sizes.md,
-        letterSpacing: 1.5,
-    },
-    skipContainer: {
-        height: 45,
-        marginTop: spacing.xs,
-        justifyContent: 'center',
-        alignItems: 'center',
+    primaryButtonText: {
+        color: '#FFFFFF',
+        fontFamily: typography.fonts.bodyBold,
+        fontSize: typography.sizes.base,
+        letterSpacing: 1,
     },
     skipButton: {
-        padding: spacing.sm,
+        flex: 1,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        paddingVertical: spacing.md,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
     },
     skipText: {
         color: colors.text.tertiary,
-        fontSize: typography.sizes.sm,
-        fontFamily: typography.fonts.medium,
-        textDecorationLine: 'underline',
+        fontSize: typography.sizes.base,
+        fontFamily: typography.fonts.bodySemiBold,
     },
-    skipPlaceholder: {
-        height: 20,
-    }
 });

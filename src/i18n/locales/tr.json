@@ -358,7 +358,11 @@
       "tr": "TÜRKÇE"
     },
     "footer": "✧ HİÇLİKTE DÖVÜLDÜ ✧",
-    "version": "GİZEMLİ PROTOKOL v0.1.0"
+    "version": "GİZEMLİ PROTOKOL v0.1.0",
+    "other": {
+      "title": "DİĞER",
+      "replay_tutorial": "📖 Nasıl Oynanır"
+    }
   },
   "cards": {
     "Commander": "Komutan",
@@ -812,23 +816,27 @@
   },
   "tutorial": {
     "slide1": {
-      "title": "Sigilborne'a Hoş Geldin",
-      "desc": "Strateji ve yerleşimin önemli olduğu bir roguelike deste kurma oyunu. Kazanmak için düşman kahramanı yen."
+      "title": "Yolculuk Başlıyor",
+      "desc": "Stratejinin en büyük silahın olduğu Sigilborne dünyasına hoş geldin. Desteni kur, birimlerini akıllıca yerleştir ve zafer için düşman Kahramanı mağlup et."
     },
     "slide2": {
-      "title": "Kaynaklar",
-      "desc": "Kart oynamak için Mana gerekir. Her tur daha fazla Maksimum Mana kazanırsın. Altın ise dükkanda kullanılır."
+      "title": "Mana ve Servet",
+      "desc": "Mana, büyülerini ve çağrılarını güçlendirir. Her tur daha fazla Maksimum Mana kazanırsın. Dükkandan güçlü yadigar satın almak için altın topla."
     },
     "slide3": {
-      "title": "Kart Anatomisi",
-      "desc": "Sol Üst: Mana Bedeli. Sol Alt: Saldırı Gücü. Sağ Alt: Sağlık Puanı. Kartlarını iyi tanı!"
+      "title": "Mühürleri Okumak",
+      "desc": "Her kartın üç anahtarı vardır: Mana Bedeli (Sol Üst), Saldırı Gücü (Sol Alt) ve Canlılık (Sağ Alt). Tahtaya hükmetmek için desteni tanı."
     },
     "slide4": {
-      "title": "Savaşa Hazır",
-      "desc": "Birimleri tahtaya sürükle. Düşman birimlerine saldır veya doğrudan düşman kahramanını hedef al. İyi şanslar!"
+      "title": "Fraksiyonlar ve Sinerji",
+      "desc": "Arcane, Doğa ve Tarafsız fraksiyonlara hükmet. Aynı fraksiyondan birimleri birleştirmek, güçlü sinerjilerin ve gizli yeteneklerin kilidini açabilir."
+    },
+    "slide5": {
+      "title": "Taktiksel Savaş",
+      "desc": "Birimleri savaş alanına sürükle. Doğrudan önlerindeki düşmanlara saldırırlar. Birimlerine mi odaklanacaksın, yoksa doğrudan Kahramana mı vuracaksın?"
     },
     "btn": {
-      "play": "Anladım! Başla",
+      "play": "Başlayalım",
       "next": "İleri",
       "skip": "Atla"
     }

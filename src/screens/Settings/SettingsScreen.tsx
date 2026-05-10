@@ -21,7 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { RootStackParamList } from '../../types';
 import { Text, BoardSurface } from '../../components/ui';
-import { colors, spacing } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n';
 import { useSettingsStore } from '../../store';
@@ -159,7 +159,9 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                         paddingBottom: insets.bottom + 20,
                         paddingHorizontal: 16,
                         flexDirection: isLandscape ? 'row' : 'column',
+                        flexWrap: 'wrap',
                         alignItems: isLandscape ? 'flex-start' : 'center',
+                        justifyContent: isLandscape ? 'flex-start' : 'center',
                         gap: 12,
                     }
                 ]}
@@ -257,7 +259,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                 {/* OTHER */}
                 <View style={isLandscape ? styles.columnHalf : styles.columnFull}>
                     <Section title={t('settings.other.title', 'OTHER')} delay={500}>
-                        <Pressable 
+                        <Pressable
                             style={styles.replayButton}
                             onPress={() => {
                                 const reset = useSettingsStore.getState().resetTutorial;
@@ -339,7 +341,7 @@ const styles = StyleSheet.create({
         color: colors.arcane.emerald,
         fontWeight: '700',
         letterSpacing: 1.5,
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
     },
     titleBlock: {
         alignItems: 'center',
@@ -350,14 +352,14 @@ const styles = StyleSheet.create({
         letterSpacing: 5,
         opacity: 0.6,
         fontWeight: '700',
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
     },
     titleMain: {
         fontSize: 22,
         fontWeight: '900',
         color: colors.arcane.white,
         letterSpacing: 8,
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
         textShadowColor: colors.arcane.emerald,
         textShadowOffset: { width: 0, height: 0 },
         textShadowRadius: 10,
@@ -404,7 +406,7 @@ const styles = StyleSheet.create({
         color: colors.arcane.emerald,
         letterSpacing: 3,
         fontWeight: '900',
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
         opacity: 0.85,
     },
 
@@ -451,7 +453,7 @@ const styles = StyleSheet.create({
         color: colors.arcane.white,
         fontWeight: '700',
         letterSpacing: 0.5,
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
     },
     toggleSublabel: {
         fontSize: 9,
@@ -501,14 +503,14 @@ const styles = StyleSheet.create({
         color: colors.arcane.emerald,
         fontWeight: '900',
         letterSpacing: 1.5,
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
         opacity: 0.6,
     },
     speedBtnTextActive: {
         color: colors.arcane.obsidian,
         opacity: 1,
     },
-    
+
     // Replay Button
     replayButton: {
         width: '100%',
@@ -524,7 +526,7 @@ const styles = StyleSheet.create({
         color: colors.arcane.emerald,
         fontWeight: '900',
         letterSpacing: 2,
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
         opacity: 0.9,
     },
 
@@ -540,7 +542,7 @@ const styles = StyleSheet.create({
         color: colors.arcane.emerald,
         letterSpacing: 2,
         opacity: 0.3,
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
     },
     footerVersion: {
         fontSize: 8,

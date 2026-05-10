@@ -278,10 +278,10 @@ const NATURE_SIEGE: Card[] = [
 
 const NEUTRAL_SIEGE: Card[] = [
     createCard('Old Catapult', 'unit', 'common', 3, 5, [], 'cards.descriptions.old_catapult', '', require('../../assets/units/siege/old_catapult.jpg')),
-    createCard('Supply Wagon', 'unit', 'rare', 2, 2, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.supply_wagon', '', ''),
-    createCard('Ram', 'unit', 'common', 4, 8, [], 'cards.descriptions.ram', '', ''),
-    createCard('Supply Balloon', 'unit', 'epic', 5, 4, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.supply_balloon', '', ''),
-    createCard('Junk Launcher', 'unit', 'common', 2, 2, [ABILITIES.MUSTER('Junk Launcher')], 'cards.descriptions.junk_launcher', '', ''),
+    createCard('Supply Wagon', 'unit', 'rare', 2, 2, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.supply_wagon', '', require('../../assets/units/siege/supply_wagon.jpg')),
+    createCard('Ram', 'unit', 'common', 4, 8, [], 'cards.descriptions.ram', '', require('../../assets/units/siege/ram.jpg')),
+    createCard('Supply Balloon', 'unit', 'epic', 5, 4, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.supply_balloon', '', require('../../assets/units/siege/supply_balloon.jpg')),
+    createCard('Junk Launcher', 'unit', 'common', 2, 2, [ABILITIES.MUSTER('Junk Launcher')], 'cards.descriptions.junk_launcher', '', require('../../assets/units/siege/junk_launcher.jpg')),
 ].map(c => ({ ...c, faction: 'neutral' as Faction }));
 
 export const SIEGE_UNITS: Card[] = [
