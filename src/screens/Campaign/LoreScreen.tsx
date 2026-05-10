@@ -75,72 +75,74 @@ export const LoreScreen: React.FC<Props> = ({ navigation }) => {
                 style={[StyleSheet.absoluteFill, { bottom: '40%' }]}
             />
 
-            {/* === HEADER (glassmorphism, absolute) === */}
-            <View style={[styles.header, { height: HEADER_HEIGHT }]}>
-                <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
-                <LinearGradient
-                    colors={['rgba(0,0,0,0.85)', 'rgba(0,0,0,0.3)']}
-                    style={StyleSheet.absoluteFill}
-                />
-                <View style={[styles.headerInner, { paddingTop: insets.top + 4 }]}>
-                    <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
-                        <MaterialCommunityIcons name="chevron-left" size={32} color={colors.arcane.emerald} />
-                    </Pressable>
-                    <Text style={styles.title}>{t('lore.title').toUpperCase()}</Text>
-                    <View style={{ width: 40 }} />
-                </View>
-                <View style={styles.headerBottomBorder} />
-            </View>
-
-            {/* === BIOME TABS (below header, also absolute) === */}
-            <View style={[styles.tabsWrapper, { top: HEADER_HEIGHT }]}>
-                <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.tabsScroll}
-                >
-                    {MAP_BIOMES.map(biome => {
-                        const active = biome.id === selectedBiomeId;
-                        const unlocked = isBiomeUnlocked(biome);
-                        return (
-                            <Pressable
-                                key={biome.id}
-                                onPress={() => setSelectedBiomeId(biome.id)}
-                                style={[
-                                    styles.tab,
-                                    active && { borderColor: biome.colors[0], backgroundColor: `${biome.colors[0]}22` },
-                                    !unlocked && styles.tabLocked,
-                                ]}
-                            >
-                                {!unlocked && (
-                                    <MaterialCommunityIcons name="lock" size={10} color="rgba(255,255,255,0.3)" style={{ marginRight: 4 }} />
-                                )}
-                                <Text style={[
-                                    styles.tabText,
-                                    active && { color: biome.colors[0] },
-                                    !unlocked && { color: 'rgba(255,255,255,0.25)' },
-                                ]}>
-                                    {t(`biome.${biome.id}`).toUpperCase()}
-                                </Text>
-                                {active && (
-                                    <View style={{ backgroundColor: biome.colors[0] }} />
-                                )}
-                            </Pressable>
-                        );
-                    })}
-                </ScrollView>
-                <View style={[styles.tabsBottomBorder, { backgroundColor: `${selectedBiome.colors[0]}33` }]} />
-            </View>
-
             {/* === SCROLL CONTENT === */}
             <ScrollView
                 contentContainerStyle={[
                     styles.scrollContent,
-                    { paddingTop: HEADER_HEIGHT + TABS_HEIGHT + 20, paddingBottom: insets.bottom + 40 },
+                    { paddingTop: 0, paddingBottom: insets.bottom + 40 },
                 ]}
                 showsVerticalScrollIndicator={false}
             >
+                {/* === HEADER (now inside scroll) === */}
+                <View style={[styles.header, { height: HEADER_HEIGHT }]}>
+                    <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFill} />
+                    <LinearGradient
+                        colors={['rgba(0,0,0,0.85)', 'rgba(0,0,0,0.3)']}
+                        style={StyleSheet.absoluteFill}
+                    />
+                    <View style={[styles.headerInner, { paddingTop: insets.top + 4 }]}>
+                        <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
+                            <MaterialCommunityIcons name="chevron-left" size={32} color={colors.arcane.emerald} />
+                        </Pressable>
+                        <Text style={styles.title}>{t('lore.title').toUpperCase()}</Text>
+                        <View style={{ width: 40 }} />
+                    </View>
+                    <View style={styles.headerBottomBorder} />
+                </View>
+
+                {/* === BIOME TABS (now inside scroll) === */}
+                <View style={[styles.tabsWrapper]}>
+                    <BlurView intensity={20} tint="dark" style={StyleSheet.absoluteFill} />
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.tabsScroll}
+                    >
+                        {MAP_BIOMES.map(biome => {
+                            const active = biome.id === selectedBiomeId;
+                            const unlocked = isBiomeUnlocked(biome);
+                            return (
+                                <Pressable
+                                    key={biome.id}
+                                    onPress={() => setSelectedBiomeId(biome.id)}
+                                    style={[
+                                        styles.tab,
+                                        active && { borderColor: biome.colors[0], backgroundColor: `${biome.colors[0]}22` },
+                                        !unlocked && styles.tabLocked,
+                                    ]}
+                                >
+                                    {!unlocked && (
+                                        <MaterialCommunityIcons name="lock" size={10} color="rgba(255,255,255,0.3)" style={{ marginRight: 4 }} />
+                                    )}
+                                    <Text style={[
+                                        styles.tabText,
+                                        active && { color: biome.colors[0] },
+                                        !unlocked && { color: 'rgba(255,255,255,0.25)' },
+                                    ]}>
+                                        {t(`biome.${biome.id}`).toUpperCase()}
+                                    </Text>
+                                    {active && (
+                                        <View style={{ backgroundColor: biome.colors[0] }} />
+                                    )}
+                                </Pressable>
+                            );
+                        })}
+                    </ScrollView>
+                    <View style={[styles.tabsBottomBorder, { backgroundColor: `${selectedBiome.colors[0]}33` }]} />
+                </View>
+
+                <View style={{ height: 20 }} />
+
                 {/* Biome header row */}
                 <Animated.View entering={FadeIn} style={styles.biomeHeader}>
                     <View style={[styles.biomeColorBar, { backgroundColor: selectedBiome.colors[0] }]} />
@@ -229,9 +231,7 @@ const styles = StyleSheet.create({
     },
     // ─── Header ──────────────────────────────────────────
     header: {
-        position: 'absolute',
-        top: 0, left: 0, right: 0,
-        zIndex: 100,
+        width: '100%',
         overflow: 'hidden',
     },
     headerInner: {
@@ -259,10 +259,8 @@ const styles = StyleSheet.create({
     },
     // ─── Tabs ────────────────────────────────────────────
     tabsWrapper: {
-        position: 'absolute',
-        left: 0, right: 0,
+        width: '100%',
         height: 52,
-        zIndex: 99,
         overflow: 'hidden',
     },
     tabsScroll: {
@@ -300,13 +298,14 @@ const styles = StyleSheet.create({
     },
     // ─── Content ─────────────────────────────────────────
     scrollContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 0, // Header and tabs handle their own padding
     },
     biomeHeader: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 12,
         marginBottom: 20,
+        paddingHorizontal: 20,
     },
     biomeColorBar: {
         width: 3,
@@ -329,6 +328,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderRadius: 8,
         padding: 18,
+        marginHorizontal: 20,
         marginBottom: 16,
         borderWidth: 1,
         borderColor: 'rgba(16,185,129,0.12)',

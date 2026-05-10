@@ -41,6 +41,7 @@ import { CampaignMapSkiaBackground } from './components/CampaignMapSkiaBackgroun
 import { MapParallaxLayers } from './components/MapParallaxLayers';
 import { RelicTray } from '../../components/campaign/RelicTray';
 import { TOTAL_STAGES, MAP_BIOMES } from './constants';
+import { AnimatedLegendaryBorder } from '../Tutorial/components/AnimatedLegendaryBorder';
 import { generateCampaignMap, MapNode as MapNodeTypeData } from '../../data/campaignData';
 import { useCampaignStore } from '../../store/campaignStore';
 import { useDeckStore } from '../../store/deckStore';
@@ -276,9 +277,14 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        onPress={() => setDifficultyModalVisible(true)}
-                        style={[styles.headerPill, { borderColor: colors.arcane.cyan }]}
+                        onPress={() => {
+                            setDifficultyModalVisible(true);
+                        }}
+                        style={styles.headerPill}
                     >
+                        {selectedDifficulty === 'easy' && <Ionicons name="leaf-outline" size={14} color={colors.arcane.cyan} />}
+                        {selectedDifficulty === 'medium' && <MaterialCommunityIcons name="shield-outline" size={14} color={colors.arcane.cyan} />}
+                        {selectedDifficulty === 'hard' && <MaterialCommunityIcons name="skull-outline" size={14} color={colors.arcane.cyan} />}
                         <Text variant="caption" color={colors.arcane.cyan} style={styles.pillText} numberOfLines={1}>
                             {t(`campaign.difficulty.${selectedDifficulty}`).toUpperCase()}
                         </Text>
@@ -308,7 +314,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                         <Animated.View
                             entering={FadeIn.duration(300)}
                             exiting={FadeOut.duration(200)}
-                            style={[styles.difficultyModalContainer, { width: screenWidth * 0.85, maxHeight: screenHeight * 0.7 }]}
+                            style={[styles.difficultyModalContainer, { width: screenWidth * 0.85, maxHeight: screenHeight * 0.7, borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.4)' }]}
                         >
                             <ExpoLinearGradient colors={['rgba(30, 30, 60, 0.98)', 'rgba(10, 10, 20, 0.98)']} style={styles.difficultyGradient}>
                                 <Text style={styles.difficultyHeader}>{t('campaign.select_difficulty')}</Text>
@@ -363,7 +369,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                         <Animated.View
                             entering={FadeIn.duration(300)}
                             exiting={FadeOut.duration(200)}
-                            style={[styles.stagePortalContainer, { width: screenWidth * 0.88, height: screenHeight * 0.8 }]}
+                            style={[styles.stagePortalContainer, { width: screenWidth * 0.88, height: screenHeight * 0.8, borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.4)' }]}
                         >
                             <View style={styles.stagePortalHeader}>
                                 <Text style={styles.stageLevelName}>
@@ -380,85 +386,95 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                 </TouchableOpacity>
                             </View>
 
-                            <View style={styles.stagePortalBody}>
-                                <View style={styles.stageInfoRow}>
-                                    <View style={styles.stageLevelPill}>
-                                        <Text style={styles.stageLevelText}>
-                                            {t('common.level', { num: selectedStage })}
-                                        </Text>
+                            {/* WIDESCREEN BRIEFING BODY */}
+                            <View style={styles.stagePortalHorizontalBody}>
+                                {/* LEFT: THE PORTAL / ART */}
+                                <View style={styles.stagePortalLeft}>
+                                    <View style={styles.stageArtContainer}>
+                                        <View style={styles.stageArtGlow} />
+                                        <View style={styles.stageIconMain}>
+                                            {(() => {
+                                                const stageData = stages.find(s => s.id === selectedStage);
+                                                const type = stageData?.type;
+                                                if (type === 'boss') return <MaterialCommunityIcons name="skull" size={32} color="#f59e0b" />;
+                                                if (type === 'elite') return <MaterialCommunityIcons name="star-shooting" size={32} color={colors.arcane.emerald} />;
+                                                if (type === 'shop') return <MaterialCommunityIcons name="diamond-stone" size={32} color="#fbbf24" />;
+                                                if (type === 'event') return <MaterialCommunityIcons name="map-marker-question" size={32} color="#a855f7" />;
+                                                if (type === 'rest') return <MaterialCommunityIcons name="tent" size={32} color="#2dd4bf" />;
+                                                return <MaterialCommunityIcons name="shield-sword" size={32} color={colors.arcane.emerald} />;
+                                            })()}
+                                        </View>
                                     </View>
-                                    <View style={[styles.stageLevelPill, { borderColor: colors.arcane.cyan }]}>
-                                        <Text style={[styles.stageLevelText, { color: colors.arcane.cyan }]}>
-                                            {t(`campaign.difficulty.${selectedDifficulty}`)}
-                                        </Text>
-                                    </View>
-                                    {selectedStage !== null && completedNodes.includes(selectedStage) && (
-                                        <View style={[styles.stageLevelPill, { borderColor: colors.arcane.emerald, backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
-                                            <Text style={[styles.stageLevelText, { color: colors.arcane.emerald }]}>
-                                                {t('common.completed')}
+                                </View>
+
+                                {/* RIGHT: INFO & ACTIONS */}
+                                <View style={styles.stagePortalRight}>
+                                    <View style={styles.stageInfoRow}>
+                                        <View style={styles.stageLevelPill}>
+                                            <Text style={styles.stageLevelText}>
+                                                {t('common.level', { num: selectedStage })}
                                             </Text>
                                         </View>
-                                    )}
-                                </View>
+                                        <View style={[styles.stageLevelPill, { borderColor: colors.arcane.cyan }]}>
+                                            <Text style={[styles.stageLevelText, { color: colors.arcane.cyan }]}>
+                                                {t(`campaign.difficulty.${selectedDifficulty}`)}
+                                            </Text>
+                                        </View>
+                                        {selectedStage !== null && completedNodes.includes(selectedStage) && (
+                                            <View style={[styles.stageLevelPill, { borderColor: colors.arcane.emerald, backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                                                <Text style={[styles.stageLevelText, { color: colors.arcane.emerald }]}>
+                                                    {t('common.completed')}
+                                                </Text>
+                                            </View>
+                                        )}
+                                    </View>
 
-                                <View style={styles.stageArtContainer}>
-                                    <View style={styles.stageArtGlow} />
-                                    <View style={styles.stageIconMain}>
+                                    <Text style={styles.stageDesc}>
                                         {(() => {
                                             const type = stages.find(s => s.id === selectedStage)?.type;
-                                            if (type === 'boss') return <MaterialCommunityIcons name="skull" size={24} color="#f59e0b" />;
-                                            if (type === 'elite') return <MaterialCommunityIcons name="star-shooting" size={24} color={colors.arcane.emerald} />;
-                                            if (type === 'shop') return <MaterialCommunityIcons name="diamond-stone" size={24} color="#fbbf24" />;
-                                            if (type === 'event') return <MaterialCommunityIcons name="map-marker-question" size={24} color="#a855f7" />;
-                                            if (type === 'rest') return <MaterialCommunityIcons name="tent" size={24} color="#2dd4bf" />;
-                                            return <MaterialCommunityIcons name="shield-sword" size={24} color={colors.arcane.emerald} />;
+                                            if (type === 'boss') return t('campaign.descriptions.boss');
+                                            if (type === 'shop') return t('campaign.descriptions.shop');
+                                            if (type === 'event') return t('campaign.descriptions.event');
+                                            return t('campaign.descriptions.battle');
                                         })()}
-                                    </View>
-                                </View>
-
-                                <Text style={styles.stageDesc}>
-                                    {(() => {
-                                        const type = stages.find(s => s.id === selectedStage)?.type;
-                                        if (type === 'boss') return t('campaign.descriptions.boss');
-                                        if (type === 'shop') return t('campaign.descriptions.shop');
-                                        if (type === 'event') return t('campaign.descriptions.event');
-                                        return t('campaign.descriptions.battle');
-                                    })()}
-                                </Text>
-                            </View>
-
-                            <TouchableOpacity
-                                style={styles.portalAction}
-                                onPress={handlePlayStage}
-                                activeOpacity={0.8}
-                            >
-                                <ExpoLinearGradient
-                                    colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
-                                    style={styles.portalActionGradient}
-                                >
-                                    <Text style={styles.portalActionText}>
-                                        {selectedStage !== null && completedNodes.includes(selectedStage) 
-                                            ? t('common.replay').toUpperCase() 
-                                            : (stages.find(s => s.id === selectedStage)?.type === 'shop' ? t('common.visit_merchant') : t('common.enter_void'))}
                                     </Text>
-                                </ExpoLinearGradient>
-                            </TouchableOpacity>
+
+                                    <View style={{ flex: 1 }} />
+
+                                    <TouchableOpacity
+                                        style={styles.portalAction}
+                                        onPress={handlePlayStage}
+                                        activeOpacity={0.8}
+                                    >
+                                        <ExpoLinearGradient
+                                            colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
+                                            style={styles.portalActionGradient}
+                                        >
+                                            <Text style={styles.portalActionText}>
+                                                {selectedStage !== null && completedNodes.includes(selectedStage)
+                                                    ? t('common.replay').toUpperCase()
+                                                    : (stages.find(s => s.id === selectedStage)?.type === 'shop' ? t('common.visit_merchant') : t('common.enter_void'))}
+                                            </Text>
+                                        </ExpoLinearGradient>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
                         </Animated.View>
                     </BlurView>
                 </Animated.View>
             </Modal>
 
             {/* Lore Chronicles Button */}
-            <Animated.View 
+            <Animated.View
                 entering={FadeIn.delay(1000)}
                 style={[styles.loreButtonContainer, { bottom: insets.bottom + 20 }]}
             >
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={styles.loreButton}
                     onPress={() => navigation.navigate('Lore')}
                     activeOpacity={0.8}
                 >
-                    <ExpoLinearGradient 
+                    <ExpoLinearGradient
                         colors={['rgba(16, 185, 129, 0.2)', 'rgba(0, 0, 0, 0.4)']}
                         style={StyleSheet.absoluteFill}
                     />
@@ -548,10 +564,18 @@ const MapNodeComponent = React.memo<{
         }
     }, [isActive, isCurrent]);
 
+    const glowAnimatedStyle = useAnimatedStyle(() => {
+        if (!(isCurrent || isActive)) return { opacity: 0 };
+        return {
+            transform: [{ scale: pulse.value * 1.2 }],
+            opacity: interpolate(pulse.value, [1, 1.15], [0.15, 0.35]),
+        };
+    });
+
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
             { translateX: -NODE_SIZE / 2 },
-            { scale: pulse.value }
+            { scale: (isCurrent || isActive) ? 1.05 : 1 }
         ]
     }));
 
@@ -586,31 +610,21 @@ const MapNodeComponent = React.memo<{
         >
             <Animated.View style={[
                 styles.nodeGlow,
-                isBoss && styles.nodeGlowBoss,
+                stage.type === 'elite' && !isLocked && styles.nodeGlowElite,
+                stage.type === 'boss' && !isLocked && styles.nodeGlowBoss,
                 stage.type === 'shop' && !isLocked && styles.nodeGlowShop,
                 stage.type === 'event' && !isLocked && styles.nodeGlowEvent,
                 stage.type === 'rest' && !isLocked && styles.nodeGlowRest,
                 isCurrent && styles.nodeGlowCurrent,
                 isActive && styles.nodeGlowActive,
-                { width: NODE_SIZE + 20, height: NODE_SIZE + 20, borderRadius: (NODE_SIZE + 20) / 2 }
+                { width: NODE_SIZE + 20, height: NODE_SIZE + 20, borderRadius: (NODE_SIZE + 20) / 2 },
+                isLocked && { opacity: 0 }, // Kill glow for locked stages
+                glowAnimatedStyle
             ]} />
 
-            {isBoss && <View style={styles.bossRing} />}
+            {isBoss && !isLocked && <View style={styles.bossRing} />}
 
-            <ExpoLinearGradient
-                colors={
-                    isCurrent || isActive
-                        ? [colors.arcane.emerald, colors.arcane.emeraldDark]
-                        : isBoss && !isLocked
-                            ? ['#f59e0b', '#78350f']
-                            : stage.type === 'shop' && !isLocked
-                                ? ['#fbbf24', '#92400e']
-                                : stage.type === 'event' && !isLocked
-                                    ? ['#a855f7', '#581c87']
-                                    : stage.type === 'rest' && !isLocked
-                                        ? ['#2dd4bf', '#0d9488']
-                                        : [colors.arcane.obsidian, 'rgba(20,20,20,0.8)']
-                }
+            <View
                 style={[
                     styles.nodeSigil,
                     { width: NODE_SIZE - 4, height: NODE_SIZE - 4 },
@@ -620,10 +634,26 @@ const MapNodeComponent = React.memo<{
                     stage.type === 'event' && !isLocked && styles.nodeSigilEvent,
                 ]}
             >
+                <ExpoLinearGradient
+                    colors={
+                        isCurrent || isActive
+                            ? [colors.arcane.emerald, colors.arcane.emeraldDark]
+                            : isBoss && !isLocked
+                                ? ['#f59e0b', '#78350f']
+                                : stage.type === 'shop' && !isLocked
+                                    ? ['#fbbf24', '#92400e']
+                                    : stage.type === 'event' && !isLocked
+                                        ? ['#a855f7', '#581c87']
+                                        : stage.type === 'rest' && !isLocked
+                                            ? ['#2dd4bf', '#0d9488']
+                                            : [colors.arcane.obsidian, 'rgba(20,20,20,0.8)']
+                    }
+                    style={StyleSheet.absoluteFill}
+                />
                 <View style={[styles.nodeIconWrapper, { transform: [{ rotate: '-45deg' }] }]}>
                     {getIcon()}
                 </View>
-            </ExpoLinearGradient>
+            </View>
             {isCompleted && (
                 <View style={styles.completedBadge}>
                     <Ionicons name="checkmark-circle" size={16} color={colors.arcane.emerald} />
@@ -738,7 +768,7 @@ const styles = StyleSheet.create({
         transform: [{ rotate: '45deg' }],
         borderWidth: 1.5,
         borderColor: 'rgba(255,255,255,0.2)',
-        ...shadows.md,
+        overflow: 'hidden',
     },
     nodeSigilActive: {
         borderColor: '#fff',
@@ -771,7 +801,14 @@ const styles = StyleSheet.create({
     },
     nodeGlowActive: {
         opacity: 0.3,
-        transform: [{ scale: 1.3 }],
+    },
+    nodeGlowCurrent: {
+        backgroundColor: colors.arcane.emerald,
+        opacity: 0.4,
+    },
+    nodeGlowElite: {
+        backgroundColor: colors.arcane.emerald,
+        opacity: 0.25,
     },
     nodeGlowBoss: {
         backgroundColor: '#f59e0b',
@@ -908,11 +945,21 @@ const styles = StyleSheet.create({
     closePortal: {
         padding: 4,
     },
-    stagePortalBody: {
+    stagePortalHorizontalBody: {
         flex: 1,
-        paddingHorizontal: spacing.md,
-        paddingTop: spacing.sm,
-        paddingBottom: spacing.xs,
+        flexDirection: 'row',
+        padding: spacing.lg,
+        gap: spacing.xl,
+    },
+    stagePortalLeft: {
+        flex: 0.8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    stagePortalRight: {
+        flex: 2,
+        justifyContent: 'center',
+        paddingRight: spacing.md,
     },
     stageInfoRow: {
         flexDirection: 'row',
@@ -934,41 +981,46 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     stageArtContainer: {
-        height: 44,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: 0,
-        marginBottom: spacing.lg,
     },
     stageArtGlow: {
         position: 'absolute',
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: 100,
+        height: 100,
+        borderRadius: 50,
         backgroundColor: colors.arcane.emerald,
-        opacity: 0.1,
+        opacity: 0.12,
     },
     stageIconMain: {
-        width: 42,
-        height: 42,
-        borderRadius: 21,
+        width: 60,
+        height: 60,
+        borderRadius: 30,
         backgroundColor: 'rgba(0,0,0,0.4)',
         borderWidth: 2,
-        borderColor: 'rgba(16, 185, 129, 0.2)',
+        borderColor: colors.arcane.emerald,
         justifyContent: 'center',
         alignItems: 'center',
+        shadowColor: colors.arcane.emerald,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.4,
+        shadowRadius: 15,
+        elevation: 10,
     },
     stageDesc: {
-        color: 'rgba(255,255,255,0.6)',
-        fontSize: 12,
-        lineHeight: 18,
-        textAlign: 'center',
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: 13,
+        lineHeight: 20,
+        textAlign: 'left',
         fontStyle: 'italic',
-        paddingHorizontal: spacing.md,
+        marginBottom: spacing.md,
     },
     portalAction: {
         width: '100%',
-        height: 48,
+        height: 42,
+        borderRadius: 10,
+        overflow: 'hidden',
+        marginTop: spacing.sm,
     },
     portalActionGradient: {
         flex: 1,
@@ -978,8 +1030,8 @@ const styles = StyleSheet.create({
     portalActionText: {
         color: colors.arcane.obsidian,
         fontWeight: '900',
-        fontSize: 16,
-        letterSpacing: 4,
+        fontSize: 14,
+        letterSpacing: 3,
     },
     // --- Lore Button ---
     loreButtonContainer: {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     StyleSheet,
@@ -6,14 +6,28 @@ import {
     useWindowDimensions,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import Animated, { FadeIn, FadeInRight, FadeOutLeft, LinearTransition } from 'react-native-reanimated';
+import Animated, { 
+    FadeIn, 
+    FadeInRight, 
+    FadeOutLeft, 
+    LinearTransition,
+    useSharedValue,
+    useAnimatedStyle,
+    withRepeat,
+    withTiming,
+    Easing,
+    interpolate
+} from 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 import { RootStackParamList } from '../../types';
 import { Text } from '../../components/ui';
 import { colors, spacing, typography } from '../../theme';
 import { useSettingsStore } from '../../store/settingsStore';
 import * as Haptics from 'expo-haptics';
+import { AnimatedLegendaryBorder } from './components/AnimatedLegendaryBorder';
 
 type TutorialScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Tutorial'>;
 
@@ -23,10 +37,37 @@ interface Props {
 
 export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
-    const { height: screenHeight } = useWindowDimensions();
+    const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const { t } = useTranslation();
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [cardLayout, setCardLayout] = useState<{ width: number; height: number } | null>(null);
     const completeTutorial = useSettingsStore(state => state.completeTutorial);
+
+    const onCardLayout = (event: any) => {
+        const { width, height } = event.nativeEvent.layout;
+        setCardLayout({ width, height });
+    };
+
+    // Shimmer Animation Logic
+    const shimmerProgress = useSharedValue(-1);
+
+    useEffect(() => {
+        shimmerProgress.value = withRepeat(
+            withTiming(1, { 
+                duration: 4000, 
+                easing: Easing.bezier(0.4, 0, 0.2, 1) 
+            }),
+            -1,
+            false
+        );
+    }, []);
+
+    const shimmerStyle = useAnimatedStyle(() => ({
+        transform: [{
+            translateX: interpolate(shimmerProgress.value, [-1, 1], [-screenWidth, screenWidth])
+        }],
+        opacity: interpolate(shimmerProgress.value, [-1, -0.8, 0.8, 1], [0, 1, 1, 0])
+    }));
 
     const SLIDES = [
         {
@@ -72,6 +113,13 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
         }
     };
 
+    const handlePrev = () => {
+        if (currentIndex > 0) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setCurrentIndex(prev => prev - 1);
+        }
+    };
+
     const handleComplete = () => {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         completeTutorial();
@@ -87,66 +135,119 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
             <Animated.View entering={FadeIn.duration(1000)} style={styles.backgroundOverlay} />
 
             <View style={styles.contentWrapper}>
-                {/* Top Spacer to position the card roughly 10% from the top */}
-                <View style={{ height: screenHeight * 0.01 }} />
+                {/* Centered top spacer for landscape */}
+                <View style={{ height: screenHeight * 0.12 }} />
 
-                <Animated.View
-                    key={currentSlide.id}
-                    entering={FadeInRight.duration(400)}
-                    exiting={FadeOutLeft.duration(300)}
-                    style={styles.cardContainer}
-                >
-                    {/* Header */}
-                    <View style={styles.iconContainer}>
-                        <Text style={styles.icon}>{currentSlide.icon}</Text>
-                    </View>
-                    <Text style={styles.title}>{currentSlide.title}</Text>
+                {/* STATIC CARD WRAPPER */}
+                <View style={styles.cardContainer} onLayout={onCardLayout}>
+                    {/* 1. Legendary Animated Border (Static, Back) */}
+                    {cardLayout && (
+                        <AnimatedLegendaryBorder 
+                            width={cardLayout.width}
+                            height={cardLayout.height}
+                            borderRadius={24}
+                            borderWidth={2}
+                        />
+                    )}
 
-                    {/* Body */}
-                    <Text style={styles.description}>{currentSlide.description}</Text>
-
-                    {/* Spacer */}
-                    <View style={{ height: spacing.xl }} />
-
-                    {/* Pagination Dots */}
-                    <Animated.View layout={LinearTransition} style={styles.pagination}>
-                        {SLIDES.map((_, i) => (
-                            <Animated.View
-                                key={i}
-                                layout={LinearTransition}
-                                style={[
-                                    styles.dot,
-                                    i === currentIndex ? styles.dotActive : styles.dotInactive
+                    {/* 2. Glassmorphism Shimmer Overlay (Static, Back) */}
+                    <View 
+                        style={[StyleSheet.absoluteFill, { overflow: 'hidden', borderRadius: 24 }]}
+                        pointerEvents="none"
+                    >
+                        <Animated.View style={[StyleSheet.absoluteFill, { width: '200%' }, shimmerStyle]}>
+                            <LinearGradient
+                                colors={[
+                                    'transparent',
+                                    'rgba(16, 185, 129, 0.02)',
+                                    'rgba(16, 185, 129, 0.08)',
+                                    'rgba(16, 185, 129, 0.02)',
+                                    'transparent'
                                 ]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={StyleSheet.absoluteFill}
                             />
-                        ))}
+                        </Animated.View>
+                    </View>
+
+                    {/* 3. ANIMATED CONTENT BLOCK (Middle) */}
+                    <Animated.View
+                        key={currentIndex}
+                        entering={FadeInRight.duration(400)}
+                        exiting={FadeOutLeft.duration(300)}
+                        style={StyleSheet.absoluteFill}
+                        pointerEvents="box-none"
+                    >
+                        <View style={styles.horizontalContent}>
+                            {/* LEFT: ICON */}
+                            <View style={styles.leftColumn}>
+                                <View style={styles.iconContainer}>
+                                    <Text style={styles.icon}>{currentSlide.icon}</Text>
+                                </View>
+                                
+                                {/* Pagination */}
+                                <Animated.View layout={LinearTransition} style={styles.pagination}>
+                                    {SLIDES.map((_, i) => (
+                                        <Animated.View
+                                            key={i}
+                                            layout={LinearTransition}
+                                            style={[
+                                                styles.dot,
+                                                i === currentIndex ? styles.dotActive : styles.dotInactive
+                                            ]}
+                                        />
+                                    ))}
+                                </Animated.View>
+                            </View>
+
+                            {/* RIGHT: TEXT CONTENT */}
+                            <View style={styles.rightColumn}>
+                                <Text style={styles.title}>{currentSlide.title}</Text>
+                                <Text style={styles.description}>{currentSlide.description}</Text>
+                            </View>
+                        </View>
                     </Animated.View>
 
-                    {/* Button Row */}
-                    <View style={styles.buttonRow}>
-                        {currentIndex < SLIDES.length - 1 && (
-                            <TouchableOpacity
-                                style={styles.skipButton}
-                                onPress={handleComplete}
-                                activeOpacity={0.7}
-                            >
-                                <Text style={styles.skipText}>{t('tutorial.btn.skip', 'Skip')}</Text>
-                            </TouchableOpacity>
-                        )}
+                    {/* 4. STATIC NAVIGATION ELEMENTS (FRONT - Rendered last) */}
+                    
+                    {/* Skip / Close Button */}
+                    <TouchableOpacity 
+                        style={styles.closeButton} 
+                        onPress={handleComplete}
+                        activeOpacity={0.6}
+                    >
+                        <Ionicons name="close" size={24} color={colors.text.tertiary} />
+                    </TouchableOpacity>
 
-                        <TouchableOpacity
-                            style={styles.primaryButton}
+                    {/* Left Chevron */}
+                    {currentIndex > 0 && (
+                        <View style={[styles.navContainer, styles.leftNav]} pointerEvents="box-none">
+                            <TouchableOpacity 
+                                style={styles.navChevron} 
+                                onPress={handlePrev}
+                                activeOpacity={0.6}
+                            >
+                                <Ionicons name="chevron-back" size={24} color={colors.arcane.emerald} />
+                            </TouchableOpacity>
+                        </View>
+                    )}
+
+                    {/* Right Chevron */}
+                    <View style={[styles.navContainer, styles.rightNav]} pointerEvents="box-none">
+                        <TouchableOpacity 
+                            style={styles.navChevron} 
                             onPress={handleNext}
-                            activeOpacity={0.8}
+                            activeOpacity={0.6}
                         >
-                            <Text style={styles.primaryButtonText}>
-                                {currentIndex === SLIDES.length - 1
-                                    ? t('tutorial.btn.play', "Let's Play")
-                                    : t('tutorial.btn.next', 'Next')}
-                            </Text>
+                            <Ionicons 
+                                name={currentIndex === SLIDES.length - 1 ? "play" : "chevron-forward"} 
+                                size={currentIndex === SLIDES.length - 1 ? 20 : 24} 
+                                color={colors.arcane.emerald} 
+                            />
                         </TouchableOpacity>
                     </View>
-                </Animated.View>
+                </View>
             </View>
         </View>
     );
@@ -167,100 +268,112 @@ const styles = StyleSheet.create({
         paddingHorizontal: spacing.xl,
     },
     cardContainer: {
-        width: '100%',
-        maxWidth: 420,
+        width: '92%',
+        maxWidth: 720,
+        minHeight: 280,
         backgroundColor: colors.arcane.graphite,
         borderRadius: 24,
-        paddingHorizontal: spacing.xl,
+        paddingHorizontal: spacing['2xl'],
         paddingVertical: spacing.xl,
-        alignItems: 'center',
         borderWidth: 1,
-        borderColor: colors.glass.border,
+        borderColor: 'rgba(16, 185, 129, 0.1)',
         shadowColor: colors.arcane.emerald,
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.15,
         shadowRadius: 30,
         elevation: 10,
+        justifyContent: 'center',
+        position: 'relative',
+    },
+    horizontalContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: spacing['2xl'],
+        paddingHorizontal: spacing['2xl'],
+        height: '100%',
+    },
+    leftColumn: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 120,
+    },
+    rightColumn: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingRight: spacing.xl,
     },
     iconContainer: {
-        marginBottom: spacing.sm,
-        paddingTop: spacing.xs,
+        marginBottom: spacing.xl,
     },
     icon: {
-        fontSize: 48,
-        lineHeight: 56,
+        fontSize: 72,
+        lineHeight: 84,
         textAlign: 'center',
     },
     title: {
-        fontSize: typography.sizes.xl,
+        fontSize: typography.sizes['2xl'],
         fontFamily: typography.fonts.heading,
         color: colors.text.primary,
-        textAlign: 'center',
-        marginBottom: spacing.md,
+        textAlign: 'left',
+        marginBottom: spacing.sm,
+        lineHeight: 32,
+        paddingVertical: 2,
     },
     description: {
         fontSize: typography.sizes.base,
         color: colors.text.secondary,
-        textAlign: 'center',
-        lineHeight: 24,
+        textAlign: 'left',
+        lineHeight: 22,
     },
     pagination: {
         flexDirection: 'row',
-        marginBottom: spacing.xl,
         height: 8,
         alignItems: 'center',
     },
     dot: {
-        height: 8,
-        borderRadius: 4,
-        marginHorizontal: 4,
+        height: 6,
+        borderRadius: 3,
+        marginHorizontal: 3,
     },
     dotActive: {
         backgroundColor: colors.arcane.emerald,
-        width: 24,
+        width: 18,
     },
     dotInactive: {
         backgroundColor: 'rgba(16, 185, 129, 0.2)',
-        width: 8,
+        width: 6,
     },
-    buttonRow: {
-        flexDirection: 'row',
-        width: '100%',
-        alignItems: 'center',
-        gap: spacing.md,
+    closeButton: {
+        position: 'absolute',
+        top: spacing.md,
+        right: spacing.md,
+        zIndex: 30,
+        padding: spacing.xs,
     },
-    primaryButton: {
-        flex: 1,
-        backgroundColor: colors.arcane.emerald,
-        paddingVertical: spacing.md,
-        borderRadius: 14,
+    navContainer: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        justifyContent: 'center',
+        zIndex: 30,
+        width: 60,
+    },
+    leftNav: {
+        left: 0,
+        alignItems: 'flex-start',
+        paddingLeft: spacing.sm,
+    },
+    rightNav: {
+        right: 0,
+        alignItems: 'flex-end',
+        paddingRight: spacing.sm,
+    },
+    navChevron: {
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        borderRadius: 21,
+        width: 42,
+        height: 42,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: colors.arcane.emerald,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 6,
-    },
-    primaryButtonText: {
-        color: '#FFFFFF',
-        fontFamily: typography.fonts.bodyBold,
-        fontSize: typography.sizes.base,
-        letterSpacing: 1,
-    },
-    skipButton: {
-        flex: 1,
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        paddingVertical: spacing.md,
-        borderRadius: 14,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-    },
-    skipText: {
-        color: colors.text.tertiary,
-        fontSize: typography.sizes.base,
-        fontFamily: typography.fonts.bodySemiBold,
     },
 });

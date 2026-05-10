@@ -463,9 +463,21 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                         pressed && isPlayerTurn && player.hero.ability.currentCooldown === 0 && { transform: [{ scale: 0.93 }] },
                                     ]}
                                 >
-                                    <Text style={{ fontSize: 10, color: player.hero.ability.currentCooldown > 0 ? colors.text.disabled : colors.arcane.white, fontWeight: '900', letterSpacing: 1 }}>
-                                        {player.hero.ability.currentCooldown > 0 ? t('common.used') : `⚡ ${t(player.hero.ability.name).toUpperCase()}`}
-                                    </Text>
+                                    <View style={styles.heroAbilityContent}>
+                                        {player.hero.ability.currentCooldown === 0 && (
+                                            <Text style={styles.heroAbilityIcon}>⚡</Text>
+                                        )}
+                                        <Text 
+                                            numberOfLines={1}
+                                            adjustsFontSizeToFit
+                                            style={[
+                                                styles.heroAbilityText,
+                                                { color: player.hero.ability.currentCooldown > 0 ? colors.text.disabled : colors.arcane.white }
+                                            ]}
+                                        >
+                                            {player.hero.ability.currentCooldown > 0 ? t('common.used') : t(player.hero.ability.name).toUpperCase()}
+                                        </Text>
+                                    </View>
                                 </Pressable>
 
                                 <Pressable
@@ -775,13 +787,28 @@ const styles = StyleSheet.create({
     passButtonDisabled: { opacity: 0.4 },
     heroAbilityButton: {
         width: 90,
-        height: 28,
-        borderRadius: 2,
-        alignItems: 'center',
-        justifyContent: 'center',
+        height: 32,
+        borderRadius: 4,
         borderWidth: 1,
         borderColor: 'rgba(16, 185, 129, 0.15)',
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        overflow: 'hidden',
+    },
+    heroAbilityContent: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 4,
+    },
+    heroAbilityIcon: {
+        fontSize: 8,
+        color: colors.arcane.cyan,
+    },
+    heroAbilityText: {
+        fontSize: 8,
+        fontWeight: '900',
+        letterSpacing: 0.5,
     },
     heroAbilityActive: {
         borderColor: colors.arcane.emerald,
