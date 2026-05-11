@@ -14,6 +14,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Particle } from './Particle';
 import { colors } from '../../../theme';
+import { useAnimationMultiplier } from '../../../utils/animation';
 
 export type SpectralEffectType = 'scorch' | 'boost' | 'revive' | 'void_bolt';
 
@@ -32,6 +33,7 @@ export const SpectralEffect: React.FC<SpectralEffectProps> = ({
     onComplete,
     onShake
 }) => {
+    const anim = useAnimationMultiplier();
     // Shared values for layers
     const glowScale = useSharedValue(0);
     const glowOpacity = useSharedValue(0);
@@ -56,30 +58,30 @@ export const SpectralEffect: React.FC<SpectralEffectProps> = ({
 
     useEffect(() => {
         // 1. Anticipation (120ms)
-        glowScale.value = withTiming(0.4, { duration: 120, easing: Easing.in(Easing.quad) });
-        glowOpacity.value = withTiming(0.4, { duration: 120 });
-
+        glowScale.value = withTiming(0.4, { duration: anim(120), easing: Easing.in(Easing.quad) });
+        glowOpacity.value = withTiming(0.4, { duration: anim(120) });
+ 
         // 2. Impact (Fast Burst)
-        const impactDelay = 120;
-
+        const impactDelay = anim(120);
+ 
         // Glow impact
         glowScale.value = withDelay(impactDelay, withSpring(2.5, { damping: 10, stiffness: 100 }));
-        glowOpacity.value = withDelay(impactDelay, withTiming(0.8, { duration: 50 }));
-
+        glowOpacity.value = withDelay(impactDelay, withTiming(0.8, { duration: anim(50) }));
+ 
         // Pulse impact
         pulseScale.value = withDelay(impactDelay, withSpring(3, { damping: 12, stiffness: 120 }));
         pulseOpacity.value = withDelay(impactDelay, withSequence(
-            withTiming(1, { duration: 50 }),
-            withTiming(0, { duration: 600 })
+            withTiming(1, { duration: anim(50) }),
+            withTiming(0, { duration: anim(600) })
         ));
-
+ 
         // Trigger Screen Shake for destructive effects
         if (isDestructive && onShake) {
             setTimeout(() => onShake(5), impactDelay);
         }
-
+ 
         // 3. Decay
-        glowOpacity.value = withDelay(impactDelay + 400, withTiming(0, { duration: 400 }, (finished) => {
+        glowOpacity.value = withDelay(impactDelay + anim(400), withTiming(0, { duration: anim(400) }, (finished) => {
             if (finished) {
                 runOnJS(onComplete)();
             }

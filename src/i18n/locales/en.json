@@ -137,6 +137,7 @@
     "replay": "REPLAY",
     "reawaken": "REAWAKEN",
     "abandon": "ABANDON",
+    "cancel": "CANCEL",
     "selected": "Selected",
     "messages": {
       "game_started": "Game Started",
@@ -210,6 +211,8 @@
     }
   },
   "deck_builder": {
+    "deck_locked_title": "DECK LOCKED",
+    "deck_locked_desc": "Your deck is locked during an active expedition. Visit a Merchant to purify your deck.",
     "vault_title": "VAULT",
     "construct_title": "CONSTRUCT",
     "unlinked": "UNLINKED",
@@ -357,6 +360,8 @@
       "medium": "MEDIUM",
       "hard": "HARD"
     },
+    "confirm_abandon": "Abandon Expedition?",
+    "confirm_abandon_desc": "All progress in this run will be lost. Your deck will be unlocked.",
     "descriptions": {
       "boss": "A cosmic terror guards the path forward. Steel your soul for a battle of ages.",
       "shop": "Scattered relics and rare cards for those with the gold to pay.",
@@ -855,8 +860,16 @@
       "desc": "Command the Arcane, Nature, and Neutral factions. Combining units from the same faction can unlock powerful synergies and hidden abilities."
     },
     "slide5": {
+      "title": "Unit Classes & Weather",
+      "desc": "Units belong to three classes: Melee, Ranged, or Siege. Each class is vulnerable to specific Weather effects like Frost or Fog, which reduce their power to 1. Legendary units are immune to these effects!"
+    },
+    "slide6": {
+      "title": "The Locked Path",
+      "desc": "During the first 40 stages (Verdant Echo), you can edit your deck freely. However, once you enter deeper biomes, your deck LOCKS. To change strategy, you must use the Merchant or Abandon the run (which resets all progress to stage 1)."
+    },
+    "slide7": {
       "title": "Tactical Combat",
-      "desc": "Drag units to the battlefield. They attack enemies directly in front of them. Will you focus on their units, or strike the enemy Hero directly?"
+      "desc": "Drag units to the battlefield. They attack enemies directly in front of them. Reduce the enemy's total power to ensure your victory at the end of the round!"
     },
     "btn": {
       "play": "Let's Play",

@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
     FadeIn,
+    FadeInUp,
     FadeInLeft,
     FadeInRight,
     useSharedValue,
@@ -31,6 +32,7 @@ import { CardComponent } from '../../components/game';
 import { colors } from '../../theme';
 import { useTranslation } from 'react-i18next';
 import { useDeckStore } from '../../store/deckStore';
+import { useCampaignStore } from '../../store/campaignStore';
 import { getAllCards, AVAILABLE_HEROES } from '../../data/cardData';
 
 type DeckBuilderScreenNavigationProp = StackNavigationProp<RootStackParamList, 'DeckBuilder'>;
@@ -67,7 +69,7 @@ const SigilIcon = ({ active, label, onPress, icon }: { active: boolean; label: s
     );
 };
 
-const DeckCardRow = ({ card, onRemove, index }: { card: Card; onRemove: () => void; index: number }) => {
+const DeckCardRow = ({ card, onRemove, index, disabled }: { card: Card; onRemove: () => void; index: number; disabled?: boolean }) => {
     const { t } = useTranslation();
     return (
         <Animated.View entering={FadeInRight.delay(index * 20)} style={styles.deckCardRow}>
@@ -75,9 +77,11 @@ const DeckCardRow = ({ card, onRemove, index }: { card: Card; onRemove: () => vo
                 <Text style={styles.manaText}>{card.manaCost}</Text>
             </View>
             <Text style={styles.deckCardName} numberOfLines={1}>{t(`cards.${card.name}`).toUpperCase()}</Text>
-            <Pressable onPress={onRemove} style={styles.removeBtn}>
-                <Text style={styles.removeText}>✕</Text>
-            </Pressable>
+            {!disabled && (
+                <Pressable onPress={onRemove} style={styles.removeBtn}>
+                    <Text style={styles.removeText}>✕</Text>
+                </Pressable>
+            )}
         </Animated.View>
     );
 };
@@ -88,8 +92,28 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     const { width: sw, height: sh } = useWindowDimensions();
     const {
         decks, activeDeckId,
-        addCardToDeck, removeCardFromDeck, createDeck, deleteDeck, setActiveDeck, setDeckHero,
+        addCardToDeck: addToDeck, removeCardFromDeck: removeFromDeck, createDeck, deleteDeck, setActiveDeck, setDeckHero,
     } = useDeckStore();
+
+    const { runActive, currentNodeId } = useCampaignStore();
+    
+    // The deck is only locked AFTER the first biome (Verdant Echo, ends at stage 40)
+    const isDeckLocked = runActive && currentNodeId > 40;
+
+    const handleAddCard = (card: Card) => {
+        if (isDeckLocked) return;
+        if (activeDeckId) addToDeck(activeDeckId, card);
+    };
+
+    const handleRemoveCard = (deckId: string, cardId: string) => {
+        if (isDeckLocked) return;
+        removeFromDeck(deckId, cardId);
+    };
+
+    const handleSetHero = (deckId: string, heroId: string) => {
+        if (isDeckLocked) return;
+        setDeckHero(deckId, heroId);
+    };
 
     const [filter, setFilter] = useState<'all' | CardType | 'hero'>('hero');
     const [libWidth, setLibWidth] = useState(0);
@@ -114,6 +138,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     };
 
     const handleCreateDeck = () => {
+        if (isDeckLocked) return;
         let nextNum = 1;
         while (decks.some(d => d.name === t('deck_builder.default_deck_name', { num: nextNum }))) {
             nextNum++;
@@ -137,6 +162,15 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
             />
 
             <View style={[styles.layout, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+                {isDeckLocked && (
+                    <Animated.View entering={FadeInUp} style={styles.lockedBanner}>
+                        <MaterialCommunityIcons name="lock" size={16} color={colors.arcane.white} />
+                        <View style={{ marginLeft: 10 }}>
+                            <Text style={styles.lockedTitle}>{t('deck_builder.deck_locked_title')}</Text>
+                            <Text style={styles.lockedDesc}>{t('deck_builder.deck_locked_desc')}</Text>
+                        </View>
+                    </Animated.View>
+                )}
 
                 {/* 1. THE SIGILS (Left Pillar) */}
                 <View style={styles.sigilPillar}>
@@ -178,8 +212,8 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                 return (
                                     <View style={styles.vaultCardWrapper}>
                                         <Pressable
-                                            style={[styles.heroCardPreview, isSelected && styles.heroCardPreviewSelected]}
-                                            onPress={() => activeDeckId && setDeckHero(activeDeckId, item.id)}
+                                            style={[styles.heroCardPreview, isSelected && styles.heroCardPreviewSelected, isDeckLocked && { opacity: 0.8 }]}
+                                            onPress={() => activeDeckId && handleSetHero(activeDeckId, item.id)}
                                         >
                                             <Image source={item.artwork} style={styles.heroArtwork} />
                                             {isSelected && <View style={styles.heroSelectedOverlay} />}
@@ -237,9 +271,9 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             card={item}
                                             width={cardW}
                                             height={cardH}
-                                            onPress={isLinkable ? () => addCardToDeck(activeDeckId!, item) : undefined}
+                                            onPress={isLinkable && !isDeckLocked ? () => handleAddCard(item) : undefined}
                                             onInfoPress={() => setSelectedDetailCard(item)}
-                                            isPlayable={isLinkable}
+                                            isPlayable={isLinkable && !isDeckLocked}
                                         />
                                         {count > 0 && (
                                             <View style={styles.countBadge}>
@@ -259,7 +293,11 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                         <View style={styles.deckSwitchRow}>
                             <Text style={styles.pillarTitle}>{activeDeck ? activeDeck.name.toUpperCase() : t('deck_builder.active_hero').toUpperCase()}</Text>
                             <View style={styles.spacer} />
-                            <Pressable onPress={handleCreateDeck} style={styles.actionIcon}>
+                            <Pressable 
+                                onPress={handleCreateDeck} 
+                                style={[styles.actionIcon, isDeckLocked && { opacity: 0.3 }]}
+                                disabled={isDeckLocked}
+                            >
                                 <Text style={styles.actionIconText}>+</Text>
                             </Pressable>
                         </View>
@@ -273,8 +311,12 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                             {decks.map((deck) => (
                                 <Pressable
                                     key={deck.id}
-                                    onPress={() => setActiveDeck(deck.id)}
-                                    style={[styles.deckTab, activeDeckId === deck.id && styles.deckTabActive]}
+                                    onPress={() => !isDeckLocked && setActiveDeck(deck.id)}
+                                    style={[
+                                        styles.deckTab, 
+                                        activeDeckId === deck.id && styles.deckTabActive,
+                                        isDeckLocked && activeDeckId !== deck.id && { opacity: 0.3 }
+                                    ]}
                                 >
                                     <Text style={[styles.deckTabText, activeDeckId === deck.id && styles.deckTabTextActive]}>
                                         {deck.name.substring(deck.name.length - 1)}
@@ -303,7 +345,8 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                     <DeckCardRow
                                         card={item}
                                         index={index}
-                                        onRemove={() => removeCardFromDeck(activeDeck.id, item.id)}
+                                        onRemove={() => handleRemoveCard(activeDeck.id, item.id)}
+                                        disabled={isDeckLocked}
                                     />
                                 )}
                                 contentContainerStyle={styles.essenceList}
@@ -854,4 +897,29 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         letterSpacing: 3,
     },
+    lockedBanner: {
+        position: 'absolute',
+        top: 20,
+        left: '20%',
+        right: '20%',
+        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+        borderWidth: 1,
+        borderColor: colors.error,
+        padding: 12,
+        borderRadius: 4,
+        flexDirection: 'row',
+        alignItems: 'center',
+        zIndex: 100,
+    },
+    lockedTitle: {
+        color: colors.arcane.white,
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 1,
+    },
+    lockedDesc: {
+        color: 'rgba(255,255,255,0.7)',
+        fontSize: 10,
+        marginTop: 2,
+    }
 });

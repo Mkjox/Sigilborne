@@ -28,6 +28,7 @@ import { generateCampaignMap } from '../../data/campaignData';
 import { useCampaignStore } from '../../store/campaignStore';
 import { RelicTray } from '../../components/campaign/RelicTray';
 import { useTranslation } from 'react-i18next';
+import { useAnimationMultiplier } from '../../utils/animation';
 
 type GameBoardScreenNavigationProp = StackNavigationProp<RootStackParamList, 'GameBoard'>;
 type GameBoardScreenRouteProp = RouteProp<RootStackParamList, 'GameBoard'>;
@@ -51,6 +52,7 @@ const BoardZone: React.FC<{
 }> = ({ cards, isPlayer, cardWidth, cardHeight, onPress, onCardPress, isActive, highlightedCardIds = [], selectedCardId }) => {
     const weather = useGameStore(state => state.weather);
     const talents = useGameStore(state => (isPlayer ? state.player.unlockedTalents : state.ai.unlockedTalents) || []);
+    const anim = useAnimationMultiplier();
 
     const factionBoosts = React.useMemo(() => {
         return talents.reduce((acc: Record<string, number>, t: any) => {
@@ -89,8 +91,8 @@ const BoardZone: React.FC<{
                     return (
                         <Animated.View
                             key={`${card.id}-${index}`}
-                            entering={FadeIn.delay(index * 100)}
-                            exiting={FadeOut}
+                            entering={FadeIn.duration(anim(400)).delay(index * anim(100))}
+                            exiting={FadeOut.duration(anim(300))}
                         >
                             <Animated.View
                                 style={{
@@ -140,6 +142,7 @@ export const GameBoardScreen: React.FC<Props> = (props) => {
 
 const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
     const { t } = useTranslation();
+    const anim = useAnimationMultiplier();
     const { difficulty = 'medium', stageId } = route.params || {};
     const insets = useSafeAreaInsets();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
@@ -181,10 +184,10 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
     useEffect(() => {
         registerShakeHandler((intensity) => {
             boardShake.value = withSequence(
-                withTiming(intensity, { duration: 50 }),
-                withTiming(-intensity, { duration: 50 }),
-                withTiming(intensity / 2, { duration: 50 }),
-                withTiming(0, { duration: 50 })
+                withTiming(intensity, { duration: anim(50) }),
+                withTiming(-intensity, { duration: anim(50) }),
+                withTiming(intensity / 2, { duration: anim(50) }),
+                withTiming(0, { duration: anim(50) })
             );
         });
     }, []);
@@ -283,7 +286,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
             if (!isPersistent) {
                 const timer = setTimeout(() => {
                     setMessage(null);
-                }, 2000);
+                }, anim(2000));
                 return () => clearTimeout(timer);
             }
         }, [message, selectedCardId]);
@@ -292,8 +295,8 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
 
         return (
             <Animated.View
-                entering={SlideInDown.springify()}
-                exiting={FadeOut}
+                entering={SlideInDown.duration(anim(400))}
+                exiting={FadeOut.duration(anim(300))}
                 style={styles.toastContainer}
                 pointerEvents="none"
             >
@@ -467,7 +470,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                         {player.hero.ability.currentCooldown === 0 && (
                                             <Text style={styles.heroAbilityIcon}>⚡</Text>
                                         )}
-                                        <Text 
+                                        <Text
                                             numberOfLines={1}
                                             adjustsFontSizeToFit
                                             style={[
@@ -530,7 +533,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                 return (
                                     <Animated.View
                                         key={card.id}
-                                        entering={SlideInDown.delay(index * 50)}
+                                        entering={SlideInDown.duration(anim(500)).delay(index * anim(50))}
                                         style={[
                                             styles.handCardContainer,
                                             {
@@ -561,46 +564,94 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
 
                     {/* Game Over Overlay */}
                     {gameOver && (
-                        <View style={styles.overlay}>
-                            <View style={styles.overlayCard}>
-                                <Text variant="h2" style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: 'serif' }}>
+                        <Animated.View
+                            entering={FadeIn.duration(anim(600))}
+                            style={styles.overlay}
+                        >
+                            <Animated.View
+                                entering={SlideInDown.duration(anim(600))}
+                                style={styles.overlayCard}
+                            >
+                                <Text
+                                    variant="h2"
+                                    numberOfLines={1}
+                                    adjustsFontSizeToFit
+                                    style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: 'serif', textAlign: 'center', width: '100%' }}
+                                >
                                     {winner === 'player' ? t('common.victory') : (winner === 'draw' ? t('common.draw') : t('common.defeat'))}
                                 </Text>
-                                
+
                                 {winner === 'player' && isAlreadyCompleted && (
                                     <Text variant="caption" color={colors.text.disabled} style={{ marginBottom: 12, opacity: 0.7 }}>
                                         {t('campaign.echo_victory_no_rewards').toUpperCase()}
                                     </Text>
                                 )}
-                                
+
                                 <View style={styles.overlayBtnGroup}>
                                     {winner === 'player' && (
-                                        <Pressable 
-                                            onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} 
+                                        <Pressable
+                                            onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }}
                                             style={[styles.overlayBtn, { backgroundColor: colors.arcane.emerald }]}
                                         >
-                                            <Text variant="button" color={colors.arcane.obsidian} style={{ letterSpacing: 4, fontWeight: '900' }}>{t('common.continue_expedition')}</Text>
+                                            <Text
+                                                variant="button"
+                                                numberOfLines={1}
+                                                adjustsFontSizeToFit
+                                                color={colors.arcane.obsidian}
+                                                style={{ letterSpacing: 4, fontWeight: '900' }}
+                                            >
+                                                {t('common.continue_expedition')}
+                                            </Text>
                                         </Pressable>
                                     )}
 
-                                    <Pressable onPress={() => startGame(difficulty)} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: winner === 'player' ? 'rgba(255,255,255,0.2)' : colors.arcane.emerald }]}>
-                                        <Text variant="button" color={winner === 'player' ? colors.arcane.white : colors.arcane.emerald} style={{ letterSpacing: 4 }}>{winner === 'player' ? t('common.replay') : t('common.reawaken')}</Text>
+                                    <Pressable
+                                        onPress={() => startGame(difficulty)}
+                                        style={[
+                                            styles.overlayBtn,
+                                            {
+                                                backgroundColor: winner === 'player' ? 'transparent' : colors.arcane.emerald,
+                                                borderWidth: 1,
+                                                borderColor: winner === 'player' ? 'rgba(255,255,255,0.2)' : colors.arcane.emerald
+                                            }
+                                        ]}
+                                    >
+                                        <Text
+                                            variant="button"
+                                            numberOfLines={1}
+                                            adjustsFontSizeToFit
+                                            color={winner === 'player' ? colors.arcane.white : colors.arcane.obsidian}
+                                            style={{ letterSpacing: 4, fontWeight: winner === 'player' ? '400' : '900' }}
+                                        >
+                                            {winner === 'player' ? t('common.replay') : t('common.reawaken')}
+                                        </Text>
                                     </Pressable>
 
                                     <Pressable onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }} style={[styles.overlayBtn, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.arcane.emerald }]}>
-                                        <Text variant="button" color={colors.arcane.emerald} style={{ letterSpacing: 4 }}>{t('common.abandon')}</Text>
+                                        <Text
+                                            variant="button"
+                                            numberOfLines={1}
+                                            adjustsFontSizeToFit
+                                            color={colors.arcane.emerald}
+                                            style={{ letterSpacing: 4 }}
+                                        >
+                                            {t('common.abandon')}
+                                        </Text>
                                     </Pressable>
                                 </View>
-                            </View>
-                        </View>
+                            </Animated.View>
+                        </Animated.View>
                     )}
 
                     {/* Round End Overlay */}
                     {phase === 'round_end' && !gameOver && (
-                        <View style={styles.overlay}>
-                            <Animated.View entering={FadeIn.delay(300)} style={styles.overlayCard}>
+                        <Animated.View
+                            entering={FadeIn.duration(anim(400))}
+                            style={styles.overlay}
+                        >
+                            <Animated.View entering={FadeIn.duration(anim(300))} style={styles.overlayCard}>
                                 <Text variant="caption" color={colors.text.disabled} style={{ letterSpacing: 4, marginBottom: 8 }}>{t('common.round_complete', { num: currentRound })}</Text>
-                                
+
                                 <View style={styles.roundEndScores}>
                                     <View style={styles.roundEndScoreItem}>
                                         <Text variant="h3" color={colors.error}>{aiPower}</Text>
@@ -619,14 +670,22 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     {message ? t(message).toUpperCase() : ''}
                                 </Text>
 
-                                <Pressable 
-                                    onPress={continueToNextRound} 
+                                <Pressable
+                                    onPress={continueToNextRound}
                                     style={styles.overlayBtn}
                                 >
-                                    <Text variant="button" color={colors.arcane.white} style={{ letterSpacing: 4 }}>{t('common.continue')}</Text>
+                                    <Text
+                                        variant="button"
+                                        numberOfLines={1}
+                                        adjustsFontSizeToFit
+                                        color={colors.arcane.white}
+                                        style={{ letterSpacing: 4 }}
+                                    >
+                                        {t('common.continue')}
+                                    </Text>
                                 </Pressable>
                             </Animated.View>
-                        </View>
+                        </Animated.View>
                     )}
                 </Animated.View>
             </BoardSurface>

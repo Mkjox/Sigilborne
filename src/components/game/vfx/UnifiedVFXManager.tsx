@@ -20,6 +20,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { getGlobalEventBus } from '../../../engine/eventBus';
 import { ShaderLibrary } from './ShaderLibrary';
+import { getAdjustedDuration } from '../../../utils/animation';
 
 const PARTICLE_COUNT = 25;
 
@@ -68,7 +69,7 @@ export const UnifiedVFXManager: React.FC = () => {
         intensity.value = 0;
         timeline.value = 0;
         
-        intensity.value = withTiming(1, { duration: 200 });
+        intensity.value = withTiming(1, { duration: getAdjustedDuration(200) });
 
         let duration = 1000;
         let easing = Easing.out(Easing.quad);
@@ -93,9 +94,9 @@ export const UnifiedVFXManager: React.FC = () => {
                 break;
         }
 
-        timeline.value = withTiming(1, { duration, easing }, (finished) => {
+        timeline.value = withTiming(1, { duration: getAdjustedDuration(duration), easing }, (finished) => {
             if (finished) {
-                intensity.value = withTiming(0, { duration: 300 }, (f2) => {
+                intensity.value = withTiming(0, { duration: getAdjustedDuration(300) }, (f2) => {
                    if (f2) runOnJS(playNextVFX)();
                 });
             }

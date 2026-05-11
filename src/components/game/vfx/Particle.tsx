@@ -9,6 +9,7 @@ import Animated, {
     Extrapolate
 } from 'react-native-reanimated';
 import { StyleSheet } from 'react-native';
+import { useAnimationMultiplier } from '../../../utils/animation';
 
 interface ParticleProps {
     angle: number; // in radians
@@ -25,21 +26,22 @@ export const Particle: React.FC<ParticleProps> = ({
     color,
     size = 4
 }) => {
+    const anim = useAnimationMultiplier();
     const progress = useSharedValue(0);
     const opacity = useSharedValue(0);
 
     useEffect(() => {
         // Staggered start
-        opacity.value = withDelay(delay, withTiming(1, { duration: 50 }));
+        opacity.value = withDelay(anim(delay), withTiming(1, { duration: anim(50) }));
 
         // Motion: Transition from center to distance
-        progress.value = withDelay(delay, withTiming(1, {
-            duration: 600 + Math.random() * 200,
+        progress.value = withDelay(anim(delay), withTiming(1, {
+            duration: anim(600 + Math.random() * 200),
             easing: Easing.out(Easing.quad)
         }));
 
         // Fade out during last half of progress
-        opacity.value = withDelay(delay + 300, withTiming(0, { duration: 300 }));
+        opacity.value = withDelay(anim(delay + 300), withTiming(0, { duration: anim(300) }));
     }, []);
 
     const animatedStyle = useAnimatedStyle(() => {

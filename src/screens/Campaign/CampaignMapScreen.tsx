@@ -8,6 +8,7 @@ import {
     Modal,
     Dimensions,
     TouchableOpacity,
+    Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -69,13 +70,29 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
     const [difficultyModalVisible, setDifficultyModalVisible] = useState(false);
     const [selectedStage, setSelectedStage] = useState<number | null>(null);
     const [stageModalVisible, setStageModalVisible] = useState(false);
+    const [abandonModalVisible, setAbandonModalVisible] = useState(false);
     const [visibleRange, setVisibleRange] = useState({ start: 0, end: 30 }); // Initial window
 
     // Use deterministic generation
     const stages = useMemo(() => generateCampaignMap(TOTAL_STAGES), []);
 
     // Campaign State
-    const { currentNodeId, completedNodes, advanceToNode, gold, talentPoints, difficulty: selectedDifficulty, setDifficulty } = useCampaignStore();
+    const {
+        currentNodeId,
+        completedNodes,
+        advanceToNode,
+        gold,
+        talentPoints,
+        difficulty: selectedDifficulty,
+        setDifficulty,
+        setRunActive,
+        resetRun,
+        runActive
+    } = useCampaignStore();
+
+    React.useEffect(() => {
+        setRunActive(true);
+    }, []);
 
     // Calculate logical row for each stage to determine vertical position
     const stageLayouts = useMemo(() => {
@@ -251,6 +268,17 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                     <Ionicons name="chevron-back" size={20} color={colors.arcane.emerald} />
                     <Text variant="caption" color={colors.arcane.emerald} style={styles.pillText} numberOfLines={1}>{t('common.exit')}</Text>
                 </TouchableOpacity>
+
+                {runActive && (
+                    <TouchableOpacity
+                        onPress={() => setAbandonModalVisible(true)}
+                        style={[styles.headerPill, { marginLeft: 8, borderColor: 'rgba(239, 68, 68, 0.3)' }]}
+                        activeOpacity={0.7}
+                    >
+                        <Ionicons name="trash-outline" size={16} color={colors.error} />
+                        <Text variant="caption" color={colors.error} style={styles.pillText} numberOfLines={1}>{t('common.abandon')}</Text>
+                    </TouchableOpacity>
+                )}
 
                 <BiomeHeader scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
 
@@ -481,6 +509,56 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                     <MaterialCommunityIcons name="book-open-variant" size={26} color={colors.arcane.emerald} />
                 </TouchableOpacity>
             </Animated.View>
+            {/* Abandon Run Modal */}
+            <Modal
+                visible={abandonModalVisible}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setAbandonModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+                    <Pressable style={StyleSheet.absoluteFill} onPress={() => setAbandonModalVisible(false)} />
+
+                    <Animated.View
+                        entering={FadeInUp.springify()}
+                        exiting={FadeOut.duration(200)}
+                        style={styles.abandonModal}
+                    >
+                        <View style={styles.abandonIconContainer}>
+                            <MaterialCommunityIcons name="skull-outline" size={32} color={colors.error} />
+                        </View>
+
+                        <Text variant="h3" style={styles.abandonTitle}>{t('campaign.confirm_abandon').toUpperCase()}</Text>
+                        <Text variant="body" style={styles.abandonDesc}>{t('campaign.confirm_abandon_desc')}</Text>
+
+                        <View style={styles.abandonActions}>
+                            <TouchableOpacity
+                                style={styles.cancelBtn}
+                                onPress={() => setAbandonModalVisible(false)}
+                            >
+                                <Text style={styles.cancelBtnText}>{t('common.cancel').toUpperCase()}</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={styles.confirmAbandonBtn}
+                                onPress={() => {
+                                    setAbandonModalVisible(false);
+                                    resetRun();
+                                    navigation.navigate('MainMenu');
+                                }}
+                            >
+                                <ExpoLinearGradient
+                                    colors={[colors.error, '#7f1d1d']}
+                                    style={styles.confirmAbandonGradient}
+                                >
+                                    <Text style={styles.confirmAbandonText}>{t('common.abandon').toUpperCase()}</Text>
+                                </ExpoLinearGradient>
+                            </TouchableOpacity>
+                        </View>
+                    </Animated.View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -802,10 +880,10 @@ const styles = StyleSheet.create({
     nodeGlowActive: {
         opacity: 0.3,
     },
-    nodeGlowCurrent: {
-        backgroundColor: colors.arcane.emerald,
-        opacity: 0.4,
-    },
+    // nodeGlowCurrent: {
+    //     backgroundColor: colors.arcane.emerald,
+    //     opacity: 0.4,
+    // },
     nodeGlowElite: {
         backgroundColor: colors.arcane.emerald,
         opacity: 0.25,
@@ -1054,5 +1132,88 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.5,
         shadowRadius: 10,
         elevation: 10,
+    },
+    // --- Abandon Modal ---
+    abandonModal: {
+        width: '85%',
+        backgroundColor: colors.arcane.obsidian,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(239, 68, 68, 0.4)',
+        padding: spacing.xl,
+        alignItems: 'center',
+        shadowColor: colors.error,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+    },
+    abandonIconContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: spacing.md,
+        borderWidth: 1,
+        borderColor: 'rgba(239, 68, 68, 0.2)',
+    },
+    abandonTitle: {
+        color: colors.arcane.white,
+        fontFamily: 'serif',
+        fontSize: 18,
+        letterSpacing: 2,
+        marginBottom: spacing.sm,
+        textAlign: 'center',
+    },
+    abandonDesc: {
+        color: 'rgba(255,255,255,0.6)',
+        textAlign: 'center',
+        fontSize: 13,
+        lineHeight: 18,
+        marginBottom: spacing.xl,
+    },
+    abandonActions: {
+        flexDirection: 'row',
+        gap: spacing.md,
+        width: '100%',
+    },
+    cancelBtn: {
+        flex: 1,
+        height: 42,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 8,
+    },
+    cancelBtnText: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 11,
+        fontWeight: '900',
+        letterSpacing: 2,
+    },
+    confirmAbandonBtn: {
+        flex: 1,
+        height: 42,
+        borderRadius: 8,
+        overflow: 'hidden',
+    },
+    confirmAbandonGradient: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    confirmAbandonText: {
+        color: colors.arcane.white,
+        fontSize: 11,
+        fontWeight: '900',
+        letterSpacing: 2,
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.8)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

@@ -124,7 +124,7 @@
     "leader": "LİDER",
     "victory": "ZAFER",
     "defeat": "HÜSRAN",
-    "draw": "BERABERLİK",
+    "draw": "BERABERE",
     "continue": "DEVAM ET",
     "end_turn": "SIRAYI BİTİR",
     "escape": "KAÇIŞ",
@@ -137,6 +137,7 @@
     "replay": "TEKRAR OYNA",
     "reawaken": "YENİDEN UYAN",
     "abandon": "TERK ET",
+    "cancel": "İPTAL",
     "messages": {
       "game_started": "Oyun Başladı",
       "cannot_play": "Kart oynanamaz",
@@ -209,6 +210,8 @@
     }
   },
   "deck_builder": {
+    "deck_locked_title": "DESTE KİLİTLİ",
+    "deck_locked_desc": "Aktif bir sefer sırasında desteniz kilitlidir. Destenizi arındırmak için bir Tüccarı ziyaret edin.",
     "vault_title": "MAHZEN",
     "construct_title": "İNŞA",
     "unlinked": "BAĞSIZ",
@@ -363,6 +366,23 @@
       "title": "DİĞER",
       "replay_tutorial": "📖 Nasıl Oynanır"
     }
+  },
+  "campaign": {
+    "select_difficulty": "ZORLUK SEÇ",
+    "difficulty": {
+      "easy": "KOLAY",
+      "medium": "ORTA",
+      "hard": "ZOR"
+    },
+    "confirm_abandon": "Seferi Terk Et?",
+    "confirm_abandon_desc": "Bu turdaki tüm ilerlemeniz kaybolacak. Destenizin kilidi açılacak.",
+    "descriptions": {
+      "boss": "Yolun ilerisinde kozmik bir terör bekliyor. Çağların savaşı için ruhunu hazırla.",
+      "shop": "Altını olanlar için saçılmış yadigarlar ve nadir kartlar.",
+      "event": "Hiçlikte öngörülemeyen enerjiler dönüyor. Şans cesurdan yanadır.",
+      "battle": "Düşman kuvvetleri bu sektörde toplanıyor. İlerlemek için yolu temizle."
+    },
+    "echo_victory_no_rewards": "Zafer Yankısı (Ödül Yok)"
   },
   "cards": {
     "Commander": "Komutan",
@@ -832,8 +852,16 @@
       "desc": "Arcane, Doğa ve Tarafsız gruplara hükmet. Aynı gruptan birimleri birleştirmek, güçlü sinerjilerin ve gizli yeteneklerin kilidini açabilir."
     },
     "slide5": {
+      "title": "Birim Sınıfları ve Hava Durumu",
+      "desc": "Birimler üç sınıfa ayrılır: Yakın Dövüş, Menzilli veya Kuşatma. Her sınıf, güçlerini 1'e düşüren Ayaz veya Sis gibi belirli Hava Durumu etkilerine karşı hassastır. Efsanevi birimler bu etkilerden muaftır!"
+    },
+    "slide6": {
+      "title": "Kilitli Yol",
+      "desc": "İlk 40 aşama boyunca (Yeşil Yankı), destenizi özgürce düzenleyebilirsiniz. Ancak daha derin biyomlara girdiğinizde desteniz KİLİTLENİR. Stratejinizi değiştirmek için Tüccarı kullanmalı veya seferi Terk Etmelisiniz (bu durum tüm ilerlemenizi 1. aşamaya sıfırlar)."
+    },
+    "slide7": {
       "title": "Taktiksel Savaş",
-      "desc": "Birimleri savaş alanına sürükle. Doğrudan önlerindeki düşmanlara saldırırlar. Birimlerine mi odaklanacaksın, yoksa doğrudan Kahramana mı vuracaksın?"
+      "desc": "Birimleri savaş alanına sürükle. Doğrudan önlerindeki düşmanlara saldırırlar. Tur sonunda zaferini garantilemek için düşmanın toplam gücünü azalt!"
     },
     "btn": {
       "play": "Başlayalım",

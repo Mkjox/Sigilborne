@@ -9,10 +9,10 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
-import Animated, { 
-    FadeIn, 
-    FadeInRight, 
-    FadeOutLeft, 
+import Animated, {
+    FadeIn,
+    FadeInRight,
+    FadeOutLeft,
     LinearTransition,
     useSharedValue,
     useAnimatedStyle,
@@ -53,9 +53,9 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
 
     useEffect(() => {
         shimmerProgress.value = withRepeat(
-            withTiming(1, { 
-                duration: 4000, 
-                easing: Easing.bezier(0.4, 0, 0.2, 1) 
+            withTiming(1, {
+                duration: 4000,
+                easing: Easing.bezier(0.4, 0, 0.2, 1)
             }),
             -1,
             false
@@ -96,8 +96,20 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
         },
         {
             id: '5',
-            title: t('tutorial.slide5.title', 'Tactical Combat'),
-            description: t('tutorial.slide5.desc', 'Drag units to the battlefield. They attack enemies directly in front of them. Will you focus on their units, or strike the enemy Hero directly?'),
+            title: t('tutorial.slide5.title', 'Unit Classes & Weather'),
+            description: t('tutorial.slide5.desc', 'Units belong to three classes: Melee, Ranged, or Siege. Each class is vulnerable to specific Weather effects like Frost or Fog, which reduce their power to 1. Legendary units are immune to these effects!'),
+            icon: '🛡️'
+        },
+        {
+            id: '6',
+            title: t('tutorial.slide6.title', 'The Locked Path'),
+            description: t('tutorial.slide6.desc', 'During the first 40 stages (Verdant Echo), you can edit your deck freely. However, once you enter deeper biomes, your deck LOCKS. To change strategy, you must use the Merchant or Abandon the run (which resets all progress to stage 1).'),
+            icon: '🔒'
+        },
+        {
+            id: '7',
+            title: t('tutorial.slide7.title', 'Tactical Combat'),
+            description: t('tutorial.slide7.desc', 'Drag units to the battlefield. They attack enemies directly in front of them. Will you focus on their units, or strike the enemy Hero directly?'),
             icon: '⚔️'
         }
     ];
@@ -142,7 +154,7 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                 <View style={styles.cardContainer} onLayout={onCardLayout}>
                     {/* 1. Legendary Animated Border (Static, Back) */}
                     {cardLayout && (
-                        <AnimatedLegendaryBorder 
+                        <AnimatedLegendaryBorder
                             width={cardLayout.width}
                             height={cardLayout.height}
                             borderRadius={24}
@@ -151,7 +163,7 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                     )}
 
                     {/* 2. Glassmorphism Shimmer Overlay (Static, Back) */}
-                    <View 
+                    <View
                         style={[StyleSheet.absoluteFill, { overflow: 'hidden', borderRadius: 24 }]}
                         pointerEvents="none"
                     >
@@ -185,7 +197,7 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                                 <View style={styles.iconContainer}>
                                     <Text style={styles.icon}>{currentSlide.icon}</Text>
                                 </View>
-                                
+
                                 {/* Pagination */}
                                 <Animated.View layout={LinearTransition} style={styles.pagination}>
                                     {SLIDES.map((_, i) => (
@@ -210,10 +222,10 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                     </Animated.View>
 
                     {/* 4. STATIC NAVIGATION ELEMENTS (FRONT - Rendered last) */}
-                    
+
                     {/* Skip / Close Button */}
-                    <TouchableOpacity 
-                        style={styles.closeButton} 
+                    <TouchableOpacity
+                        style={styles.closeButton}
                         onPress={handleComplete}
                         activeOpacity={0.6}
                     >
@@ -223,8 +235,8 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                     {/* Left Chevron */}
                     {currentIndex > 0 && (
                         <View style={[styles.navContainer, styles.leftNav]} pointerEvents="box-none">
-                            <TouchableOpacity 
-                                style={styles.navChevron} 
+                            <TouchableOpacity
+                                style={styles.navChevron}
                                 onPress={handlePrev}
                                 activeOpacity={0.6}
                             >
@@ -235,15 +247,15 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
 
                     {/* Right Chevron */}
                     <View style={[styles.navContainer, styles.rightNav]} pointerEvents="box-none">
-                        <TouchableOpacity 
-                            style={styles.navChevron} 
+                        <TouchableOpacity
+                            style={styles.navChevron}
                             onPress={handleNext}
                             activeOpacity={0.6}
                         >
-                            <Ionicons 
-                                name={currentIndex === SLIDES.length - 1 ? "play" : "chevron-forward"} 
-                                size={currentIndex === SLIDES.length - 1 ? 20 : 24} 
-                                color={colors.arcane.emerald} 
+                            <Ionicons
+                                name={currentIndex === SLIDES.length - 1 ? "play" : "chevron-forward"}
+                                size={currentIndex === SLIDES.length - 1 ? 20 : 24}
+                                color={colors.arcane.emerald}
                             />
                         </TouchableOpacity>
                     </View>

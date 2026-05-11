@@ -16,6 +16,7 @@ import { Card, CardRarity } from '../../types';
 import { Text } from '../ui';
 import { useTranslation } from 'react-i18next';
 import { colors, borderRadius, shadows, getCardDimensions } from '../../theme';
+import { useAnimationMultiplier, useSpringConfig } from '../../utils/animation';
 
 interface CardComponentProps {
     card: Card;
@@ -59,6 +60,8 @@ export const CardComponent: React.FC<CardComponentProps> = ({
 }) => {
     const { t } = useTranslation();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+    const anim = useAnimationMultiplier();
+    const springConfig = useSpringConfig();
     const scale = useSharedValue(1);
     const translateY = useSharedValue(0);
     const energyPulse = useSharedValue(0);
@@ -79,19 +82,19 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     const padding = cardHeight * 0.05;
 
     const handlePressIn = () => {
-        scale.value = withSpring(0.98); // Reduced scale effect
+        scale.value = withSpring(0.98, springConfig); // Reduced scale effect
     };
 
     const handlePressOut = () => {
-        scale.value = withSpring(1);
+        scale.value = withSpring(1, springConfig);
     };
 
     React.useEffect(() => {
-        translateY.value = withSpring(isSelected ? -8 : 0); // Further softened lift
+        translateY.value = withSpring(isSelected ? -8 : 0, springConfig); // Further softened lift
 
         if (card.rarity === 'legendary' || isSelected || isTargeted) {
             energyPulse.value = withRepeat(
-                withTiming(1, { duration: 1500, easing: Easing.inOut(Easing.ease) }),
+                withTiming(1, { duration: anim(1500), easing: Easing.inOut(Easing.ease) }),
                 -1,
                 true
             );

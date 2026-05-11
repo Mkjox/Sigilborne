@@ -28,6 +28,7 @@ export interface CampaignStore {
     talentPoints: number;
     unlockedTalentIds: string[];
     unlockedCardIds: string[]; // List of card IDs that have been "found/unlocked"
+    runActive: boolean;
     
     // Actions
     advanceToNode: (nodeId: number) => void;
@@ -39,6 +40,7 @@ export interface CampaignStore {
     generateShopStock: () => void;
     buyItem: (shopItemId: string) => { success: boolean, message: string };
     removeCardFromDeck: (cardId: string) => { success: boolean, message: string };
+    setRunActive: (active: boolean) => void;
 
     // Talent Actions
     unlockCard: (cardId: string) => void;
@@ -62,6 +64,7 @@ export const useCampaignStore = create<CampaignStore>()(
             unlockedTalentIds: [],
             unlockedCardIds: [],
             difficulty: 'medium',
+            runActive: false,
             
             setDifficulty: (difficulty) => set({ difficulty }),
 
@@ -69,7 +72,7 @@ export const useCampaignStore = create<CampaignStore>()(
                 set((state) => {
                     // Quick validation - normally we'd check if nodeId is in connections
                     // But for simple store just set it
-                    return { currentNodeId: nodeId };
+                    return { currentNodeId: nodeId, runActive: true };
                 }),
 
             completeNode: (nodeId, rewards, nextNodeIds = []) =>
@@ -128,6 +131,7 @@ export const useCampaignStore = create<CampaignStore>()(
                     talentPoints: 0,
                     unlockedTalentIds: [],
                     unlockedCardIds: [],
+                    runActive: false,
                 }),
 
             generateShopStock: () =>
@@ -277,7 +281,8 @@ export const useCampaignStore = create<CampaignStore>()(
                 });
 
                 return { success, message };
-            }
+            },
+            setRunActive: (active) => set({ runActive: active }),
         }),
         {
             name: 'sigilborne-campaign-storage',
