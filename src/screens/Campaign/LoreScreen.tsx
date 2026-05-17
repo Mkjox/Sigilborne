@@ -37,14 +37,19 @@ interface LoreEntry {
 const LORE_ENTRIES: LoreEntry[] = [
     { id: 'verdant_echo_1', titleKey: 'lore.entries.verdant_echo_1.title', contentKey: 'lore.entries.verdant_echo_1.content', icon: 'star-four-points-outline', biomeId: 'verdant_echo', unlockStage: 0 },
     { id: 'verdant_echo_2', titleKey: 'lore.entries.verdant_echo_2.title', contentKey: 'lore.entries.verdant_echo_2.content', icon: 'leaf', biomeId: 'verdant_echo', unlockStage: 0 },
+    { id: 'verdant_echo_3', titleKey: 'lore.entries.verdant_echo_3.title', contentKey: 'lore.entries.verdant_echo_3.content', icon: 'tree-outline', biomeId: 'verdant_echo', unlockStage: 20 },
     { id: 'azure_spire_1', titleKey: 'lore.entries.azure_spire_1.title', contentKey: 'lore.entries.azure_spire_1.content', icon: 'sword-cross', biomeId: 'azure_spire', unlockStage: 41 },
     { id: 'azure_spire_2', titleKey: 'lore.entries.azure_spire_2.title', contentKey: 'lore.entries.azure_spire_2.content', icon: 'castle', biomeId: 'azure_spire', unlockStage: 41 },
+    { id: 'azure_spire_3', titleKey: 'lore.entries.azure_spire_3.title', contentKey: 'lore.entries.azure_spire_3.content', icon: 'telescope', biomeId: 'azure_spire', unlockStage: 61 },
     { id: 'twilight_rift_1', titleKey: 'lore.entries.twilight_rift_1.title', contentKey: 'lore.entries.twilight_rift_1.content', icon: 'auto-fix', biomeId: 'twilight_rift', unlockStage: 81 },
     { id: 'twilight_rift_2', titleKey: 'lore.entries.twilight_rift_2.title', contentKey: 'lore.entries.twilight_rift_2.content', icon: 'lightning-bolt', biomeId: 'twilight_rift', unlockStage: 81 },
+    { id: 'twilight_rift_3', titleKey: 'lore.entries.twilight_rift_3.title', contentKey: 'lore.entries.twilight_rift_3.content', icon: 'ear-hearing', biomeId: 'twilight_rift', unlockStage: 101 },
     { id: 'crimson_wake_1', titleKey: 'lore.entries.crimson_wake_1.title', contentKey: 'lore.entries.crimson_wake_1.content', icon: 'fire', biomeId: 'crimson_wake', unlockStage: 121 },
     { id: 'crimson_wake_2', titleKey: 'lore.entries.crimson_wake_2.title', contentKey: 'lore.entries.crimson_wake_2.content', icon: 'skull', biomeId: 'crimson_wake', unlockStage: 121 },
+    { id: 'crimson_wake_3', titleKey: 'lore.entries.crimson_wake_3.title', contentKey: 'lore.entries.crimson_wake_3.content', icon: 'water', biomeId: 'crimson_wake', unlockStage: 141 },
     { id: 'obsidian_heart_1', titleKey: 'lore.entries.obsidian_heart_1.title', contentKey: 'lore.entries.obsidian_heart_1.content', icon: 'diamond-stone', biomeId: 'obsidian_heart', unlockStage: 161 },
     { id: 'obsidian_heart_2', titleKey: 'lore.entries.obsidian_heart_2.title', contentKey: 'lore.entries.obsidian_heart_2.content', icon: 'eye-outline', biomeId: 'obsidian_heart', unlockStage: 161 },
+    { id: 'obsidian_heart_3', titleKey: 'lore.entries.obsidian_heart_3.title', contentKey: 'lore.entries.obsidian_heart_3.content', icon: 'heart-broken', biomeId: 'obsidian_heart', unlockStage: 181 },
 ];
 
 export const LoreScreen: React.FC<Props> = ({ navigation }) => {

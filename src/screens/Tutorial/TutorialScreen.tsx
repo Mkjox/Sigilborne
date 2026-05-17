@@ -27,7 +27,7 @@ import { Text } from '../../components/ui';
 import { colors, spacing, typography } from '../../theme';
 import { useSettingsStore } from '../../store/settingsStore';
 import * as Haptics from 'expo-haptics';
-import { AnimatedLegendaryBorder } from './components/AnimatedLegendaryBorder';
+import { TutorialVisual } from './components/TutorialVisual';
 
 type TutorialScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Tutorial'>;
 
@@ -35,32 +35,43 @@ interface Props {
     navigation: TutorialScreenNavigationProp;
 }
 
+// ─── Pulsing corner rune ──────────────────────────────────────────────────────
+const CornerRune: React.FC<{ pos: object }> = ({ pos }) => {
+    const glow = useSharedValue(0.15);
+    React.useEffect(() => {
+        glow.value = withRepeat(
+            withTiming(0.7, { duration: 2400, easing: Easing.inOut(Easing.ease) }),
+            -1, true
+        );
+    }, []);
+    const style = useAnimatedStyle(() => ({ opacity: glow.value }));
+    return (
+        <Animated.View style={[styles.cornerRune, pos, style]}>
+            <View style={styles.cornerRuneInner} />
+        </Animated.View>
+    );
+};
+
 export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
     const insets = useSafeAreaInsets();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const { t } = useTranslation();
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [cardLayout, setCardLayout] = useState<{ width: number; height: number } | null>(null);
     const completeTutorial = useSettingsStore(state => state.completeTutorial);
 
-    const onCardLayout = (event: any) => {
-        const { width, height } = event.nativeEvent.layout;
-        setCardLayout({ width, height });
-    };
-
-    // Shimmer Animation Logic
+    // Shimmer Animation Logic (Disabled for now)
     const shimmerProgress = useSharedValue(-1);
 
-    useEffect(() => {
-        shimmerProgress.value = withRepeat(
-            withTiming(1, {
-                duration: 4000,
-                easing: Easing.bezier(0.4, 0, 0.2, 1)
-            }),
-            -1,
-            false
-        );
-    }, []);
+    // useEffect(() => {
+    //     shimmerProgress.value = withRepeat(
+    //         withTiming(1, {
+    //             duration: 4000,
+    //             easing: Easing.bezier(0.4, 0, 0.2, 1)
+    //         }),
+    //         -1,
+    //         false
+    //     );
+    // }, []);
 
     const shimmerStyle = useAnimatedStyle(() => ({
         transform: [{
@@ -102,9 +113,9 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
         },
         {
             id: '6',
-            title: t('tutorial.slide6.title', 'The Locked Path'),
-            description: t('tutorial.slide6.desc', 'During the first 40 stages (Verdant Echo), you can edit your deck freely. However, once you enter deeper biomes, your deck LOCKS. To change strategy, you must use the Merchant or Abandon the run (which resets all progress to stage 1).'),
-            icon: '🔒'
+            title: t('tutorial.slide6.title', 'Deck Customization'),
+            description: t('tutorial.slide6.desc', 'Your deck is fully unlocked throughout the entire expedition. You can edit your deck freely between battles to adapt your strategy, swap faction cards, or integrate powerful new units as you advance through deeper biomes.'),
+            icon: '🃏'
         },
         {
             id: '7',
@@ -151,20 +162,21 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                 <View style={{ height: screenHeight * 0.12 }} />
 
                 {/* STATIC CARD WRAPPER */}
-                <View style={styles.cardContainer} onLayout={onCardLayout}>
-                    {/* 1. Legendary Animated Border (Static, Back) */}
-                    {cardLayout && (
-                        <AnimatedLegendaryBorder
-                            width={cardLayout.width}
-                            height={cardLayout.height}
-                            borderRadius={24}
-                            borderWidth={2}
-                        />
-                    )}
+                <View style={styles.cardContainer}>
+                    {/* Corner runes */}
+                    <CornerRune pos={{ top: 6, left: 6 }} />
+                    <CornerRune pos={{ top: 6, right: 6 }} />
+                    <CornerRune pos={{ bottom: 6, left: 6 }} />
+                    <CornerRune pos={{ bottom: 6, right: 6 }} />
+
+                    <LinearGradient
+                        colors={['rgba(16,185,129,0.04)', 'rgba(0,0,0,0)']}
+                        style={StyleSheet.absoluteFill}
+                    />
 
                     {/* 2. Glassmorphism Shimmer Overlay (Static, Back) */}
                     <View
-                        style={[StyleSheet.absoluteFill, { overflow: 'hidden', borderRadius: 24 }]}
+                        style={[StyleSheet.absoluteFill, { overflow: 'hidden', borderRadius: 2 }]}
                         pointerEvents="none"
                     >
                         <Animated.View style={[StyleSheet.absoluteFill, { width: '200%' }, shimmerStyle]}>
@@ -188,14 +200,14 @@ export const TutorialScreen: React.FC<Props> = ({ navigation }) => {
                         key={currentIndex}
                         entering={FadeInRight.duration(400)}
                         exiting={FadeOutLeft.duration(300)}
-                        style={StyleSheet.absoluteFill}
+                        style={styles.animatedContentWrapper}
                         pointerEvents="box-none"
                     >
                         <View style={styles.horizontalContent}>
                             {/* LEFT: ICON */}
                             <View style={styles.leftColumn}>
                                 <View style={styles.iconContainer}>
-                                    <Text style={styles.icon}>{currentSlide.icon}</Text>
+                                    <TutorialVisual slideId={currentSlide.id} />
                                 </View>
 
                                 {/* Pagination */}
@@ -283,12 +295,12 @@ const styles = StyleSheet.create({
         width: '92%',
         maxWidth: 720,
         minHeight: 280,
-        backgroundColor: colors.arcane.graphite,
-        borderRadius: 24,
+        backgroundColor: 'rgba(5, 7, 12, 0.98)', // Matches the extremely dark screen background overlay
+        borderRadius: 2,
         paddingHorizontal: spacing['2xl'],
         paddingVertical: spacing.xl,
         borderWidth: 1,
-        borderColor: 'rgba(16, 185, 129, 0.1)',
+        borderColor: 'rgba(16, 185, 129, 0.15)',
         shadowColor: colors.arcane.emerald,
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.15,
@@ -296,12 +308,34 @@ const styles = StyleSheet.create({
         elevation: 10,
         justifyContent: 'center',
         position: 'relative',
+        overflow: 'hidden',
+    },
+    cornerRune: {
+        position: 'absolute',
+        width: 4,
+        height: 4,
+        marginTop: 4,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10,
+    },
+    cornerRuneInner: {
+        width: 5,
+        height: 5,
+        backgroundColor: colors.arcane.emerald,
+        transform: [{ rotate: '45deg' }],
+    },
+    animatedContentWrapper: {
+        position: 'absolute',
+        top: spacing.xl,
+        bottom: spacing.xl,
+        left: spacing['2xl'],
+        right: spacing['2xl'],
     },
     horizontalContent: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: spacing['2xl'],
-        paddingHorizontal: spacing['2xl'],
+        gap: spacing.xl,
         height: '100%',
     },
     leftColumn: {
@@ -381,10 +415,12 @@ const styles = StyleSheet.create({
         paddingRight: spacing.sm,
     },
     navChevron: {
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
-        borderRadius: 21,
-        width: 42,
-        height: 42,
+        backgroundColor: 'rgba(16, 185, 129, 0.08)',
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(16, 185, 129, 0.35)',
+        width: 38,
+        height: 38,
         alignItems: 'center',
         justifyContent: 'center',
     },

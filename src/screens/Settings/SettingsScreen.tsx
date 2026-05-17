@@ -40,8 +40,9 @@ const ScreenBackground: React.FC = () => (
             locations={[0, 0.5, 1]}
             style={StyleSheet.absoluteFill}
         />
-        <View style={styles.bgLineH} />
-        <View style={styles.bgLineV} />
+        {/* Background grid lines commented out for a pristine dark void look */}
+        {/* <View style={styles.bgLineH} /> */}
+        {/* <View style={styles.bgLineV} /> */}
     </View>
 );
 

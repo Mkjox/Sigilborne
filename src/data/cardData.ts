@@ -126,7 +126,7 @@ const createCard = (
     artwork,
     description,
     flavorText,
-    isLocked: isLocked ?? (rarity === 'epic' || rarity === 'legendary'),
+    isLocked: isLocked ?? false,
 });
 
 // ============ UNIT CARDS ============
@@ -138,11 +138,11 @@ const ORDER_MELEE: Card[] = [
     createCard('Berserker', 'unit', 'rare', 3, 7, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.berserker', 'cards.flavor.berserker', require('../../assets/units/melee/berserker.jpg')),
     createCard('Shield Captain', 'unit', 'rare', 3, 4, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.shield_captain', 'cards.flavor.shield_captain', require('../../assets/units/melee/shield_captain.jpg')),
     createCard('Champion', 'unit', 'epic', 4, 9, [], 'cards.descriptions.champion', 'cards.flavor.champion', require('../../assets/units/melee/champion.jpg')),
-    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'cards.descriptions.warlord', 'cards.flavor.warlord', require('../../assets/units/melee/warlord.jpg')),
+    createCard('Warlord', 'unit', 'legendary', 6, 12, [ABILITIES.MORALE_BOOST(2)], 'cards.descriptions.warlord', 'cards.flavor.warlord', require('../../assets/units/melee/warlord.jpg'), true),
 ].map(c => ({ ...c, faction: 'order' as Faction }));
 
 const SHADOW_MELEE: Card[] = [
-    createCard('Lich King', 'unit', 'legendary', 10, 12, [ABILITIES.MORALE_BOOST(2)], 'cards.descriptions.lich_king', 'cards.flavor.lich_king', require('../../assets/units/melee/lich_king.jpg')),
+    createCard('Lich King', 'unit', 'legendary', 10, 12, [ABILITIES.MORALE_BOOST(2)], 'cards.descriptions.lich_king', 'cards.flavor.lich_king', require('../../assets/units/melee/lich_king.jpg'), true),
     createCard('Grave Ghoul', 'unit', 'common', 1, 3, [], 'cards.descriptions.grave_ghoul', 'cards.flavor.grave_ghoul', require('../../assets/units/melee/grave_ghoul.jpg')),
     createCard('Wight', 'unit', 'rare', 3, 5, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.wight', 'cards.flavor.wight', require('../../assets/units/melee/wight.jpg')),
     createCard('Skeleton Warrior', 'unit', 'common', 1, 2, [ABILITIES.MUSTER('Skeleton Warrior')], 'cards.descriptions.skeleton_warrior', 'cards.flavor.skeleton_warrior', require('../../assets/units/melee/skeleton_warrior.jpg')),
@@ -158,7 +158,7 @@ const ARCANE_MELEE: Card[] = [
     createCard('Arcane Guard', 'unit', 'common', 1, 3, [], 'cards.descriptions.arcane_guard', '', require('../../assets/units/melee/arcane_guard.jpg')),
     createCard('Crystal Construct', 'unit', 'common', 2, 5, [], 'cards.descriptions.crystal_construct', '', require('../../assets/units/melee/crystal_construct.jpg')),
     createCard('Spell-Thief', 'unit', 'rare', 3, 4, [ABILITIES.SPY(1)], 'cards.descriptions.spell_thief', '', require('../../assets/units/melee/spell_thief.jpg')),
-    createCard('Void Walker', 'unit', 'epic', 5, 10, [], 'cards.descriptions.void_walker', '', require('../../assets/units/melee/void_walker.jpg')),
+    createCard('Void Walker', 'unit', 'epic', 5, 10, [], 'cards.descriptions.void_walker', '', require('../../assets/units/melee/void_walker.jpg'), true),
 ].map(c => ({ ...c, faction: 'arcane' as Faction }));
 
 const NATURE_MELEE: Card[] = [
@@ -167,7 +167,7 @@ const NATURE_MELEE: Card[] = [
     createCard('Shapeshifter', 'unit', 'epic', 5, 6, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.shapeshifter', '', require('../../assets/units/melee/shapeshifter.jpg')),
     createCard('Bear Spirit', 'unit', 'common', 2, 5, [], 'cards.descriptions.bear_spirit', '', require('../../assets/units/melee/bear_spirit.jpg')),
     createCard('Wolf Pack Alpha', 'unit', 'rare', 3, 4, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.wolf_alpha', '', require('../../assets/units/melee/wolf_pack_alpha.jpg')),
-    createCard('Elder Ent', 'unit', 'legendary', 8, 15, [], 'cards.descriptions.elder_ent', '', require('../../assets/units/melee/elder_ent.jpg')),
+    createCard('Elder Ent', 'unit', 'legendary', 8, 15, [], 'cards.descriptions.elder_ent', '', require('../../assets/units/melee/elder_ent.jpg'), true),
     createCard('Wild Boar', 'unit', 'common', 1, 3, [ABILITIES.MUSTER('Wild Boar')], 'cards.descriptions.wild_boar', '', require('../../assets/units/melee/wild_boar.jpg')),
 ].map(c => ({ ...c, faction: 'nature' as Faction }));
 
@@ -194,7 +194,7 @@ const ORDER_RANGED: Card[] = [
     createCard('Elven Marksman', 'unit', 'rare', 3, 6, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.elven_marksman', 'cards.flavor.elven_marksman', require('../../assets/units/ranged/elven_marksman.jpg')),
     createCard('Scout', 'unit', 'rare', 2, 1, [ABILITIES.SPY(2)], 'cards.descriptions.scout', 'cards.flavor.scout', require('../../assets/units/ranged/scout.jpg')),
     createCard('Sniper', 'unit', 'epic', 4, 8, [], 'cards.descriptions.sniper', 'cards.flavor.sniper', require('../../assets/units/ranged/sniper.jpg')),
-    createCard('Dragon Hunter', 'unit', 'legendary', 5, 10, [ABILITIES.SCORCH()], 'cards.descriptions.dragon_hunter', 'cards.flavor.dragon_hunter', require('../../assets/units/ranged/dragon_hunter.jpg')),
+    createCard('Dragon Hunter', 'unit', 'legendary', 5, 10, [ABILITIES.SCORCH()], 'cards.descriptions.dragon_hunter', 'cards.flavor.dragon_hunter', require('../../assets/units/ranged/dragon_hunter.jpg'), true),
 ].map(c => ({ ...c, faction: 'order' as Faction }));
 
 const SHADOW_RANGED: Card[] = [
@@ -203,7 +203,7 @@ const SHADOW_RANGED: Card[] = [
     createCard('Banshee', 'unit', 'epic', 4, 7, [ABILITIES.SCORCH()], 'cards.descriptions.banshee', 'cards.flavor.banshee', require('../../assets/units/ranged/banshee.jpg')),
     createCard('Void Wizard', 'unit', 'rare', 3, 5, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.void_wizard', 'cards.flavor.void_wizard', require('../../assets/units/ranged/void_wizard.jpg')),
     createCard('Shadow Assassin', 'unit', 'epic', 4, 8, [], 'cards.descriptions.shadow_assassin', 'cards.flavor.shadow_assassin', require('../../assets/units/ranged/shadow_assassin.jpg')),
-    createCard('Necromancer', 'unit', 'legendary', 6, 6, [ABILITIES.MEDIC()], 'cards.descriptions.necromancer', 'cards.flavor.necromancer', require('../../assets/units/ranged/necromancer.jpg')),
+    createCard('Necromancer', 'unit', 'legendary', 6, 6, [ABILITIES.MEDIC()], 'cards.descriptions.necromancer', 'cards.flavor.necromancer', require('../../assets/units/ranged/necromancer.jpg'), true),
     createCard('Dark Elf Matriarch', 'unit', 'rare', 5, 7, [], 'cards.descriptions.dark_elf_matriarch', 'cards.flavor.dark_elf_matriarch', require('../../assets/units/ranged/dark_elf_matriarch.jpg')),
 ].map(c => ({ ...c, faction: 'shadow' as Faction }));
 
@@ -213,7 +213,7 @@ const ARCANE_RANGED: Card[] = [
     createCard('Archon', 'unit', 'epic', 6, 9, [], 'cards.descriptions.archon', '', require('../../assets/units/ranged/archon.jpg')),
     createCard('Mana Wyrm', 'unit', 'common', 1, 1, [ABILITIES.MUSTER('Mana Wyrm')], 'cards.descriptions.mana_wyrm', '', require('../../assets/units/ranged/mana_wyrm.jpg')),
     createCard('Ethereal Binder', 'unit', 'rare', 3, 4, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.ethereal_binder', '', require('../../assets/units/ranged/ethereal_binder.jpg')),
-    createCard('Arcane Arch-Mage', 'unit', 'legendary', 7, 12, [ABILITIES.SCORCH()], 'cards.descriptions.arcane_archmage', '', require('../../assets/units/ranged/arcane_archmage.jpg')),
+    createCard('Arcane Arch-Mage', 'unit', 'legendary', 7, 12, [ABILITIES.SCORCH()], 'cards.descriptions.arcane_archmage', '', require('../../assets/units/ranged/arcane_archmage.jpg'), true),
 ].map(c => ({ ...c, faction: 'arcane' as Faction }));
 
 const NATURE_RANGED: Card[] = [
@@ -222,7 +222,7 @@ const NATURE_RANGED: Card[] = [
     createCard('Centaur Archer', 'unit', 'rare', 4, 6, [], 'cards.descriptions.centaur_archer', '', require('../../assets/units/ranged/centaur_archer.jpg')),
     createCard('Satyr Skirmisher', 'unit', 'common', 2, 3, [], 'cards.descriptions.satyr_skirmisher', '', require('../../assets/units/ranged/satyr_skirmisher.jpg')),
     createCard('Elven Warden', 'unit', 'rare', 3, 4, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.elven_warden', '', require('../../assets/units/ranged/elven_warden.jpg')),
-    createCard('Wind Runner', 'unit', 'epic', 5, 8, [], 'cards.descriptions.wind_runner', '', require('../../assets/units/ranged/wind_runner.jpg')),
+    createCard('Wind Runner', 'unit', 'epic', 5, 8, [], 'cards.descriptions.wind_runner', '', require('../../assets/units/ranged/wind_runner.jpg'), true),
 ].map(c => ({ ...c, faction: 'nature' as Faction }));
 
 const NEUTRAL_RANGED: Card[] = [
@@ -247,14 +247,14 @@ const ORDER_SIEGE: Card[] = [
     createCard('Trebuchet', 'unit', 'rare', 4, 8, [], 'cards.descriptions.trebuchet', 'cards.flavor.trebuchet', require('../../assets/units/siege/trebutchet.jpg')),
     createCard('War Elephant', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.war_elephant', 'cards.flavor.war_elephant', require('../../assets/units/siege/war_elephant.jpg')),
     createCard('Siege Tower', 'unit', 'epic', 5, 5, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.siege_tower', 'cards.flavor.siege_tower', require('../../assets/units/siege/siege_tower.jpg')),
-    createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'cards.descriptions.dragon', 'cards.flavor.dragon', require('../../assets/units/siege/dragon.jpg')),
+    createCard('Dragon', 'unit', 'legendary', 8, 15, [], 'cards.descriptions.dragon', 'cards.flavor.dragon', require('../../assets/units/siege/dragon.jpg'), true),
 ].map(c => ({ ...c, faction: 'order' as Faction }));
 
 const SHADOW_SIEGE: Card[] = [
     createCard('Bone Catapult', 'unit', 'common', 2, 4, [], 'cards.descriptions.bone_catapult', 'cards.flavor.bone_catapult', require('../../assets/units/siege/bone_catapult.jpg')),
     createCard('Plague Spreader', 'unit', 'rare', 4, 6, [], 'cards.descriptions.plague_spreader', 'cards.flavor.plague_spreader', require('../../assets/units/siege/plague_spreader.jpg')),
     createCard('Abomination', 'unit', 'epic', 6, 12, [], 'cards.descriptions.abomination', 'cards.flavor.abomination', require('../../assets/units/siege/abomination.jpg')),
-    createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'cards.descriptions.demon_prince', 'cards.flavor.demon_prince', require('../../assets/units/siege/demon_prince.jpg')),
+    createCard('Demon Prince', 'unit', 'legendary', 10, 15, [], 'cards.descriptions.demon_prince', 'cards.flavor.demon_prince', require('../../assets/units/siege/demon_prince.jpg'), true),
     createCard('Hellhound', 'unit', 'common', 2, 3, [ABILITIES.MUSTER('Hellhound')], 'cards.descriptions.hellhound', 'cards.flavor.hellhound', require('../../assets/units/siege/hellhound.jpg')),
     createCard('Gargoyle', 'unit', 'common', 3, 4, [], 'cards.descriptions.gargoyle', 'cards.flavor.gargoyle', require('../../assets/units/siege/gargoyle.jpg')),
     createCard('Cursed Ballista', 'unit', 'rare', 4, 7, [], 'cards.descriptions.cursed_ballista', 'cards.flavor.cursed_ballista', require('../../assets/units/siege/cursed_ballista.jpg')),
@@ -262,7 +262,7 @@ const SHADOW_SIEGE: Card[] = [
 
 const ARCANE_SIEGE: Card[] = [
     createCard('Mana Battery', 'unit', 'rare', 4, 4, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.mana_battery', '', require('../../assets/units/siege/mana_battery.jpg')),
-    createCard('Ether Cannon', 'unit', 'legendary', 9, 14, [], 'cards.descriptions.ether_cannon', '', require('../../assets/units/siege/ether_cannon.jpg')),
+    createCard('Ether Cannon', 'unit', 'legendary', 9, 14, [], 'cards.descriptions.ether_cannon', '', require('../../assets/units/siege/ether_cannon.jpg'), true),
     createCard('Leyline Conduit', 'unit', 'rare', 3, 5, [ABILITIES.MORALE_BOOST(1)], 'cards.descriptions.leyline_conduit', '', require('../../assets/units/siege/leyline_conduit.jpg')),
     createCard('Prism Tower', 'unit', 'epic', 6, 8, [ABILITIES.COMMANDER_HORN()], 'cards.descriptions.prism_tower', '', require('../../assets/units/siege/prism_tower.jpg')),
     createCard('Energy Pylon', 'unit', 'common', 2, 3, [], 'cards.descriptions.energy_pylon', '', require('../../assets/units/siege/energy_pylon.jpg')),
@@ -270,7 +270,7 @@ const ARCANE_SIEGE: Card[] = [
 
 const NATURE_SIEGE: Card[] = [
     createCard('Ancient Treant', 'unit', 'epic', 6, 10, [], 'cards.descriptions.ancient_treant', '', require('../../assets/units/siege/ancient_treant.jpg')),
-    createCard('Nature Wrath', 'unit', 'legendary', 10, 16, [], 'cards.descriptions.nature_wrath', '', require('../../assets/units/siege/nature_wrath.jpg')),
+    createCard('Nature Wrath', 'unit', 'legendary', 10, 16, [], 'cards.descriptions.nature_wrath', '', require('../../assets/units/siege/nature_wrath.jpg'), true),
     createCard('Ancient Oak', 'unit', 'rare', 4, 6, [ABILITIES.TIGHT_BOND()], 'cards.descriptions.ancient_oak', '', require('../../assets/units/siege/ancient_oak.jpg')),
     createCard('Thorn Thrower', 'unit', 'common', 2, 4, [], 'cards.descriptions.thorn_thrower', '', require('../../assets/units/siege/thorn_thrower.jpg')),
     createCard('Vine Catapult', 'unit', 'common', 3, 5, [], 'cards.descriptions.vine_catapult', '', require('../../assets/units/siege/vine_catapult.jpg')),

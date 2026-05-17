@@ -236,43 +236,63 @@
     "entries": {
       "verdant_echo_1": {
         "title": "The First Eclipse",
-        "content": "In the age before light, the Void was not an enemy, but a cradle. It was only when the first star was born that the balance shifted, and the shadows learned to hunger."
+        "content": "Before the tyranny of light, the Void was a quiet cradle. It was only when the first star ignited, tearing the dark fabric of existence, that the balance shattered. Awakened by the searing heat of creation, the shadows did not just retreat—they learned to starve, and then, to hunger."
       },
       "verdant_echo_2": {
         "title": "The Green Covenant",
-        "content": "The Verdant Echo was the first land to bear life after the Void Receding. The ancient orders formed their pacts here, binding themselves to the leylines that root deep beneath the moss."
+        "content": "The Verdant Echo was the first sovereign soil to bloom after the Void receded. Here, the ancient circles formed their unbroken pacts, binding flesh and spirit to the leylines that pulse deep beneath the primordial moss."
+      },
+      "verdant_echo_3": {
+        "title": "The First Bloom",
+        "content": "In the center of the Echo stands the Mother Tree, whose roots drink directly from the primordial leylines. It is said that every leaf that falls from its branches births a new spirit of the wild, forever tying the cycle of life to the pulse of magic."
       },
       "azure_spire_1": {
         "title": "The War of Sigils",
-        "content": "For centuries, the Order and the Shadow fought for control over the Leylines. The Arcane watched from the stars, while Nature simply survived the crossfire."
+        "content": "The War of Sigils stained the earth. The Order sought to bind the Leylines in absolute law, while the Shadow sought to unspool them into chaos. Above the carnage, the Arcane watched from their astral observatories, taking cold notes, while the roots of Nature merely endured the ash, waiting to reclaim the bones of both."
       },
       "azure_spire_2": {
         "title": "Towers of the Channelers",
-        "content": "The Azure Spires were raised by the first Mage-Architects, who sought to pierce the veil between realms. They succeeded — though what answered was not what they expected."
+        "content": "The Azure Spires were raised by the first Mage-Architects, arrogant visionaries who sought to pierce the veil between realms. They succeeded in tearing the sky—though what answered their celestial summons was not what they expected."
+      },
+      "azure_spire_3": {
+        "title": "The Astral Observatory",
+        "content": "At the apex of the highest spire lies the Grand Orrery, a mechanical marvel mapping not just the stars, but the flow of arcane energy across the realm. When the Order attacked, the Mages simply rotated the Orrery, turning the sky itself into a weapon of light."
       },
       "twilight_rift_1": {
         "title": "The Cyan Flame",
-        "content": "The Arcane masters discovered that magic is not a resource to be spent, but a conversation with the cosmos. The Cyan Flame was their first successful reply."
+        "content": "The Arcane masters eventually discovered that magic is not a mere resource to be spent, but a living conversation with the cosmos. The Cyan Flame, burning without heat or ash, was the universe's first successful reply."
       },
       "twilight_rift_2": {
         "title": "The Rift Opened",
-        "content": "At the Twilight Rift, reality frays. Scholars argue whether it was a weapon, an accident, or an invitation. Those who wander too close return changed — if they return at all."
+        "content": "At the Twilight Rift, the very threads of reality fray into nothingness. Scholars eternally debate whether the rupture was a weapon, a tragic accident, or an invitation. Those who wander too close return irrevocably changed—if they return at all."
+      },
+      "twilight_rift_3": {
+        "title": "The Whispering Echoes",
+        "content": "Those who dwell too long near the Rift begin to hear voices—not of ghosts, but of possibilities. Alternate lives, divergent timelines, and futures that never came to pass sing in a maddening choir, driving the weak-willed into the abyss."
       },
       "crimson_wake_1": {
         "title": "The Blood Concordat",
-        "content": "When the Shadow faction was driven from the Leylines, they did not flee. They burned their retreat, salting the earth with a curse that turned rivers to crimson for a generation."
+        "content": "When the Shadow faction was finally driven from the Leylines, they did not flee quietly. They burned their retreat, salting the earth with a spiteful curse that turned the rivers to thick crimson for a generation."
       },
       "crimson_wake_2": {
         "title": "The Warlord's Throne",
-        "content": "The Crimson Wake is ruled by contested power. Every warlord who has claimed the obsidian throne has held it for exactly one season. The throne itself seems to hunger."
+        "content": "The Obsidian Throne of the Wake is a seat of absolute power, yet no warlord has ever survived its embrace for more than a single season. It does not confer rulership; it consumes the ruler, drinking their ambition until nothing remains but an empty crown."
+      },
+      "crimson_wake_3": {
+        "title": "The Red Rivers",
+        "content": "The waters of the Wake are thick and metallic, carrying the ancient curse of the Shadow. To drink from it is madness; to bathe in it is a gamble. Yet, some warlords claim the blood-red waters grant them visions of their enemies' deaths."
       },
       "obsidian_heart_1": {
         "title": "Heart of the Void",
-        "content": "The Obsidian Heart is not a place — it is a wound. When the last great leyline collapsed inward, the land did not shatter. It crystallized, preserving the final moment of magic for eternity."
+        "content": "The Obsidian Heart is not a physical place—it is a cosmic wound. When the last great leyline collapsed inward, the land did not shatter; it crystallized, preserving the final breathless moment of pure magic for eternity."
       },
       "obsidian_heart_2": {
         "title": "The Void Keeper's Origin",
-        "content": "The entity known as the Void Keeper was once a cartographer, mapping the edges of the known world. He mapped one edge too many, and the Void claimed him before he could turn back."
+        "content": "The entity now feared as the Void Keeper was once a mere mortal—a master cartographer obsessed with mapping the edges of reality. Driven by a fatal curiosity, he drew one line too far across the parchment of the world. He stepped into the margin to measure the abyss, only to find the abyss had been waiting to measure him."
+      },
+      "obsidian_heart_3": {
+        "title": "The Final Echo",
+        "content": "Deep within the crystallized core of the Heart lies a single, flawless gem containing the trapped essence of the Void Keeper's original soul. It pulses with a faint, sorrowful light, a reminder of the man who sought to map eternity and lost himself within it."
       }
     }
   },
@@ -864,8 +884,8 @@
       "desc": "Units belong to three classes: Melee, Ranged, or Siege. Each class is vulnerable to specific Weather effects like Frost or Fog, which reduce their power to 1. Legendary units are immune to these effects!"
     },
     "slide6": {
-      "title": "The Locked Path",
-      "desc": "During the first 40 stages (Verdant Echo), you can edit your deck freely. However, once you enter deeper biomes, your deck LOCKS. To change strategy, you must use the Merchant or Abandon the run (which resets all progress to stage 1)."
+      "title": "Deck Customization",
+      "desc": "Your deck is fully unlocked throughout the entire expedition. You can edit your deck freely between battles to adapt your strategy, swap faction cards, or integrate powerful new units as you advance through deeper biomes."
     },
     "slide7": {
       "title": "Tactical Combat",

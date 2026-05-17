@@ -221,11 +221,15 @@ export const makeAIDecision = (state: GameState, difficulty: Difficulty): AIDeci
     return strategy.evaluate(state);
 };
 
+import { getAdjustedDuration } from '../utils/animation';
+
 export const getAIDelay = (difficulty: Difficulty): number => {
+    let base = 1000;
     switch (difficulty) {
-        case 'easy': return 1500;
-        case 'hard': return 600;
+        case 'easy': base = 1500; break;
+        case 'hard': base = 600; break;
         case 'medium':
-        default: return 1000;
+        default: base = 1000; break;
     }
+    return getAdjustedDuration(base);
 };

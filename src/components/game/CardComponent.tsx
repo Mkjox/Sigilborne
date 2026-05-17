@@ -101,7 +101,7 @@ export const CardComponent: React.FC<CardComponentProps> = ({
         } else {
             energyPulse.value = 0;
         }
-    }, [isSelected, isTargeted, card.rarity]);
+    }, [isSelected, isTargeted, card.rarity, anim, springConfig]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [

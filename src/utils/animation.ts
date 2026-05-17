@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react';
 import { useSettingsStore } from '../store/settingsStore';
 
 /**
@@ -31,7 +32,7 @@ export const useAnimationMultiplier = () => {
     const speed = useSettingsStore(state => state.animationSpeed);
     const multiplier = SPEED_MULTIPLIERS[speed] || 1.0;
     
-    return (baseDuration: number) => baseDuration * multiplier;
+    return useCallback((baseDuration: number) => baseDuration * multiplier, [multiplier]);
 };
 
 /**
@@ -57,9 +58,12 @@ export const useSpringConfig = (baseConfig: any = {}) => {
     const speed = useSettingsStore(state => state.animationSpeed);
     const multiplier = SPEED_MULTIPLIERS[speed] || 1.0;
     
-    return {
+    const stiffness = baseConfig.stiffness || 100;
+    const damping = baseConfig.damping || 10;
+    
+    return useMemo(() => ({
         ...baseConfig,
-        stiffness: (baseConfig.stiffness || 100) / multiplier,
-        damping: (baseConfig.damping || 10) / multiplier,
-    };
+        stiffness: stiffness / multiplier,
+        damping: damping / multiplier,
+    }), [multiplier, stiffness, damping]);
 };

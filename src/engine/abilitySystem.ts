@@ -180,39 +180,37 @@ export const abilityEffects = {
         const unitIndex = graveyard.findIndex(c => c.type === 'unit');
         if (unitIndex !== -1) {
             const revived = graveyard.splice(unitIndex, 1)[0];
+            // Restore unit to base power and apply summoning sickness
+            revived.power = revived.basePower || revived.power || 0;
+            revived.isExhausted = true;
             state[currentPlayer].board.push(revived);
             context.eventBus?.emit('ABILITY_TRIGGERED', { type: 'revive', cardId: revived.id, player: currentPlayer });
         }
     },
 
-    // Destroy strongest units
+    // Destroy strongest units on the ENEMY board (safe scorch)
     destroy: (context: AbilityContext): void => {
-        const { state, card } = context;
+        const { state, card, player } = context;
+        const enemyPlayer = player === 'player' ? 'ai' : 'player';
+        const board = state[enemyPlayer].board;
 
-        // Find highest power across both boards
-        const allUnits: { card: Card; owner: PlayerType }[] = [];
+        if (board.length === 0) return;
 
-        state.player.board.forEach(c => allUnits.push({ card: c, owner: 'player' }));
-        state.ai.board.forEach(c => allUnits.push({ card: c, owner: 'ai' }));
-
-        if (allUnits.length === 0) return;
-
-        // Filter out the card acting (so Dragon Hunter doesn't kill himself)
-        const otherUnits = allUnits.filter(u => u.card.id !== card.id);
+        // Filter out the card acting (though it's on enemy board)
+        const otherUnits = board.filter(u => u.id !== card.id);
 
         if (otherUnits.length === 0) return;
 
-        const maxPower = Math.max(...otherUnits.map(u => u.card.power || 0));
-        const unitsToDestroy = otherUnits.filter(u => u.card.power === maxPower);
+        const maxPower = Math.max(...otherUnits.map(u => u.power || 0));
+        const unitsToDestroy = otherUnits.filter(u => u.power === maxPower);
 
         // Destroy all units with max power
-        unitsToDestroy.forEach(({ card: targetCard, owner }) => {
-            const board = state[owner].board;
+        unitsToDestroy.forEach((targetCard) => {
             const index = board.findIndex(c => c.id === targetCard.id);
             if (index !== -1) {
                 const [removed] = board.splice(index, 1);
-                state[owner].graveyard.push(removed);
-                context.eventBus?.emit('CARD_DESTROYED', { cardId: targetCard.id, player: owner });
+                state[enemyPlayer].graveyard.push(removed);
+                context.eventBus?.emit('CARD_DESTROYED', { cardId: targetCard.id, player: enemyPlayer });
             }
         });
     },
@@ -609,6 +607,9 @@ const applyOperation = (
             const unitIdx = graveyard.findIndex(c => c.type === 'unit');
             if (unitIdx !== -1) {
                 const revived = graveyard.splice(unitIdx, 1)[0];
+                // Restore unit to base power and apply summoning sickness
+                revived.power = revived.basePower || revived.power || 0;
+                revived.isExhausted = true;
                 state[currentPlayer].board.push(revived);
                 context.eventBus?.emit('ABILITY_TRIGGERED', { type: 'revive', cardId: revived.id, player: currentPlayer });
             }

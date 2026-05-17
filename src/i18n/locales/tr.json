@@ -242,60 +242,65 @@
     "entries": {
       "verdant_echo_1": {
         "title": "İlk Tutulma",
-        "content": "Işıktan önceki çağda, Boşluk bir düşman değil, bir beşikti. Denge ancak ilk yıldız doğduğunda bozuldu ve gölgeler acıkmayı öğrendi."
+        "content": "Işığın zorbalığından önce, Boşluk sessiz bir beşikti. Denge, ancak ilk yıldız tutuşup varoluşun karanlık dokusunu yırttığında paramparça oldu. Yaratılışın kavurucu sıcaklığıyla uyanan gölgeler sadece geri çekilmedi—aç kalmayı, ve ardından, açlık çekmeyi öğrendiler."
       },
       "verdant_echo_2": {
         "title": "Yeşil Pakt",
-        "content": "Yeşil Yankı, Boşluğun Çekilmesinin ardından ilk yaşamı barındıran topraktı. Kadim düzenler paktlarını burada kurdu ve kendilerini yosunların altında derinlere uzanan ley hatlarına bağladı."
+        "content": "Yeşil Yankı, Boşluk çekildikten sonra çiçek açan ilk egemen topraktı. Burada, kadim çemberler kırılmaz paktlarını kurdular; et ve ruhu, ilkel yosunların derinliklerinde atan ley hatlarına bağladılar."
+      },
+      "verdant_echo_3": {
+        "title": "İlk Çiçek",
+        "content": "Yankı'nın merkezinde, kökleri doğrudan ilkel ley hatlarından beslenen Ana Ağaç durur. Dallarından düşen her yaprağın yeni bir vahşi doğa ruhu doğurduğu, yaşam döngüsünü sonsuza dek büyünün nabzına bağladığı söylenir."
       },
       "azure_spire_1": {
         "title": "Mühürler Savaşı",
-        "content": "Yüzyıllar boyunca Düzen ve Gölge, Ley hatlarının kontrolü için savaştı. Arkane yıldızlardan izledi, Doğa ise sadece çapraz ateşten sağ kurtuldu."
+        "content": "Mühürler Savaşı toprağı lekeledi. Düzen, Ley hatlarını mutlak yasalarla bağlamaya çalışırken, Gölge onları çözerek kaosa sürüklemek istedi. Kıyımın üstünde, Arkane astrâl gözlemevlerinden soğuk notlar alarak izledi, Doğa'nın kökleri ise sadece küllere dayandı, her ikisinin de kemiklerini geri almak için bekledi."
       },
       "azure_spire_2": {
         "title": "Kanal Ustaları'nın Kuleleri",
-        "content": "Gök Kuleleri, alemler arasındaki perdeyi delmek isteyen ilk Büyücü-Mimarlar tarafından inşa edildi. Başardılar; ancak yanıt veren, bekledikleri değildi."
+        "content": "Gök Kuleleri, alemler arasındaki perdeyi delmek isteyen kibirli vizyonerler olan ilk Büyücü-Mimarlar tarafından yükseltildi. Gökyüzünü yırtmayı başardılar—ancak göksel çağrılarına cevap veren, bekledikleri şey değildi."
+      },
+      "azure_spire_3": {
+        "title": "Astral Gözlemevi",
+        "content": "En yüksek kulenin zirvesinde, sadece yıldızların değil, alemdeki gizemli enerji akışının da haritasını çıkaran mekanik bir harika olan Büyük Güneş Sistemi Modeli bulunur. Düzen saldırdığında, Büyücüler sadece modeli döndürdüler ve gökyüzünün kendisini ışıktan bir silaha dönüştürdüler."
       },
       "twilight_rift_1": {
         "title": "Siyan Alevi",
-        "content": "Arkane ustaları, büyünün harcanacak bir kaynak değil, kozmosla yapılan bir konuşma olduğunu keşfettiler. Siyan Alevi onların ilk başarılı yanıtıydı."
+        "content": "Arkane ustaları en sonunda büyünün sadece harcanacak bir kaynak değil, kozmosla canlı bir diyalog olduğunu keşfettiler. Isı veya kül olmadan yanan Siyan Alevi, evrenin ilk başarılı yanıtıydı."
       },
       "twilight_rift_2": {
         "title": "Yarık Açıldı",
-        "content": "Alacakaranlık Yarığı'nda gerçeklik çözülür. Akademisyenler bunun bir silah mı, kaza mı yoksa davet mi olduğunu tartışır. Çok yaklaşanlar değişmiş olarak geri döner — eğer dönerlerse."
+        "content": "Alacakaranlık Yarığı'nda, gerçekliğin dokusu hiçliğe doğru çözülür. Akademisyenler bu kırılmanın bir silah mı, trajik bir kaza mı yoksa bir davet mi olduğunu sonsuza dek tartışır. Çok yaklaşanlar geri dönülemez şekilde değişmiş olarak döner—eğer dönerlerse."
+      },
+      "twilight_rift_3": {
+        "title": "Fısıldayan Yankılar",
+        "content": "Yarık yakınında çok uzun süre yaşayanlar sesler duymaya başlar—hayaletlerin değil, olasılıkların seslerini. Alternatif yaşamlar, farklı zaman çizelgeleri ve asla gerçekleşmemiş gelecekler çıldırtıcı bir koroda şarkı söyleyerek iradesi zayıf olanları uçuruma sürükler."
       },
       "crimson_wake_1": {
         "title": "Kan Andı",
-        "content": "Gölge fraksiyonu Ley hatlarından kovulduğunda kaçmadı. Geri çekilirken her şeyi yaktı; lanetli bir tohum serperek nehirleri bir nesil boyunca kırmızıya boyattı."
+        "content": "Gölge fraksiyonu nihayet Ley hatlarından sürüldüğünde, sessizce kaçmadılar. Geri çekilirken her şeyi yaktılar, nehirleri bir nesil boyunca koyu kızıla çeviren kin dolu bir lanetle toprağı zehirlediler."
       },
       "crimson_wake_2": {
         "title": "Savaş Beyi'nin Tahtı",
-        "content": "Kızıl İz, tartışmalı bir güçle yönetilir. Obsidyen tahta oturan her savaş beyi tam olarak bir mevsim boyunca onu elinde tuttu. Tahtın kendisi aç gibi görünüyor."
+        "content": "Kızıl İz'in Obsidyen Tahtı mutlak gücün koltuğudur, ancak hiçbir savaş beyi onun kucaklaşmasından bir mevsimden fazla sağ çıkamamıştır. Yöneticilik bahşetmez; hırslarını içerek, geriye sadece boş bir taç kalana dek yöneticiyi tüketir."
+      },
+      "crimson_wake_3": {
+        "title": "Kızıl Nehirler",
+        "content": "İz'in suları koyu ve metaliktir, Gölge'nin kadim lanetini taşır. Ondan içmek deliliktir; içinde yıkanmak bir kumardır. Yine de, bazı savaş beyleri kan kırmızısı suların onlara düşmanlarının ölümlerine dair vizyonlar verdiğini iddia eder."
       },
       "obsidian_heart_1": {
         "title": "Boşluğun Kalbi",
-        "content": "Obsidyen Kalp bir yer değil, bir yaradır. Son büyük ley hattı içe çöktüğünde toprak parçalanmadı. Kristalleşerek büyünün son anını sonsuza dek korudu."
+        "content": "Obsidyen Kalp fiziksel bir yer değil—kozmik bir yaradır. Son büyük ley hattı içe çöktüğünde toprak parçalanmadı; kristalleşerek, saf büyünün o son nefes kesici anını sonsuza dek korudu."
       },
       "obsidian_heart_2": {
         "title": "Boşluk Bekçisi'nin Kökeni",
-        "content": "Boşluk Bekçisi olarak bilinen varlık bir zamanlar bilinen dünyanın sınırlarını haritalayan bir kartograftu. Bir kenar fazla haritalarken Boşluk onu geri dönmeden önce yakaladı."
+        "content": "Şimdi Boşluk Bekçisi olarak korkulan varlık bir zamanlar sadece bir ölümlüydü—gerçekliğin sınırlarını haritalamaya takıntılı usta bir kartograf. Ölümcül bir merakla hareket ederek, dünyanın parşömeni üzerinde bir çizgiyi fazla uzağa çizdi. Uçurumu ölçmek için kenara adım attı, ancak uçurumun onu ölçmek için beklediğini gördü."
+      },
+      "obsidian_heart_3": {
+        "title": "Son Yankı",
+        "content": "Kalp'in kristalize olmuş çekirdeğinin derinliklerinde, Boşluk Bekçisi'nin orijinal ruhunun hapsolmuş özünü içeren tek bir kusursuz mücevher yatar. Sonsuzluğun haritasını çıkarmak isteyip içinde kaybolan adamın bir hatırlatıcısı olarak, soluk, kederli bir ışıkla atar."
       }
     }
-  },
-  "campaign": {
-    "select_difficulty": "ZORLUK SEÇİN",
-    "difficulty": {
-      "easy": "KOLAY",
-      "medium": "ORTA",
-      "hard": "ZOR"
-    },
-    "descriptions": {
-      "boss": "Kozmik bir dehşet yolu koruyor. Ruhunu çağların savaşına hazırla.",
-      "shop": "Altın ödeyebilecekler için nadir kartlar ve kalıntılar.",
-      "event": "Boşlukta öngörülemeyen enerjiler dönüyor. Şans cesurdan yanadır.",
-      "battle": "Düşman kuvvetleri bu bölgede toplanıyor. İlerlemek için yolu temizle."
-    },
-    "echo_victory_no_rewards": "Zafer Yankısı (Ödül Yok)"
   },
   "hero_classes": {
     "Warrior": "Savaşçı",
@@ -856,8 +861,8 @@
       "desc": "Birimler üç sınıfa ayrılır: Yakın Dövüş, Menzilli veya Kuşatma. Her sınıf, güçlerini 1'e düşüren Ayaz veya Sis gibi belirli Hava Durumu etkilerine karşı hassastır. Efsanevi birimler bu etkilerden muaftır!"
     },
     "slide6": {
-      "title": "Kilitli Yol",
-      "desc": "İlk 40 aşama boyunca (Yeşil Yankı), destenizi özgürce düzenleyebilirsiniz. Ancak daha derin biyomlara girdiğinizde desteniz KİLİTLENİR. Stratejinizi değiştirmek için Tüccarı kullanmalı veya seferi Terk Etmelisiniz (bu durum tüm ilerlemenizi 1. aşamaya sıfırlar)."
+      "title": "Deste Özelleştirme",
+      "desc": "Desteniz seferiniz boyunca tamamen açık kalır. Stratejinizi uyarlamak, grup kartlarını değiştirmek veya derin biyomlarda ilerlerken güçlü yeni birimler eklemek için savaşlar arasında destenizi özgürce düzenleyebilirsiniz."
     },
     "slide7": {
       "title": "Taktiksel Savaş",

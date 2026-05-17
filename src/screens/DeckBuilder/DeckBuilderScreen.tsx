@@ -97,8 +97,8 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 
     const { runActive, currentNodeId } = useCampaignStore();
     
-    // The deck is only locked AFTER the first biome (Verdant Echo, ends at stage 40)
-    const isDeckLocked = runActive && currentNodeId > 40;
+    // The deck is never locked
+    const isDeckLocked = false;
 
     const handleAddCard = (card: Card) => {
         if (isDeckLocked) return;
