@@ -381,7 +381,7 @@
       "hard": "HARD"
     },
     "confirm_abandon": "Abandon Expedition?",
-    "confirm_abandon_desc": "All progress in this run will be lost. Your deck will be unlocked.",
+    "confirm_abandon_desc": "All progress in this run will be lost.",
     "descriptions": {
       "boss": "A cosmic terror guards the path forward. Steel your soul for a battle of ages.",
       "shop": "Scattered relics and rare cards for those with the gold to pay.",

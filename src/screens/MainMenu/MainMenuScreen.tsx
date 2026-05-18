@@ -180,7 +180,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     title: {
-        fontWeight: '900',
         color: colors.arcane.white,
         fontFamily: typography.fonts.heading,
         textShadowColor: colors.arcane.emerald,

@@ -7,6 +7,7 @@ import {
     ScrollView,
     useWindowDimensions,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -125,6 +126,41 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
         toggleSound, toggleMusic, toggleHaptics, setAnimationSpeed, setLanguage,
     } = useSettingsStore();
 
+    const handleToggleSound = () => {
+        if (hapticsEnabled) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+        toggleSound();
+    };
+
+    const handleToggleMusic = () => {
+        if (hapticsEnabled) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+        toggleMusic();
+    };
+
+    const handleToggleHaptics = () => {
+        // Always vibrate on pressing the haptics toggle, so they feel the feedback immediately
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        toggleHaptics();
+    };
+
+    const handleSetAnimationSpeed = (speed: 'slow' | 'normal' | 'fast') => {
+        if (hapticsEnabled) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+        setAnimationSpeed(speed);
+    };
+
+    const handleSetLanguage = (lang: 'en' | 'tr') => {
+        if (hapticsEnabled) {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }
+        setLanguage(lang);
+        i18n.changeLanguage(lang);
+    };
+
     return (
         <BoardSurface style={styles.container}>
             <ScreenBackground />
@@ -134,7 +170,15 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                 entering={FadeIn.duration(600)}
                 style={[styles.header, { paddingTop: insets.top + 8, paddingHorizontal: 20 }]}
             >
-                <Pressable onPress={() => navigation.goBack()} style={styles.backBtn}>
+                <Pressable
+                    onPress={() => {
+                        if (hapticsEnabled) {
+                            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        }
+                        navigation.goBack();
+                    }}
+                    style={styles.backBtn}
+                >
                     <View style={styles.backBtnInner}>
                         <Text style={styles.backArrow}>‹</Text>
                         <Text style={styles.backText}>{t('common.back')}</Text>
@@ -176,7 +220,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                             label={t('settings.sensory.sound_effects')}
                             sublabel={t('settings.sensory.sound_sub')}
                             value={soundEnabled}
-                            onValueChange={toggleSound}
+                            onValueChange={handleToggleSound}
                         />
                         <View style={styles.rowDivider} />
                         <ToggleRow
@@ -184,7 +228,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                             label={t('settings.sensory.music')}
                             sublabel={t('settings.sensory.music_sub')}
                             value={musicEnabled}
-                            onValueChange={toggleMusic}
+                            onValueChange={handleToggleMusic}
                         />
                         <View style={styles.rowDivider} />
                         <ToggleRow
@@ -192,7 +236,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                             label={t('settings.sensory.haptics')}
                             sublabel={t('settings.sensory.haptics_sub')}
                             value={hapticsEnabled}
-                            onValueChange={toggleHaptics}
+                            onValueChange={handleToggleHaptics}
                         />
                     </Section>
                 </View>
@@ -207,7 +251,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                                 return (
                                     <Pressable
                                         key={speed}
-                                        onPress={() => setAnimationSpeed(speed)}
+                                        onPress={() => handleSetAnimationSpeed(speed)}
                                         style={[styles.speedBtn, isActive && styles.speedBtnActive]}
                                     >
                                         <LinearGradient
@@ -236,10 +280,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                                 return (
                                     <Pressable
                                         key={lang}
-                                        onPress={() => {
-                                            setLanguage(lang);
-                                            i18n.changeLanguage(lang);
-                                        }}
+                                        onPress={() => handleSetLanguage(lang)}
                                         style={[styles.speedBtn, isActive && styles.speedBtnActive]}
                                     >
                                         <LinearGradient
@@ -263,6 +304,9 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                         <Pressable
                             style={styles.replayButton}
                             onPress={() => {
+                                if (hapticsEnabled) {
+                                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                }
                                 const reset = useSettingsStore.getState().resetTutorial;
                                 reset();
                                 navigation.navigate('Tutorial');

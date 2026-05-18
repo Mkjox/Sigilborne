@@ -2,10 +2,10 @@
 export const typography = {
     // Font families
     fonts: {
-        heading: 'serif', // Fallback to system serif for fantasy feel
-        body: 'sans-serif',
-        bodyBold: 'sans-serif-medium',
-        bodySemiBold: 'sans-serif-medium',
+        heading: 'Cinzel-Bold', // Mystical Serif Header
+        body: 'Outfit-Regular', // Sleek UI Body text
+        bodyBold: 'Outfit-Bold', // Bold UI highlight
+        bodySemiBold: 'Outfit-SemiBold', // Semibold UI text
         mono: 'monospace',
     },
 
@@ -44,25 +44,25 @@ export const textStyles = {
         fontFamily: typography.fonts.heading,
         fontSize: typography.sizes['5xl'],
         lineHeight: typography.sizes['5xl'] * typography.lineHeights.tight,
-        fontWeight: typography.weights.bold,
+        fontWeight: 'normal' as const,
     },
     h2: {
         fontFamily: typography.fonts.heading,
         fontSize: typography.sizes['4xl'],
         lineHeight: typography.sizes['4xl'] * typography.lineHeights.tight,
-        fontWeight: typography.weights.bold,
+        fontWeight: 'normal' as const,
     },
     h3: {
         fontFamily: typography.fonts.heading,
         fontSize: typography.sizes['3xl'],
         lineHeight: typography.sizes['3xl'] * typography.lineHeights.tight,
-        fontWeight: typography.weights.bold,
+        fontWeight: 'normal' as const,
     },
     h4: {
         fontFamily: typography.fonts.bodySemiBold,
         fontSize: typography.sizes['2xl'],
         lineHeight: typography.sizes['2xl'] * typography.lineHeights.normal,
-        fontWeight: typography.weights.semibold,
+        fontWeight: 'normal' as const,
     },
     body: {
         fontFamily: typography.fonts.body,
@@ -92,7 +92,7 @@ export const textStyles = {
         fontFamily: typography.fonts.bodySemiBold,
         fontSize: typography.sizes.base,
         lineHeight: typography.sizes.base * typography.lineHeights.tight,
-        fontWeight: typography.weights.semibold,
+        fontWeight: 'normal' as const,
         textTransform: 'uppercase' as const,
         letterSpacing: 1,
     },

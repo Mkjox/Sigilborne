@@ -396,6 +396,27 @@ const SnowParticle: React.FC<{ delay: number; scale: number; startX: number }> =
 
 // ─── VISUAL 5: WEATHER DEBUFF (SLIDE 5) ──────────────────────────────────────
 const WeatherDebuffVisual: React.FC = () => {
+    const pulseScale = useSharedValue(1);
+    const pulseOpacity = useSharedValue(0.3);
+
+    useEffect(() => {
+        pulseScale.value = withRepeat(
+            withTiming(1.4, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
+            -1,
+            true
+        );
+        pulseOpacity.value = withRepeat(
+            withTiming(0.8, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
+            -1,
+            true
+        );
+    }, []);
+
+    const animatedPulseStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: pulseScale.value }],
+        opacity: pulseOpacity.value,
+    }));
+
     return (
         <View style={styles.centerContainer}>
             {/* Themed Unit Card */}
@@ -431,7 +452,7 @@ const WeatherDebuffVisual: React.FC = () => {
                 <View style={[styles.statNode, { bottom: -6, left: -6, backgroundColor: '#7F1D1D', borderColor: '#EF4444' }]}>
                     <RNText style={[styles.statNodeText, styles.debuffedText]}>1</RNText>
                     {/* Pulsing red ring to display state */}
-                    <View style={styles.debuffPulse} />
+                    <Animated.View style={[styles.debuffPulse, animatedPulseStyle]} />
                 </View>
             </View>
 
@@ -893,7 +914,6 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: '#EF4444',
         opacity: 0.3,
-        animationName: 'pulse' as any,
     },
     snowParticle: {
         position: 'absolute',

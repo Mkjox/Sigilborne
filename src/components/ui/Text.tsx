@@ -17,13 +17,24 @@ export const Text: React.FC<CustomTextProps> = ({
 }) => {
     const variantStyle = textStyles[variant];
 
+    // Flatten styles to audit and normalize any layout/font overrides
+    const flatStyle = StyleSheet.flatten([variantStyle, { color }, style]) || {};
+
+    // Global Safeguard: If using a custom font that already has a weight in its name,
+    // normalize any conflicting inline fontWeight styles to 'normal' to prevent
+    // React Native from silently failing and falling back to default system fonts.
+    if (flatStyle.fontFamily && (
+        flatStyle.fontFamily.includes('Bold') || 
+        flatStyle.fontFamily.includes('SemiBold')
+    )) {
+        if (flatStyle.fontWeight && flatStyle.fontWeight !== 'normal' && flatStyle.fontWeight !== '400') {
+            flatStyle.fontWeight = 'normal';
+        }
+    }
+
     return (
         <RNText
-            style={[
-                variantStyle,
-                { color },
-                style,
-            ]}
+            style={flatStyle}
             {...props}
         />
     );
