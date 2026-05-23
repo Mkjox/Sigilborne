@@ -13,6 +13,6 @@ export type RootStackParamList = {
     Event: { stageId: number };
     Lore: undefined;
     Tutorial: undefined;
-    Victory: { rewards: any }; // Will be properly typed in Phase 8
+    Victory: { rewards: any };
     Defeat: undefined;
 };

@@ -16,7 +16,7 @@ import {
     Easing,
 } from "react-native-reanimated";
 
-const SNOW_COUNT = 300;
+const SNOW_COUNT = 60;
 
 /**
  * GameBoardSkiaBackground - "The Frost Wastes"

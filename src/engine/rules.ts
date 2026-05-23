@@ -7,7 +7,7 @@
  */
 
 // ─── Board & Hand ───────────────────────────────────────────────
-export const STARTING_HAND_SIZE = 10;
+export const STARTING_HAND_SIZE = 5;
 export const MAX_HAND_SIZE = 10;
 export const MAX_BOARD_SIZE = 9;
 export const DRAW_PER_ROUND = 2;

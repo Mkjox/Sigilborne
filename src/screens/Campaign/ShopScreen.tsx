@@ -37,10 +37,9 @@ export const ShopScreen: React.FC = () => {
         shopStock, 
         generateShopStock, 
         buyItem, 
-        removeCardFromDeck 
     } = useCampaignStore();
     
-    const { getActiveDeck, addCardToDeck, removeCardFromDeck: removeCardFromActiveDeck } = useDeckStore();
+    const { getActiveDeck, addCardToDeck } = useDeckStore();
     const activeDeck = getActiveDeck();
     
     const [selectingToRemove, setSelectingToRemove] = useState(false);
@@ -89,21 +88,7 @@ export const ShopScreen: React.FC = () => {
         }
     };
 
-    const handleRemoveCard = (cardId: string) => {
-        if (!activeDeck) return;
-        
-        const result = removeCardFromDeck(cardId);
-        if (result.success) {
-            removeCardFromActiveDeck(activeDeck.id, cardId);
-            setSelectingToRemove(false);
-            showAlert(t('shop.purged_title'), t('shop.purged_msg'));
-        }
-    };
-
     const insets = useSafeAreaInsets();
-    const [activeTab, setActiveTab] = useState<'buy' | 'remove'>('buy');
-    
-    const REMOVE_COST = 50;
 
     return (
         <View style={styles.container}>
@@ -135,35 +120,15 @@ export const ShopScreen: React.FC = () => {
                 </Text>
             </View>
 
-            <View style={styles.tabsContainer}>
-                <TouchableOpacity
-                    style={[styles.tab, activeTab === 'buy' && styles.activeTab]}
-                    onPress={() => setActiveTab('buy')}
-                >
-                    <Text style={[styles.tabText, activeTab === 'buy' && styles.activeTabText]}>
-                        {t('shop.tabs.buy').toUpperCase()}
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    style={[styles.tab, activeTab === 'remove' && styles.activeTab]}
-                    onPress={() => setActiveTab('remove')}
-                >
-                    <Text style={[styles.tabText, activeTab === 'remove' && styles.activeTabText]}>
-                        {t('shop.tabs.remove').toUpperCase()}
-                    </Text>
-                </TouchableOpacity>
-            </View>
-
             <View style={styles.contentContainer}>
                 <View style={styles.sectionHeader}>
                     <Ionicons name="sparkles" size={18} color={colors.arcane.emerald} />
                     <Text style={styles.sectionTitle}>
-                        {activeTab === 'buy' ? t('shop.sections.stock').toUpperCase() : t('shop.sections.purify').toUpperCase()}
+                        {t('shop.sections.stock').toUpperCase()}
                     </Text>
                     <View style={styles.sectionLine} />
                 </View>
 
-                {activeTab === 'buy' ? (
                     <View style={styles.shopGrid}>
                         {shopStock.map(item => (
                             <TouchableOpacity
@@ -187,26 +152,6 @@ export const ShopScreen: React.FC = () => {
                             </TouchableOpacity>
                         ))}
                     </View>
-                ) : (
-                    <View style={styles.removeContainer}>
-                        <TouchableOpacity 
-                            style={styles.serviceCard}
-                            onPress={() => setSelectingToRemove(true)}
-                        >
-                            <View style={styles.serviceIcon}>
-                                <Ionicons name="trash-outline" size={32} color={colors.error} />
-                            </View>
-                            <View style={styles.serviceInfo}>
-                                <Text style={styles.serviceName}>{t('shop.services.remove.name')}</Text>
-                                <Text style={styles.serviceDesc}>{t('shop.services.remove.desc')}</Text>
-                            </View>
-                            <View style={styles.priceTag}>
-                                <Text style={styles.priceText}>{REMOVE_COST}</Text>
-                                <Ionicons name="cash" size={12} color={colors.arcane.emerald} />
-                            </View>
-                        </TouchableOpacity>
-                    </View>
-                )}
             </View>
             </ScrollView>
 
@@ -228,43 +173,6 @@ export const ShopScreen: React.FC = () => {
                             <Text style={styles.alertButtonText}>{t('common.back').toUpperCase()}</Text>
                         </TouchableOpacity>
                     </Animated.View>
-                </View>
-            </Modal>
-
-            {/* Selection Modal for Removal */}
-            <Modal
-                visible={selectingToRemove}
-                transparent
-                animationType="slide"
-            >
-                <View style={styles.modalBackdrop}>
-                    <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
-                    <View style={styles.selectionPanel}>
-                        <View style={styles.panelHeader}>
-                            <Text style={styles.panelTitle}>{t('shop.select_to_remove')}</Text>
-                            <TouchableOpacity onPress={() => setSelectingToRemove(false)}>
-                                <Ionicons name="close" size={24} color={colors.arcane.white} />
-                            </TouchableOpacity>
-                        </View>
-                        
-                        <FlatList
-                            data={activeDeck?.cards || []}
-                            keyExtractor={(item, index) => `${item.id}-${index}`}
-                            numColumns={3}
-                            renderItem={({ item }) => (
-                                <TouchableOpacity 
-                                    style={styles.miniCard}
-                                    onPress={() => handleRemoveCard(item.id)}
-                                >
-                                    <Text style={styles.miniCardName} numberOfLines={2}>{item.name}</Text>
-                                    <View style={styles.miniCardMana}>
-                                        <Text style={styles.miniCardManaText}>{item.manaCost}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )}
-                            contentContainerStyle={styles.selectionList}
-                        />
-                    </View>
                 </View>
             </Modal>
         </View>
