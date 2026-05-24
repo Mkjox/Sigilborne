@@ -820,6 +820,7 @@ const styles = StyleSheet.create({
         letterSpacing: 3,
         textShadowColor: 'rgba(0,0,0,0.8)',
         textShadowRadius: 10,
+        fontFamily: typography.fonts.heading
     },
     biomeHeaderLine: {
         height: 1,
@@ -951,7 +952,7 @@ const styles = StyleSheet.create({
     difficultyList: {
         flexDirection: 'row',
         width: '100%',
-        gap: spacing.xs,
+        gap: spacing.md,
     },
     relicTrayWrapper: {
         position: 'absolute',

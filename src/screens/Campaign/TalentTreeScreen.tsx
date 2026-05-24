@@ -214,7 +214,7 @@ export const TalentTreeScreen: React.FC = () => {
 
             {/* Info Panel - Glassmorphism */}
             {selectedTalent && (
-                <Animated.View entering={FadeInDown.springify().damping(20)} style={styles.infoPanelWrapper}>
+                <Animated.View entering={FadeInDown.springify().damping(40)} style={styles.infoPanelWrapper}>
                     <BlurView
                         intensity={90}
                         tint="dark"

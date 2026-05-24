@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import { View, StyleSheet, StyleProp, ViewStyle, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, borderRadius, spacing } from '../../theme';
 
@@ -12,6 +12,11 @@ export const BoardSurface: React.FC<BoardSurfaceProps> = ({ style, children }) =
     return (
         <View style={[styles.container, style]}>
             {/* Vignette Overlay for depth */}
+            <ImageBackground
+                source={require('../../../assets/board_background.png')}
+                style={StyleSheet.absoluteFill}
+                resizeMode='cover'
+            >
             <LinearGradient
                 colors={['rgba(0,0,0,0.5)', 'transparent', 'rgba(0,0,0,0.4)']}
                 start={{ x: 0, y: 0 }}
@@ -19,8 +24,8 @@ export const BoardSurface: React.FC<BoardSurfaceProps> = ({ style, children }) =
                 style={StyleSheet.absoluteFill}
                 pointerEvents="none"
             />
-
             {children}
+            </ImageBackground>
         </View>
     );
 };

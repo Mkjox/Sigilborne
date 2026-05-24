@@ -295,9 +295,9 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                             ]}>
                                                 <Image 
                                                     source={
-                                                        card.category === 'melee' ? require('../../assets/icons/melee.png') :
-                                                        card.category === 'ranged' ? require('../../assets/icons/ranged.png') :
-                                                        require('../../assets/icons/siege.png')
+                                                        card.category === 'melee' ? require('../../../assets/classes/melee.png') :
+                                                        card.category === 'ranged' ? require('../../../assets/classes/ranged.png') :
+                                                        require('../../../assets/classes/siege.png')
                                                     }
                                                     style={{ width: '100%', height: '100%' }}
                                                     contentFit="contain"
