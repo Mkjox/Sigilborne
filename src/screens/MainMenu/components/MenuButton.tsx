@@ -15,7 +15,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text } from '../../../components/ui';
-import { colors, spacing, shadows } from '../../../theme';
+import { colors, spacing, shadows, typography } from '../../../theme';
 
 interface MenuButtonProps {
     title: string;
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: '600',
         letterSpacing: 2,
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
         textTransform: 'uppercase',
     },
     largeText: {

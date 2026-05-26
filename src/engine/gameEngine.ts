@@ -216,6 +216,18 @@ export const playCard = (
     // Emit event
     eventBus?.emit('CARD_PLAYED', { cardId, cardName: card.name, cardType: card.type, player: currentPlayer });
 
+    // Pull cards if hand is empty after playing card and executing abilities
+    if (newState[currentPlayer].hand.length === 0) {
+        const { newDeck, newHand: drawnHand } = drawCards(
+            newState[currentPlayer].deck,
+            newState[currentPlayer].hand,
+            STARTING_HAND_SIZE
+        );
+        newState[currentPlayer].deck = newDeck;
+        newState[currentPlayer].hand = drawnHand;
+        eventBus?.emit('CARD_DRAWN', { count: drawnHand.length, player: currentPlayer });
+    }
+
     return { newState, success: true };
 };
 

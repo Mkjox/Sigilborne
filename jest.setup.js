@@ -9,6 +9,7 @@ jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock
 
 // Mock Linear Gradient
 jest.mock('expo-linear-gradient', () => {
+  const React = require('react');
   const { View } = require('react-native');
   return {
     LinearGradient: (props) => React.createElement(View, props),
@@ -42,3 +43,7 @@ jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: jest.fn(), goBack: jest.fn() }),
   useRoute: () => ({ params: {} }),
 }));
+
+// Mock AsyncStorage
+jest.mock('@react-native-async-storage/async-storage', () => require('@react-native-async-storage/async-storage/jest/async-storage-mock'));
+

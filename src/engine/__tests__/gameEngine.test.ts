@@ -1,5 +1,6 @@
 import { getTotalPower, playCard, resolveRound, createInitialGameState } from '../gameEngine';
 import { Card, GameState } from '../../types';
+import { STARTING_HAND_SIZE } from '../rules';
 
 describe('Game Engine', () => {
     let initialState: GameState;
@@ -32,15 +33,84 @@ describe('Game Engine', () => {
         
         initialState.player.hand = [card];
         initialState.player.mana = 10;
+        initialState.player.deck = [{ id: 'deck-card', name: 'Deck Card', type: 'unit', power: 1, attack: 1, abilities: [] } as any];
         initialState.currentTurn = 'player';
 
         const { newState, success } = playCard(initialState, 'test-card', initialState.weather);
 
         expect(success).toBe(true);
         expect(newState.player.mana).toBe(8);
-        expect(newState.player.hand).toHaveLength(0);
         expect(newState.player.board).toHaveLength(1);
         expect(newState.player.board[0].id).toBe('test-card');
+    });
+
+    test('playCard should draw cards when hand becomes empty', () => {
+        const card: Card = { 
+            id: 'last-card', 
+            name: 'Last Card', 
+            type: 'unit', 
+            manaCost: 1, 
+            power: 3, 
+            attack: 1, 
+            abilities: [] 
+        } as any;
+        
+        const mockDeck: Card[] = Array.from({ length: 10 }, (_, i) => ({
+            id: `deck-${i}`,
+            name: `Deck Unit ${i}`,
+            type: 'unit',
+            power: 2,
+            attack: 2,
+            abilities: []
+        } as any));
+
+        initialState.player.hand = [card];
+        initialState.player.mana = 10;
+        initialState.player.deck = mockDeck;
+        initialState.currentTurn = 'player';
+
+        const { newState, success } = playCard(initialState, 'last-card', initialState.weather);
+
+        expect(success).toBe(true);
+        expect(newState.player.board).toHaveLength(1);
+        expect(newState.player.board[0].id).toBe('last-card');
+        
+        // Hand should have been refilled to STARTING_HAND_SIZE
+        expect(newState.player.hand).toHaveLength(STARTING_HAND_SIZE);
+        expect(newState.player.deck).toHaveLength(mockDeck.length - STARTING_HAND_SIZE);
+    });
+
+    test('playCard should draw fewer/zero cards if deck has fewer than STARTING_HAND_SIZE when hand becomes empty', () => {
+        const card: Card = { 
+            id: 'last-card', 
+            name: 'Last Card', 
+            type: 'unit', 
+            manaCost: 1, 
+            power: 3, 
+            attack: 1, 
+            abilities: [] 
+        } as any;
+        
+        const mockDeck: Card[] = Array.from({ length: 2 }, (_, i) => ({
+            id: `deck-${i}`,
+            name: `Deck Unit ${i}`,
+            type: 'unit',
+            power: 2,
+            attack: 2,
+            abilities: []
+        } as any));
+
+        initialState.player.hand = [card];
+        initialState.player.mana = 10;
+        initialState.player.deck = mockDeck;
+        initialState.currentTurn = 'player';
+
+        const { newState, success } = playCard(initialState, 'last-card', initialState.weather);
+
+        expect(success).toBe(true);
+        // Hand should have drawn whatever was remaining in the deck (2 cards)
+        expect(newState.player.hand).toHaveLength(2);
+        expect(newState.player.deck).toHaveLength(0);
     });
 
     test('resolveRound should correctly determine the winner', () => {

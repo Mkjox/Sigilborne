@@ -16,7 +16,7 @@ import Animated, {
 import { RootStackParamList, Card } from '../../types';
 import { Text, BoardSurface } from '../../components/ui';
 import { CardComponent } from '../../components/game';
-import { colors, spacing } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 import { useGameStore } from '../../store';
 import { VFXProvider, useVFX } from '../../context/VFXContext';
 import { WeatherProvider, useWeather } from '../../context/WeatherContext';
@@ -216,8 +216,8 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
     const cardHeight = Math.min(BOARD_HALF_HEIGHT * 0.75, 140);
     const cardWidth = cardHeight * 0.72;
 
-    // Hand Card Styling - Secondary (Reduced by ~25%)
-    const handCardH = Math.min(HAND_ZONE_HEIGHT * 0.7, 100);
+    // Hand Card Styling - Secondary (Increased slightly to be more readable)
+    const handCardH = Math.min(HAND_ZONE_HEIGHT * 0.82, 115);
     const handCardW = handCardH * 0.72;
 
     const shouldHighlightPass = currentTurn === 'player' && !isAIThinking && !player.hasPassed;
@@ -576,7 +576,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     variant="h2"
                                     numberOfLines={1}
                                     adjustsFontSizeToFit
-                                    style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: 'serif', textAlign: 'center', width: '100%' }}
+                                    style={{ color: colors.arcane.white, marginBottom: 20, letterSpacing: 8, fontFamily: typography.fonts.heading, textAlign: 'center', width: '100%' }}
                                 >
                                     {winner === 'player' ? t('common.victory') : (winner === 'draw' ? t('common.draw') : t('common.defeat'))}
                                 </Text>
@@ -666,7 +666,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     </View>
                                 </View>
 
-                                <Text variant="h4" color={colors.arcane.white} style={{ marginVertical: 20, fontFamily: 'serif', textAlign: 'center' }}>
+                                <Text variant="h4" color={colors.arcane.white} style={{ marginVertical: 20, fontFamily: typography.fonts.heading, textAlign: 'center' }}>
                                     {message ? t(message).toUpperCase() : ''}
                                 </Text>
 
@@ -770,7 +770,7 @@ const styles = StyleSheet.create({
         color: colors.arcane.white,
         fontSize: 16,
         fontWeight: '900',
-        fontFamily: 'serif',
+        fontFamily: typography.fonts.heading,
         width: 20,
         textAlign: 'center',
     },
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
         width: 32, height: 32, borderRadius: 2, alignItems: 'center', justifyContent: 'center',
         backgroundColor: 'rgba(0,0,0,0.6)', borderWidth: 1.5,
     },
-    scoreText: { fontSize: 16, fontWeight: '900', fontFamily: 'serif' },
+    scoreText: { fontSize: 16, fontWeight: '900', fontFamily: typography.fonts.heading },
     statDisplay: { alignItems: 'center', gap: 4, paddingVertical: 8 },
     powerBadge: {
         width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center',
@@ -825,8 +825,8 @@ const styles = StyleSheet.create({
         width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center',
         backgroundColor: 'rgba(6, 182, 212, 0.1)', borderWidth: 2, borderColor: colors.arcane.cyan, marginBottom: 4,
     },
-    powerText: { fontWeight: '900', fontFamily: 'serif', fontSize: 20 },
-    statLabel: { fontSize: 8, letterSpacing: 1.5, opacity: 0.6, fontWeight: '900', fontFamily: 'serif' },
+    powerText: { fontWeight: '900', fontFamily: typography.fonts.heading, fontSize: 20 },
+    statLabel: { fontSize: 8, letterSpacing: 1.5, opacity: 0.6, fontWeight: '900', fontFamily: typography.fonts.heading },
     actionCluster: {
         marginTop: 'auto',
         alignItems: 'center',
