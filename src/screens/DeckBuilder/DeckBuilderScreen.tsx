@@ -8,6 +8,7 @@ import {
     FlatList,
     Modal,
     TouchableWithoutFeedback,
+    Alert,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -145,6 +146,30 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
         }
         const id = createDeck(t('deck_builder.default_deck_name', { num: nextNum }));
         setActiveDeck(id);
+    };
+
+    const handleDeleteDeck = (deckId: string) => {
+        if (isDeckLocked) return;
+        Alert.alert(
+            t('deck_builder.delete_confirm_title'),
+            t('deck_builder.delete_confirm_desc'),
+            [
+                { text: t('common.cancel'), style: 'cancel' },
+                {
+                    text: t('common.delete'),
+                    style: 'destructive',
+                    onPress: () => {
+                        deleteDeck(deckId);
+                        const remaining = decks.filter(d => d.id !== deckId);
+                        if (remaining.length > 0) {
+                            setActiveDeck(remaining[0].id);
+                        } else {
+                            setActiveDeck(null);
+                        }
+                    },
+                },
+            ]
+        );
     };
 
     const isDeckFull = activeDeck && activeDeck.cards.length >= 25;
@@ -293,6 +318,15 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                         <View style={styles.deckSwitchRow}>
                             <Text style={styles.pillarTitle}>{activeDeck ? activeDeck.name.toUpperCase() : t('deck_builder.active_hero').toUpperCase()}</Text>
                             <View style={styles.spacer} />
+                            {activeDeck && (
+                                <Pressable 
+                                    onPress={() => handleDeleteDeck(activeDeck.id)} 
+                                    style={[styles.deleteActionIcon, { marginRight: 8 }, isDeckLocked && { opacity: 0.3 }]}
+                                    disabled={isDeckLocked}
+                                >
+                                    <MaterialCommunityIcons name="trash-can-outline" size={16} color={colors.error} />
+                                </Pressable>
+                            )}
                             <Pressable 
                                 onPress={handleCreateDeck} 
                                 style={[styles.actionIcon, isDeckLocked && { opacity: 0.3 }]}
@@ -521,6 +555,15 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(16,185,129,0.3)',
         backgroundColor: 'rgba(16,185,129,0.05)',
+    },
+    deleteActionIcon: {
+        width: 30,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(211,95,95,0.3)',
+        backgroundColor: 'rgba(211,95,95,0.05)',
     },
     actionIconText: {
         color: colors.arcane.emerald,

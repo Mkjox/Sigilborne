@@ -138,6 +138,7 @@
     "reawaken": "YENİDEN UYAN",
     "abandon": "TERK ET",
     "cancel": "İPTAL",
+    "delete": "SİL",
     "messages": {
       "game_started": "Oyun Başladı",
       "cannot_play": "Kart oynanamaz",
@@ -221,6 +222,8 @@
     "hero_count": "{{count}} KAHRAMAN",
     "essence_count": "{{count}} ÖZ",
     "deck_count": "{{count}}/25 ÖZ",
+    "delete_confirm_title": "BAĞI SÖK",
+    "delete_confirm_desc": "Bu desteyi kalıcı olarak silmek istediğinden emin misin? Tüm kartlar mahzene geri dönecektir.",
     "filters": {
       "hero": "KAHRAMAN",
       "all": "HEPSİ",

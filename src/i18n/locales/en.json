@@ -138,6 +138,7 @@
     "reawaken": "REAWAKEN",
     "abandon": "ABANDON",
     "cancel": "CANCEL",
+    "delete": "DELETE",
     "selected": "Selected",
     "messages": {
       "game_started": "Game Started",
@@ -222,6 +223,8 @@
     "hero_count": "{{count}} HEROES",
     "essence_count": "{{count}} ESSENCES",
     "deck_count": "{{count}}/25 ESSENCES",
+    "delete_confirm_title": "DISMANTLE LINK",
+    "delete_confirm_desc": "Are you sure you want to permanently dissolve this deck? All cards will return to the vault.",
     "filters": {
       "hero": "HERO",
       "all": "ALL",
