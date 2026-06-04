@@ -45,3 +45,4 @@ export const PRICE_EPIC = 250;
 export const PRICE_LEGENDARY = 500;
 export const PRICE_RELIC = 350;
 export const PRICE_REMOVE_CARD = 100;
+export const PRICE_FACTION_UNLOCK = 150;

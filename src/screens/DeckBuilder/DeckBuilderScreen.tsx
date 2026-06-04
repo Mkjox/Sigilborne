@@ -15,6 +15,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BlurView } from 'expo-blur';
 import Animated, {
     FadeIn,
     FadeInUp,
@@ -30,7 +31,7 @@ import Animated, {
 import { RootStackParamList, Card, CardType } from '../../types';
 import { Text } from '../../components/ui';
 import { CardComponent } from '../../components/game';
-import { colors } from '../../theme';
+import { colors, spacing, shadows } from '../../theme';
 import { useTranslation } from 'react-i18next';
 import { useDeckStore } from '../../store/deckStore';
 import { useCampaignStore } from '../../store/campaignStore';
@@ -119,6 +120,7 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     const [filter, setFilter] = useState<'all' | CardType | 'hero'>('hero');
     const [libWidth, setLibWidth] = useState(0);
     const [selectedDetailCard, setSelectedDetailCard] = useState<Card | null>(null);
+    const [deckToDelete, setDeckToDelete] = useState<string | null>(null);
 
     const activeDeck = useMemo(() => decks.find(d => d.id === activeDeckId), [decks, activeDeckId]);
     const filteredCards = useMemo(() => {
@@ -150,26 +152,19 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
 
     const handleDeleteDeck = (deckId: string) => {
         if (isDeckLocked) return;
-        Alert.alert(
-            t('deck_builder.delete_confirm_title'),
-            t('deck_builder.delete_confirm_desc'),
-            [
-                { text: t('common.cancel'), style: 'cancel' },
-                {
-                    text: t('common.delete'),
-                    style: 'destructive',
-                    onPress: () => {
-                        deleteDeck(deckId);
-                        const remaining = decks.filter(d => d.id !== deckId);
-                        if (remaining.length > 0) {
-                            setActiveDeck(remaining[0].id);
-                        } else {
-                            setActiveDeck(null);
-                        }
-                    },
-                },
-            ]
-        );
+        setDeckToDelete(deckId);
+    };
+
+    const confirmDeleteDeck = () => {
+        if (!deckToDelete) return;
+        deleteDeck(deckToDelete);
+        const remaining = decks.filter(d => d.id !== deckToDelete);
+        if (remaining.length > 0) {
+            setActiveDeck(remaining[0].id);
+        } else {
+            setActiveDeck(null);
+        }
+        setDeckToDelete(null);
     };
 
     const isDeckFull = activeDeck && activeDeck.cards.length >= 25;
@@ -451,6 +446,53 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                         </TouchableWithoutFeedback>
                     </View>
                 </TouchableWithoutFeedback>
+            </Modal>
+
+            {/* Delete Deck Modal */}
+            <Modal
+                visible={!!deckToDelete}
+                transparent
+                animationType="fade"
+                onRequestClose={() => setDeckToDelete(null)}
+            >
+                <View style={styles.modalOverlay}>
+                    <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+                    <Pressable style={StyleSheet.absoluteFill} onPress={() => setDeckToDelete(null)} />
+
+                    <Animated.View
+                        entering={FadeInUp.springify()}
+                        exiting={FadeOut.duration(200)}
+                        style={styles.deleteModal}
+                    >
+                        <View style={styles.deleteIconContainer}>
+                            <MaterialCommunityIcons name="trash-can-outline" size={32} color={colors.error} />
+                        </View>
+
+                        <Text style={styles.deleteTitle}>{t('deck_builder.delete_confirm_title').toUpperCase()}</Text>
+                        <Text style={styles.deleteDesc}>{t('deck_builder.delete_confirm_desc')}</Text>
+
+                        <View style={styles.deleteActions}>
+                            <Pressable
+                                style={styles.cancelBtn}
+                                onPress={() => setDeckToDelete(null)}
+                            >
+                                <Text style={styles.cancelBtnText}>{t('common.cancel').toUpperCase()}</Text>
+                            </Pressable>
+
+                            <Pressable
+                                style={styles.confirmDeleteBtn}
+                                onPress={confirmDeleteDeck}
+                            >
+                                <LinearGradient
+                                    colors={[colors.error, '#7f1d1d']}
+                                    style={styles.confirmDeleteGradient}
+                                >
+                                    <Text style={styles.confirmDeleteText}>{t('common.delete').toUpperCase()}</Text>
+                                </LinearGradient>
+                            </Pressable>
+                        </View>
+                    </Animated.View>
+                </View>
             </Modal>
         </View>
     );
@@ -964,5 +1006,80 @@ const styles = StyleSheet.create({
         color: 'rgba(255,255,255,0.7)',
         fontSize: 10,
         marginTop: 2,
+    },
+    // --- Delete Modal ---
+    deleteModal: {
+        width: '85%',
+        backgroundColor: colors.arcane.obsidian,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(239, 68, 68, 0.4)',
+        padding: spacing.xl,
+        alignItems: 'center',
+        ...shadows.lg,
+        shadowColor: colors.error,
+    },
+    deleteIconContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: spacing.md,
+        borderWidth: 1,
+        borderColor: 'rgba(239, 68, 68, 0.2)',
+    },
+    deleteTitle: {
+        color: colors.arcane.white,
+        fontFamily: 'serif',
+        fontSize: 18,
+        letterSpacing: 2,
+        marginBottom: spacing.sm,
+        textAlign: 'center',
+    },
+    deleteDesc: {
+        color: 'rgba(255,255,255,0.6)',
+        textAlign: 'center',
+        fontSize: 13,
+        lineHeight: 18,
+        marginBottom: spacing.xl,
+    },
+    deleteActions: {
+        flexDirection: 'row',
+        gap: spacing.md,
+        width: '100%',
+    },
+    cancelBtn: {
+        flex: 1,
+        height: 42,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 8,
+    },
+    cancelBtnText: {
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: 11,
+        fontWeight: '900',
+        letterSpacing: 2,
+    },
+    confirmDeleteBtn: {
+        flex: 1,
+        height: 42,
+        borderRadius: 8,
+        overflow: 'hidden',
+    },
+    confirmDeleteGradient: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    confirmDeleteText: {
+        color: colors.arcane.white,
+        fontSize: 11,
+        fontWeight: '900',
+        letterSpacing: 2,
     }
 });

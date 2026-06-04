@@ -3,10 +3,8 @@ import {
     View,
     StyleSheet,
     TouchableOpacity,
-    FlatList,
     Dimensions,
     Modal,
-    Pressable,
     ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -14,11 +12,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types';
 import { useCampaignStore, ShopItem } from '../../store/campaignStore';
 import { useDeckStore } from '../../store/deckStore';
-import { colors, spacing, typography, shadows, borderRadius } from '../../theme';
+import { colors, spacing, typography } from '../../theme';
 import { Ionicons } from '@expo/vector-icons';
 import { getAllCards } from '../../data/cardData';
 import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeIn, FadeOut, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInUp } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '../../components/ui';
@@ -27,6 +25,22 @@ import { useTranslation } from 'react-i18next';
 const { width, height } = Dimensions.get('window');
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'Shop'>;
+
+const FactionColors: Record<string, string> = {
+    order: '255, 215, 0',
+    shadow: '168, 85, 247',
+    nature: '16, 185, 129',
+    arcane: '6, 182, 212',
+    neutral: '156, 163, 175',
+};
+
+const FactionIcons: Record<string, keyof typeof Ionicons.glyphMap> = {
+    order: 'shield-half',
+    shadow: 'moon',
+    nature: 'leaf',
+    arcane: 'star',
+    neutral: 'scale',
+};
 
 export const ShopScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
@@ -42,7 +56,7 @@ export const ShopScreen: React.FC = () => {
     const { getActiveDeck, addCardToDeck } = useDeckStore();
     const activeDeck = getActiveDeck();
     
-    const [selectingToRemove, setSelectingToRemove] = useState(false);
+
     const [alertConfig, setAlertConfig] = useState<{ visible: boolean; title: string; message: string }>({
         visible: false,
         title: '',
@@ -54,7 +68,6 @@ export const ShopScreen: React.FC = () => {
     };
 
     useEffect(() => {
-        // Generate new stock if the shop is empty or we just arrived
         if (shopStock.length === 0) {
             generateShopStock();
         }
@@ -62,27 +75,16 @@ export const ShopScreen: React.FC = () => {
 
     const handleBuyItem = (item: ShopItem) => {
         if (item.purchased) return;
-        
-        if (item.type === 'service' && item.itemId === 'remove_card') {
-            if (gold < item.price) {
-                showAlert(t('common.not_enough_gold'), t('common.merchant_refusal'));
-                return;
-            }
-            setSelectingToRemove(true);
-            return;
-        }
 
         const result = buyItem(item.id);
         
         if (result.success) {
-            // If it's a card, add it to the active deck
             if (item.type === 'card' && activeDeck) {
                 const cardData = getAllCards().find(c => c.id === item.itemId);
                 if (cardData) {
                     addCardToDeck(activeDeck.id, cardData);
                 }
             }
-            // Relics are handled within buyItem (added to campaignStore.relics)
         } else {
             showAlert(t('common.merchant'), result.message);
         }
@@ -90,69 +92,123 @@ export const ShopScreen: React.FC = () => {
 
     const insets = useSafeAreaInsets();
 
+    const relics = shopStock.filter(i => i.type === 'relic');
+    const unlocks = shopStock.filter(i => i.type === 'faction_unlock');
+
+
     return (
         <View style={styles.container}>
             {/* Background */}
             <ExpoLinearGradient
-                colors={['#0f172a', '#1e1b4b', '#000000']}
+                colors={['#050505', '#1a0b2e', '#000000']}
                 style={StyleSheet.absoluteFillObject}
             />
 
             <ScrollView 
-                contentContainerStyle={{ flexGrow: 1, paddingBottom: 60 }} 
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }} 
                 showsVerticalScrollIndicator={false}
             >
                 <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Ionicons name="chevron-back" size={28} color={colors.arcane.white} />
-                </TouchableOpacity>
-                <View style={styles.goldDisplay}>
-                    <Ionicons name="cash" size={16} color={colors.arcane.emerald} style={{ marginRight: 6 }} />
-                    <Text variant="h4" color={colors.arcane.white}>{gold}</Text>
-                    <Text variant="caption" color={colors.arcane.emerald} style={{ marginLeft: 4 }}> {t('common.gold').toUpperCase()}</Text>
-                </View>
-            </View>
-
-            <View style={styles.titleContainer}>
-                <Text variant="h1" style={styles.title}>{t('shop.title').toUpperCase()}</Text>
-                <Text variant="caption" color={colors.arcane.emerald} style={styles.subtitle}>
-                    {t('shop.subtitle').toUpperCase()}
-                </Text>
-            </View>
-
-            <View style={styles.contentContainer}>
-                <View style={styles.sectionHeader}>
-                    <Ionicons name="sparkles" size={18} color={colors.arcane.emerald} />
-                    <Text style={styles.sectionTitle}>
-                        {t('shop.sections.stock').toUpperCase()}
-                    </Text>
-                    <View style={styles.sectionLine} />
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <BlurView intensity={20} tint="dark" style={styles.backButtonBlur}>
+                            <Ionicons name="chevron-back" size={24} color={colors.arcane.white} />
+                        </BlurView>
+                    </TouchableOpacity>
+                    
+                    <Animated.View entering={FadeIn.delay(200)} style={styles.goldContainer}>
+                        <BlurView intensity={30} tint="dark" style={styles.goldBlur}>
+                            <View style={styles.goldIconCircle}>
+                                <Ionicons name="cash" size={16} color="#fbbf24" />
+                            </View>
+                            <Text style={styles.goldText}>{gold}</Text>
+                        </BlurView>
+                    </Animated.View>
                 </View>
 
-                    <View style={styles.shopGrid}>
-                        {shopStock.map(item => (
-                            <TouchableOpacity
-                                key={item.id}
-                                style={[styles.shopItemCard, item.purchased && styles.shopItemPurchased]}
-                                onPress={() => handleBuyItem(item)}
-                                disabled={item.purchased}
-                            >
-                                <View style={styles.itemIconContainer}>
-                                    <Ionicons 
-                                        name={item.type === 'card' ? 'card' : 'diamond'} 
-                                        size={24} 
-                                        color={colors.arcane.emerald} 
-                                    />
-                                </View>
-                                <Text style={styles.itemName}>{t(item.name)}</Text>
-                                <View style={styles.priceTag}>
-                                    <Text style={styles.priceText}>{item.purchased ? 'SOLD' : item.price}</Text>
-                                    {!item.purchased && <Ionicons name="cash" size={12} color={colors.arcane.emerald} />}
-                                </View>
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-            </View>
+                <Animated.View entering={FadeInUp.delay(100)} style={styles.titleContainer}>
+                    <Text style={styles.title}>{t('shop.title').toUpperCase()}</Text>
+                    <Text style={styles.subtitle}>{t('shop.subtitle').toUpperCase()}</Text>
+                </Animated.View>
+
+                <View style={styles.contentContainer}>
+                    
+                    {/* RELICS SECTION */}
+                    {relics.length > 0 && (
+                        <View style={styles.sectionContainer}>
+                            <View style={styles.sectionHeader}>
+                                <Ionicons name="sparkles" size={16} color="#f59e0b" />
+                                <Text style={[styles.sectionTitle, { color: '#f59e0b' }]}>
+                                    {t('shop.sections.relics', 'ARTIFACTS').toUpperCase()}
+                                </Text>
+                                <View style={[styles.sectionLine, { backgroundColor: 'rgba(245, 158, 11, 0.2)' }]} />
+                            </View>
+                            <View style={styles.shopGrid}>
+                                {relics.map((item, index) => (
+                                    <Animated.View key={item.id} entering={FadeInUp.delay(200 + index * 50)} style={styles.shopItemWrapper}>
+                                        <TouchableOpacity
+                                            style={[styles.relicCard, item.purchased && styles.shopItemPurchased]}
+                                            onPress={() => handleBuyItem(item)}
+                                            disabled={item.purchased}
+                                        >
+                                            <ExpoLinearGradient colors={['rgba(245, 158, 11, 0.1)', 'transparent']} style={StyleSheet.absoluteFillObject} />
+                                            <View style={styles.relicIconContainer}>
+                                                <Ionicons name="diamond" size={28} color="#f59e0b" />
+                                            </View>
+                                            <Text style={styles.itemName}>{t(item.name)}</Text>
+                                            <View style={styles.priceTag}>
+                                                <Text style={styles.priceText}>{item.purchased ? 'SOLD' : item.price}</Text>
+                                                {!item.purchased && <Ionicons name="cash" size={12} color="#fbbf24" />}
+                                            </View>
+                                            {item.purchased && <View style={styles.soldOverlay}><Text style={styles.soldText}>SOLD</Text></View>}
+                                        </TouchableOpacity>
+                                    </Animated.View>
+                                ))}
+                            </View>
+                        </View>
+                    )}
+
+                    {/* FACTION UNLOCKS SECTION */}
+                    {unlocks.length > 0 && (
+                        <View style={styles.sectionContainer}>
+                            <View style={styles.sectionHeader}>
+                                <Ionicons name="book" size={16} color={colors.arcane.cyan} />
+                                <Text style={[styles.sectionTitle, { color: colors.arcane.cyan }]}>
+                                    {t('shop.sections.unlocks', 'SEALED TOMES').toUpperCase()}
+                                </Text>
+                                <View style={[styles.sectionLine, { backgroundColor: 'rgba(6, 182, 212, 0.2)' }]} />
+                            </View>
+                            <View style={styles.shopGrid}>
+                                {unlocks.map((item, index) => {
+                                    const fColorRgb = FactionColors[item.itemId] || '16, 185, 129';
+                                    const fColor = `rgb(${fColorRgb})`;
+                                    const fIcon = FactionIcons[item.itemId] || 'book';
+                                    return (
+                                        <Animated.View key={item.id} entering={FadeInUp.delay(300 + index * 50)} style={styles.shopItemWrapper}>
+                                            <TouchableOpacity
+                                                style={[styles.unlockCard, { borderColor: `rgba(${fColorRgb}, 0.3)` }, item.purchased && styles.shopItemPurchased]}
+                                                onPress={() => handleBuyItem(item)}
+                                                disabled={item.purchased}
+                                            >
+                                                <ExpoLinearGradient colors={[`rgba(${fColorRgb}, 0.1)`, 'transparent']} style={StyleSheet.absoluteFillObject} />
+                                                <View style={[styles.unlockIconContainer, { backgroundColor: `rgba(${fColorRgb}, 0.1)` }]}>
+                                                    <Ionicons name={fIcon as any} size={24} color={fColor} />
+                                                </View>
+                                                <Text style={styles.itemName}>{t(item.name)}</Text>
+                                                <View style={[styles.priceTag, { backgroundColor: `rgba(${fColorRgb}, 0.1)` }]}>
+                                                    <Text style={[styles.priceText, { color: fColor }]}>{item.purchased ? 'SOLD' : item.price}</Text>
+                                                    {!item.purchased && <Ionicons name="cash" size={12} color={fColor} />}
+                                                </View>
+                                                {item.purchased && <View style={styles.soldOverlay}><Text style={styles.soldText}>SOLD</Text></View>}
+                                            </TouchableOpacity>
+                                        </Animated.View>
+                                    );
+                                })}
+                            </View>
+                        </View>
+                    )}
+
+
+                </View>
             </ScrollView>
 
             {/* Custom Alert Modal */}
@@ -190,31 +246,43 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: spacing.lg,
         paddingBottom: spacing.md,
+        zIndex: 10,
     },
     backButton: {
+        borderRadius: 22,
+        overflow: 'hidden',
+    },
+    backButtonBlur: {
         width: 44,
         height: 44,
         justifyContent: 'center',
+        alignItems: 'center',
     },
-    goldDisplay: {
+    goldContainer: {
+        borderRadius: 20,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: 'rgba(251, 191, 36, 0.3)',
+    },
+    goldBlur: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.5)',
         paddingHorizontal: spacing.md,
         paddingVertical: spacing.sm,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(16,185,129,0.3)',
+    },
+    goldIconCircle: {
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        backgroundColor: 'rgba(251, 191, 36, 0.15)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 8,
     },
     goldText: {
         color: colors.arcane.white,
         fontWeight: '900',
         fontSize: 16,
-    },
-    goldLabel: {
-        color: colors.arcane.emerald,
-        fontWeight: '700',
-        fontSize: 10,
     },
     titleContainer: {
         paddingHorizontal: spacing.xl,
@@ -267,14 +335,16 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: spacing.xl,
     },
+    sectionContainer: {
+        marginBottom: spacing.xl,
+    },
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: spacing.lg,
+        marginBottom: spacing.md,
         gap: spacing.sm,
     },
     sectionTitle: {
-        color: colors.arcane.emerald,
         fontSize: 12,
         fontWeight: '900',
         letterSpacing: 2,
@@ -282,92 +352,94 @@ const styles = StyleSheet.create({
     sectionLine: {
         flex: 1,
         height: 1,
-        backgroundColor: 'rgba(16,185,129,0.2)',
     },
     shopGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         gap: spacing.md,
-        paddingBottom: spacing['4xl'],
     },
-    shopItemCard: {
+    shopItemWrapper: {
         width: '30%',
+    },
+    relicCard: {
         aspectRatio: 0.8,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        borderRadius: 4,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        borderRadius: 8,
         padding: spacing.sm,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
+        borderColor: 'rgba(245, 158, 11, 0.3)',
         alignItems: 'center',
         justifyContent: 'space-between',
+        overflow: 'hidden',
+    },
+    unlockCard: {
+        aspectRatio: 0.8,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        borderRadius: 8,
+        padding: spacing.sm,
+        borderWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        overflow: 'hidden',
     },
     shopItemPurchased: {
-        opacity: 0.3,
+        opacity: 0.5,
     },
-    itemIconContainer: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: 'rgba(16,185,129,0.05)',
+    relicIconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(245, 158, 11, 0.1)',
         justifyContent: 'center',
         alignItems: 'center',
+        marginTop: spacing.xs,
+    },
+    unlockIconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: spacing.xs,
     },
     itemName: {
         color: colors.arcane.white,
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: '900',
         textAlign: 'center',
         marginTop: spacing.sm,
+        marginBottom: spacing.xs,
     },
     priceTag: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(16,185,129,0.1)',
+        backgroundColor: 'rgba(245, 158, 11, 0.15)',
         paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderRadius: 10,
-        marginTop: spacing.xs,
+        paddingVertical: 4,
+        borderRadius: 12,
         gap: 4,
     },
     priceText: {
-        color: colors.arcane.emerald,
+        color: '#f59e0b',
         fontWeight: '900',
-        fontSize: 10,
+        fontSize: 11,
     },
-    removeContainer: {
-        flex: 1,
-    },
-    serviceCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.3)',
-        borderRadius: 4,
-        padding: spacing.lg,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
-    },
-    serviceIcon: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    soldOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.6)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: spacing.md,
     },
-    serviceInfo: {
-        flex: 1,
-    },
-    serviceName: {
+    soldText: {
         color: colors.arcane.white,
         fontSize: 16,
         fontWeight: '900',
-    },
-    serviceDesc: {
-        color: 'rgba(255,255,255,0.5)',
-        fontSize: 12,
-        marginTop: 2,
+        letterSpacing: 4,
+        transform: [{ rotate: '-15deg' }],
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 2,
     },
     modalBackdrop: {
         flex: 1,
@@ -410,65 +482,4 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         letterSpacing: 2,
     },
-    selectionPanel: {
-        width: width,
-        height: height * 0.7,
-        backgroundColor: colors.arcane.obsidian,
-        position: 'absolute',
-        bottom: 0,
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
-        borderTopWidth: 1,
-        borderTopColor: colors.arcane.emerald,
-        padding: spacing.xl,
-    },
-    panelHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: spacing.xl,
-    },
-    panelTitle: {
-        color: colors.arcane.white,
-        fontSize: 18,
-        fontWeight: '900',
-        letterSpacing: 2,
-    },
-    selectionList: {
-        paddingBottom: spacing.xl,
-    },
-    miniCard: {
-        flex: 1/3,
-        aspectRatio: 0.7,
-        backgroundColor: 'rgba(255,255,255,0.03)',
-        borderRadius: 4,
-        margin: 4,
-        padding: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
-    },
-    miniCardName: {
-        color: colors.arcane.white,
-        fontSize: 10,
-        fontWeight: '700',
-        textAlign: 'center',
-    },
-    miniCardMana: {
-        position: 'absolute',
-        top: 2,
-        right: 2,
-        width: 16,
-        height: 16,
-        borderRadius: 8,
-        backgroundColor: colors.arcane.cyan,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    miniCardManaText: {
-        color: colors.arcane.white,
-        fontSize: 8,
-        fontWeight: '900',
-    }
 });

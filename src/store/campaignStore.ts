@@ -9,8 +9,8 @@ import { getRelicById } from '../data/relicData';
 
 export interface ShopItem {
     id: string;
-    type: 'card' | 'relic' | 'service';
-    itemId: string; // The Card ID or Relic ID
+    type: 'card' | 'relic' | 'service' | 'faction_unlock';
+    itemId: string; // The Card ID, Relic ID, or Faction name
     name: string;
     price: number;
     description: string;
@@ -140,23 +140,29 @@ export const useCampaignStore = create<CampaignStore>()(
                     const unlockedCardPool = allCards.filter(c => !c.isLocked || state.unlockedCardIds.includes(c.id));
                     const stock: ShopItem[] = [];
 
-                    // 1. Pick 6 random CARDS (up from 3)
-                    const count = 6;
-                    for (let i = 0; i < count; i++) {
-                        const card = unlockedCardPool[Math.floor(Math.random() * unlockedCardPool.length)];
-                        let price = Rules.PRICE_COMMON;
-                        if (card.rarity === 'rare') price = Rules.PRICE_RARE;
-                        else if (card.rarity === 'epic') price = Rules.PRICE_EPIC;
-                        else if (card.rarity === 'legendary') price = Rules.PRICE_LEGENDARY;
+                    // 1. Generate Faction Unlocks for factions that have locked cards
+                    const factions = ['order', 'shadow', 'nature', 'arcane', 'neutral'] as const;
+                    const availableFactions = factions.filter(faction => 
+                        allCards.some(c => c.faction === faction && c.isLocked && !state.unlockedCardIds.includes(c.id))
+                    );
 
+                    // Shuffle available factions
+                    for (let i = availableFactions.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [availableFactions[i], availableFactions[j]] = [availableFactions[j], availableFactions[i]];
+                    }
+
+                    // Pick up to 3 faction unlocks
+                    const numUnlocks = Math.min(3, availableFactions.length);
+                    for (let i = 0; i < numUnlocks; i++) {
+                        const faction = availableFactions[i];
                         stock.push({
-                            id: `shop_card_${i}_${Date.now()}`,
-                            type: 'card',
-                            itemId: card.id,
-                            name: `cards.${card.name}`,
-                            price,
-                            description: card.description,
-                            rarity: card.rarity,
+                            id: `shop_unlock_${faction}_${Date.now()}`,
+                            type: 'faction_unlock',
+                            itemId: faction,
+                            name: `shop.unlock_${faction}`,
+                            price: Rules.PRICE_FACTION_UNLOCK,
+                            description: `shop.unlock_${faction}_desc`,
                             purchased: false,
                         });
                     }
@@ -178,17 +184,6 @@ export const useCampaignStore = create<CampaignStore>()(
                             });
                         }
                     }
-
-                    // 3. Add removal service
-                    stock.push({
-                        id: 'shop_service_remove',
-                        type: 'service',
-                        itemId: 'remove_card',
-                        name: 'shop.services.amnesia_name',
-                        price: Rules.PRICE_REMOVE_CARD,
-                        description: 'shop.services.amnesia_desc',
-                        purchased: false,
-                    });
 
                     return { shopStock: stock };
                 }),
@@ -225,15 +220,22 @@ export const useCampaignStore = create<CampaignStore>()(
                         newRelics = [...state.relics, item.itemId];
                     }
                     
-                    // Card purchases would need to be added to deckStore, 
-                    // which is a separate store. We might need to handle this 
-                    // via a cross-store action or a component-level trigger.
-                    // For now, we'll just track the purchase in shopStock.
+                    // Handle Faction Unlock
+                    let newUnlockedCardIds = state.unlockedCardIds;
+                    if (item.type === 'faction_unlock') {
+                        const allCards = getAllCards();
+                        const lockedFactionCards = allCards.filter(c => c.faction === item.itemId && c.isLocked && !state.unlockedCardIds.includes(c.id));
+                        if (lockedFactionCards.length > 0) {
+                            const randomCard = lockedFactionCards[Math.floor(Math.random() * lockedFactionCards.length)];
+                            newUnlockedCardIds = [...state.unlockedCardIds, randomCard.id];
+                        }
+                    }
 
                     return {
                         gold: state.gold - item.price,
                         shopStock: newStock,
                         relics: newRelics,
+                        unlockedCardIds: newUnlockedCardIds,
                     };
                 });
                 

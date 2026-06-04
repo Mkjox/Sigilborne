@@ -611,7 +611,7 @@ const BiomeHeader: React.FC<{ scrollY: SharedValue<number>, totalHeight: number 
 
     return (
         <Animated.View style={[styles.biomeHeaderContainer, animatedStyle]}>
-            <Text style={styles.biomeHeaderText}>{name}</Text>
+            <Text style={styles.biomeHeaderText} numberOfLines={1} adjustsFontSizeToFit>{name}</Text>
             <View style={styles.biomeHeaderLine} />
         </Animated.View>
     );
