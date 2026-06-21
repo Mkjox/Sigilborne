@@ -200,7 +200,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
         setAnimationSpeed(speed);
     }, [hapticsEnabled, setAnimationSpeed]);
 
-    const handleSetLanguage = useCallback((lang: 'en' | 'tr') => {
+    const handleSetLanguage = useCallback((lang: 'en' | 'tr' | 'es') => {
         if (hapticsEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setLanguage(lang);
         i18n.changeLanguage(lang);
@@ -212,10 +212,10 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
     }, [hapticsEnabled]);
 
     const tabs: { key: TabKey; label: string; icon: string }[] = [
-        { key: 'sensory',  label: t('settings.sensory.title'),          icon: '🔊' },
-        { key: 'visuals',  label: t('settings.visuals.title'),          icon: '✨' },
-        { key: 'language', label: t('settings.language.title'),         icon: '🌐' },
-        { key: 'other',    label: t('settings.other.title', 'OTHER'),   icon: '⚙️' },
+        { key: 'sensory', label: t('settings.sensory.title'), icon: '🔊' },
+        { key: 'visuals', label: t('settings.visuals.title'), icon: '✨' },
+        { key: 'language', label: t('settings.language.title'), icon: '🌐' },
+        { key: 'other', label: t('settings.other.title', 'OTHER'), icon: '⚙️' },
     ];
 
     return (
@@ -325,7 +325,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                         <Section>
                             <Text style={styles.optionLabel}>{t('settings.language.select').toUpperCase()}</Text>
                             <View style={styles.optionRow}>
-                                {(['en', 'tr'] as const).map((lang) => {
+                                {(['en', 'tr', 'es'] as const).map((lang) => {
                                     const isActive = i18n.language.startsWith(lang);
                                     return (
                                         <Pressable

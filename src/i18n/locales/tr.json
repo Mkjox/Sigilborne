@@ -797,6 +797,7 @@
   "events": {
     "mysterious_encounter": "GİZEMLİ KARŞILAŞMA",
     "continue_journey": "YOLCULUĞA DEVAM ET",
+    "already_completed_desc": "Burası sessiz hissettiriyor. Önceki karşılaşmanızın yankıları hala havada asılı, ancak enerjiler dağılmış. Burada bulunacak başka bir şey yok.",
     "whispering_void": {
       "title": "Fısıldayan Hiçlik",
       "description": "Gerçeklikteki bir yarık düşük, titreşimli bir frekansla uğulduyor. Varlığınıza tepki veriyor gibi görünüyor, başka bir aleme bakış sunuyor.",

@@ -1,0 +1,828 @@
+{
+  "common": {
+    "play": "JUGAR",
+    "exit": "SALIR",
+    "ascend": "ASCENDER",
+    "visit_merchant": "VISITAR AL MERCADER",
+    "enter_void": "ENTRAR AL VACÍO",
+    "completed": "COMPLETADO",
+    "level": "NIVEL {{num}}",
+    "stage": "ETAPA {{num}}",
+    "boss": "JEFE {{num}}",
+    "elite": "ÉLITE {{num}}",
+    "back": "VOLVER",
+    "back_void": "VACÍO",
+    "gold": "ORO",
+    "points_abbr": "PT",
+    "no_relics": "Ninguna reliquia encontrada",
+    "not_enough_gold": "¡Oro insuficiente!",
+    "merchant_refusal": "El Mercader niega con la cabeza. \"Vuelve cuando tengas más moneda, viajero.\"",
+    "game_errors": {
+      "not_in_hand": "La carta no está en la mano",
+      "not_enough_mana": "No hay suficiente maná",
+      "unit_not_found": "Unidad no encontrada",
+      "unit_exhausted": "La unidad está agotada",
+      "attack_success": "Ataque exitoso",
+      "ability_cooldown": "Habilidad en tiempo de recarga",
+      "ability_success": "Habilidad del héroe usada"
+    },
+    "you": "TÚ",
+    "opponent": "OPONENTE",
+    "rounds": "RONDAS",
+    "power": "PODER",
+    "mana": "MANÁ",
+    "hand": "MANO",
+    "cards": "CARTAS",
+    "deck": "MAZO",
+    "turn": "TURNO",
+    "passed": "PASADO",
+    "rarities": {
+      "common": "Común",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Legendario",
+      "boss": "Jefe"
+    },
+    "used": "USADO",
+    "leader": "LÍDER",
+    "victory": "VICTORIA",
+    "defeat": "OBLIVIO",
+    "draw": "EMPATE",
+    "continue": "CONTINUAR",
+    "end_turn": "TERMINAR TURNO",
+    "escape": "ESCAPAR",
+    "void_keeper": "GUARDIÁN DEL VACÍO",
+    "void_keeper_title": "La Sombra del Tabernero",
+    "corruption": "CORRUPCIÓN",
+    "essence": "ESENCIA",
+    "round_complete": "RONDA {{num}} COMPLETADA",
+    "continue_expedition": "CONTINUAR EXPEDICIÓN",
+    "replay": "REPETIR",
+    "reawaken": "DESPERTAR",
+    "abandon": "ABANDONAR",
+    "cancel": "CANCELAR",
+    "delete": "BORRAR",
+    "selected": "Seleccionado",
+    "messages": {
+      "game_started": "Juego Comenzado",
+      "cannot_play": "No se puede jugar la carta",
+      "played_card": "Jugó {{name}}",
+      "used_hero_ability": "Habilidad de Héroe Usada",
+      "cannot_use_ability": "No se puede usar la habilidad",
+      "victory": "¡Victoria!",
+      "stalemate": "¡Empate!",
+      "defeat": "¡Derrota!",
+      "you_won": "¡Tú Ganaste!",
+      "ai_won": "¡La IA Ganó!",
+      "draw": "¡Empate!",
+      "you_passed": "Pasaste",
+      "round_start": "¡Inicio de la Ronda {{num}}!",
+      "attack": "¡Ataque!",
+      "attack_failed": "Ataque fallido",
+      "ai_passed": "La IA pasó",
+      "ai_used_ability": "La IA usó {{name}}",
+      "ai_played_card": "La IA jugó {{name}}",
+      "ai_played_generic": "La IA jugó una carta",
+      "card_info": "{{name}}: {{desc}}",
+      "no_description": "Sin descripción"
+    }
+  },
+  "shop": {
+    "title": "El Mercader del Vacío",
+    "subtitle": "Reliquias de tiempos olvidados...",
+    "tabs": {
+      "buy": "Adquirir",
+      "remove": "Purificar"
+    },
+    "sections": {
+      "stock": "Stock Actual",
+      "purify": "Purgar a los Débiles"
+    },
+    "acquired": "ADQUIRIDO",
+    "removal_title": "Selecciona una ofrenda para quemar",
+    "purged_title": "Purgado",
+    "purged_msg": "La carta se quema hasta convertirse en polvo arcano. Tu mazo se siente más ligero.",
+    "services": {
+      "remove": {
+        "name": "Limpieza del Vacío",
+        "desc": "Elimina permanentemente una carta de tu mazo para adelgazarlo y obtener mejores robos."
+      }
+    },
+    "select_to_remove": "SELECCIONA LA CARTA A ELIMINAR",
+    "confirm_purchase": "CONFIRMAR COMPRA",
+    "confirm_desc": "¿Estás seguro de que deseas agregar \"{{name}}\" a tu mazo?",
+    "buy_for": "Comprar por {{price}}",
+    "confirm_purify": "CONFIRMAR PURIFICACIÓN",
+    "confirm_purify_desc": "¿Estás seguro de que deseas eliminar permanentemente \"{{name}}\" de tu mazo?",
+    "purify_for": "Purificar por {{price}}"
+  },
+  "relics": {
+    "war_banner": {
+      "name": "Estandarte de Guerra",
+      "desc": "Al comienzo de tu turno, aumenta el poder de un aliado aleatorio en 1."
+    },
+    "mana_crystal": {
+      "name": "Cristal de Maná",
+      "desc": "Al comienzo de cada ronda, gana 1 de Maná Máximo."
+    },
+    "soul_gem": {
+      "name": "Gema de Alma",
+      "desc": "Cuando un aliado es destruido, roba 1 carta."
+    },
+    "thornmail": {
+      "name": "Cota de Espinas",
+      "desc": "Cuando un aliado recibe daño, inflige 1 de daño a un enemigo aleatorio."
+    }
+  },
+  "deck_builder": {
+    "deck_locked_title": "MAZO BLOQUEADO",
+    "deck_locked_desc": "Tu mazo está bloqueado durante una expedición activa. Visita a un Mercader para purificar tu mazo.",
+    "vault_title": "BÓVEDA",
+    "construct_title": "CONSTRUIR",
+    "unlinked": "DESVINCULADO",
+    "forge_link": "FORJAR VÍNCULO",
+    "active_hero": "HÉROE ACTIVO",
+    "default_deck_name": "Mazo {{num}}",
+    "hero_count": "{{count}} HÉROES",
+    "essence_count": "{{count}} ESENCIAS",
+    "deck_count": "{{count}}/25 ESENCIAS",
+    "delete_confirm_title": "DESMANTELAR VÍNCULO",
+    "delete_confirm_desc": "¿Estás seguro de que quieres disolver permanentemente este mazo? Todas las cartas volverán a la bóveda.",
+    "filters": {
+      "hero": "HÉROE",
+      "all": "TODAS",
+      "unit": "UNIDADES",
+      "spell": "HECHIZOS"
+    }
+  },
+  "lore": {
+    "title": "Crónicas",
+    "locked": "Crónica Desconocida",
+    "locked_desc": "Alcanza {{biome}} para desbloquear esta entrada.",
+    "entries": {
+      "verdant_echo_1": {
+        "title": "El Primer Eclipse",
+        "content": "Antes de la tiranía de la luz, el Vacío era una cuna silenciosa. Fue solo cuando la primera estrella se encendió, rasgando el tejido oscuro de la existencia, que el equilibrio se hizo añicos. Despertadas por el calor abrasador de la creación, las sombras no solo se retiraron, aprendieron a pasar hambre y luego, a tener hambre."
+      },
+      "verdant_echo_2": {
+        "title": "El Pacto Verde",
+        "content": "El Eco Verde fue el primer suelo soberano en florecer después de que el Vacío retrocediera. Aquí, los círculos antiguos formaron sus pactos inquebrantables, uniendo carne y espíritu a las líneas ley que pulsan profundamente debajo del musgo primordial."
+      },
+      "verdant_echo_3": {
+        "title": "La Primera Flor",
+        "content": "En el centro del Eco se encuentra el Árbol Madre, cuyas raíces beben directamente de las líneas ley primordiales. Se dice que cada hoja que cae de sus ramas da a luz a un nuevo espíritu de la naturaleza, atando para siempre el ciclo de la vida al pulso de la magia."
+      },
+      "azure_spire_1": {
+        "title": "La Guerra de los Sellos",
+        "content": "La Guerra de los Sellos manchó la tierra. El Orden buscó atar las Líneas Ley en una ley absoluta, mientras que la Sombra buscó desenrollarlas hacia el caos. Por encima de la carnicería, los Arcanos observaban desde sus observatorios astrales, tomando notas frías, mientras las raíces de la Naturaleza simplemente soportaban las cenizas, esperando reclamar los huesos de ambos."
+      },
+      "azure_spire_2": {
+        "title": "Torres de los Canalizadores",
+        "content": "Las Agujas Azules fueron levantadas por los primeros Magos-Arquitectos, visionarios arrogantes que buscaban perforar el velo entre reinos. Lograron rasgar el cielo, aunque lo que respondió a su invocación celestial no fue lo que esperaban."
+      },
+      "azure_spire_3": {
+        "title": "El Observatorio Astral",
+        "content": "En el vértice de la aguja más alta se encuentra el Gran Planetario, una maravilla mecánica que traza un mapa no solo de las estrellas, sino del flujo de energía arcana a través del reino. Cuando el Orden atacó, los Magos simplemente giraron el Planetario, convirtiendo el cielo mismo en un arma de luz."
+      },
+      "twilight_rift_1": {
+        "title": "La Llama Cian",
+        "content": "Los maestros Arcanos finalmente descubrieron que la magia no es un mero recurso que se gasta, sino una conversación viva con el cosmos. La Llama Cian, que ardía sin calor ni cenizas, fue la primera respuesta exitosa del universo."
+      },
+      "twilight_rift_2": {
+        "title": "La Falla Abierta",
+        "content": "En la Falla del Crepúsculo, los mismos hilos de la realidad se deshilachan hacia la nada. Los eruditos debaten eternamente si la ruptura fue un arma, un trágico accidente o una invitación. Quienes se acercan demasiado regresan cambiados irrevocablemente, si es que regresan."
+      },
+      "twilight_rift_3": {
+        "title": "Los Ecos Susurrantes",
+        "content": "Aquellos que habitan demasiado tiempo cerca de la Falla comienzan a escuchar voces, no de fantasmas, sino de posibilidades. Vidas alternativas, líneas de tiempo divergentes y futuros que nunca llegaron a pasar cantan en un coro enloquecedor, empujando a los débiles de voluntad al abismo."
+      },
+      "crimson_wake_1": {
+        "title": "El Concordato de Sangre",
+        "content": "Cuando la facción de la Sombra finalmente fue expulsada de las Líneas Ley, no huyeron en silencio. Quemaron su retirada, salando la tierra con una maldición rencorosa que volvió los ríos de un carmesí espeso durante una generación."
+      },
+      "crimson_wake_2": {
+        "title": "El Trono del Señor de la Guerra",
+        "content": "El Trono de Obsidiana de la Estela es un asiento de poder absoluto, sin embargo, ningún señor de la guerra ha sobrevivido a su abrazo por más de una sola estación. No confiere gobierno; consume al gobernante, bebiendo su ambición hasta que no queda nada más que una corona vacía."
+      },
+      "crimson_wake_3": {
+        "title": "Los Ríos Rojos",
+        "content": "Las aguas de la Estela son espesas y metálicas, portadoras de la antigua maldición de la Sombra. Beber de ella es locura; bañarse en ella es una apuesta. Sin embargo, algunos señores de la guerra afirman que las aguas de color rojo sangre les otorgan visiones de la muerte de sus enemigos."
+      },
+      "obsidian_heart_1": {
+        "title": "Corazón del Vacío",
+        "content": "El Corazón de Obsidiana no es un lugar físico, es una herida cósmica. Cuando la última gran línea ley colapsó hacia adentro, la tierra no se hizo añicos; se cristalizó, preservando el último momento sin aliento de magia pura para la eternidad."
+      },
+      "obsidian_heart_2": {
+        "title": "El Origen del Guardián del Vacío",
+        "content": "La entidad que ahora se teme como el Guardián del Vacío alguna vez fue un simple mortal, un maestro cartógrafo obsesionado con mapear los bordes de la realidad. Impulsado por una curiosidad fatal, trazó una línea demasiado lejos a través del pergamino del mundo. Entró al margen para medir el abismo, solo para descubrir que el abismo había estado esperando para medirlo a él."
+      },
+      "obsidian_heart_3": {
+        "title": "El Último Eco",
+        "content": "En lo profundo del núcleo cristalizado del Corazón yace una sola gema impecable que contiene la esencia atrapada del alma original del Guardián del Vacío. Pulsa con una luz tenue y dolorosa, un recordatorio del hombre que buscó trazar el mapa de la eternidad y se perdió dentro de ella."
+      }
+    }
+  },
+  "biome": {
+    "verdant_echo": "Eco Verde",
+    "azure_spire": "Aguja Azur",
+    "twilight_rift": "Falla del Crepúsculo",
+    "crimson_wake": "Estela Carmesí",
+    "obsidian_heart": "Corazón de Obsidiana"
+  },
+  "hero_classes": {
+    "Warrior": "Guerrero",
+    "Warlock": "Brujo",
+    "Mage": "Mago",
+    "Hunter": "Cazador",
+    "Cleric": "Clérigo",
+    "Rogue": "Pícaro",
+    "Fighter": "Luchador",
+    "Shaman": "Chamán",
+    "Paladin": "Paladín",
+    "Druid": "Druida"
+  },
+  "collection": {
+    "title": "COLECCIÓN",
+    "hero_label": "HÉROE",
+    "hero_subtitle": "Héroe {{class}} • {{ability}}",
+    "hero_desc": "{{desc}} (Recarga: {{cooldown}} Rondas)",
+    "no_flavor": "Un eco misterioso del vacío.",
+    "stats": {
+      "total": "TOTAL",
+      "decks": "MAZOS"
+    },
+    "categories": {
+      "all": "Todas",
+      "units": "Unidades",
+      "heroes": "Héroes",
+      "spells": "Hechizos",
+      "weather": "Clima"
+    }
+  },
+  "menu": {
+    "subtitle": "CRÓNICAS ARCANAS",
+    "enter_void": "Entrar Al Vacío",
+    "collection": "Colección",
+    "deck_builder": "Constructor de Mazos",
+    "settings": "Ajustes"
+  },
+  "settings": {
+    "title": "AJUSTES",
+    "sensory": {
+      "title": "SENSORIAL",
+      "sound_effects": "Efectos de Sonido",
+      "sound_sub": "Jugadas de cartas, impactos y ambiente",
+      "music": "Música de Fondo",
+      "music_sub": "Melodías del vacío arcano",
+      "haptics": "Retroalimentación Háptica",
+      "haptics_sub": "Respuesta táctil en las acciones"
+    },
+    "visuals": {
+      "title": "VISUALES",
+      "animation_speed": "VELOCIDAD DE ANIMACIÓN",
+      "speeds": {
+        "slow": "LENTO",
+        "normal": "NORMAL",
+        "fast": "RÁPIDO"
+      }
+    },
+    "language": {
+      "title": "IDIOMA",
+      "select": "Selecciona tu idioma",
+      "en": "ENGLISH",
+      "tr": "TÜRKÇE",
+      "es": "ESPAÑOL"
+    },
+    "footer": "✧ FORJADO EN EL VACÍO ✧",
+    "version": "PROTOCOLO ARCANO v0.1.0",
+    "other": {
+      "title": "OTROS",
+      "replay_tutorial": "📖 Cómo Jugar"
+    }
+  },
+  "campaign": {
+    "select_difficulty": "SELECCIONAR DIFICULTAD",
+    "difficulty": {
+      "easy": "FÁCIL",
+      "medium": "MEDIO",
+      "hard": "DIFÍCIL"
+    },
+    "confirm_abandon": "¿Abandonar Expedición?",
+    "confirm_abandon_desc": "Todo el progreso en esta carrera se perderá.",
+    "descriptions": {
+      "boss": "Un terror cósmico protege el camino a seguir. Prepara tu alma para una batalla de eras.",
+      "shop": "Reliquias dispersas y cartas raras para aquellos con el oro para pagar.",
+      "event": "Energías impredecibles se arremolinan en el vacío. La fortuna favorece a los audaces.",
+      "battle": "Las fuerzas enemigas se congregan en este sector. Despeja el camino para avanzar."
+    },
+    "echo_victory_no_rewards": "Eco de Victoria (Sin Recompensas)"
+  },
+  "cards": {
+    "Commander": "Comandante",
+    "Dark Lord": "Señor Oscuro",
+    "Archmage": "Archimago",
+    "Ranger": "Explorador",
+    "Paladin": "Paladín",
+    "Trickster": "Tramposo",
+    "Druid": "Druida",
+    "Swordsman": "Espadachín",
+    "Knight": "Caballero",
+    "Berserker": "Berserker",
+    "Shield Captain": "Capitán de Escudo",
+    "Champion": "Campeón",
+    "Warlord": "Señor de la Guerra",
+    "Lich King": "Rey Exánime",
+    "Grave Ghoul": "Necrófago de Tumba",
+    "Wight": "Tumulario",
+    "Skeleton Warrior": "Guerrero Esqueleto",
+    "Death Knight": "Caballero de la Muerte",
+    "Zombie Horde": "Horda Zombi",
+    "Crypt Guard": "Guardia de Cripta",
+    "Archer": "Arquero",
+    "Crossbowman": "Ballestero",
+    "Elven Marksman": "Tirador Élfico",
+    "Scout": "Explorador",
+    "Sniper": "Francotirador",
+    "Dragon Hunter": "Cazador de Dragones",
+    "Dark Elf Archer": "Arquero Elfo Oscuro",
+    "Soul Harvester": "Cosechador de Almas",
+    "Banshee": "Alma en Pena",
+    "Void Wizard": "Mago del Vacío",
+    "Shadow Assassin": "Asesino de las Sombras",
+    "Necromancer": "Nigromante",
+    "Dark Elf Matriarch": "Matriarca Elfa Oscura",
+    "Catapult": "Catapulta",
+    "Ballista": "Balista",
+    "Trebuchet": "Trabuquete",
+    "War Elephant": "Elefante de Guerra",
+    "Siege Tower": "Torre de Asedio",
+    "Dragon": "Dragón",
+    "Bone Catapult": "Catapulta de Hueso",
+    "Plague Spreader": "Esparcidor de Plaga",
+    "Abomination": "Abominación",
+    "Demon Prince": "Príncipe Demonio",
+    "Hellhound": "Sabueso Infernal",
+    "Gargoyle": "Gárgola",
+    "Cursed Ballista": "Balista Maldita",
+    "Commander's Horn": "Cuerno de Comandante",
+    "Decoy": "Señuelo",
+    "Scorch": "Quemar",
+    "Resurrection": "Resurrección",
+    "Dark Pact": "Pacto Oscuro",
+    "Void Bolt": "Rayo del Vacío",
+    "Life Drain": "Drenar Vida",
+    "Raise Dead": "Levantar Muertos",
+    "Biting Frost": "Escarcha Mordaz",
+    "Impenetrable Fog": "Niebla Impenetrable",
+    "Clear Skies": "Cielos Despejados",
+    "Corrupt Ground": "Suelo Corrupto",
+    "Wailing Fog": "Niebla Llorona",
+    "Arcane Guard": "Guardia Arcano",
+    "Crystal Construct": "Constructo de Cristal",
+    "Spell-Thief": "Ladrón de Hechizos",
+    "Void Walker": "Caminante del Vacío",
+    "Mana Wyrm": "Vermes de Maná",
+    "Ethereal Binder": "Atador Etéreo",
+    "Arcane Arch-Mage": "Archimago Arcano",
+    "Leyline Conduit": "Conducto de Línea Ley",
+    "Prism Tower": "Torre Prisma",
+    "Bear Spirit": "Espíritu de Oso",
+    "Wolf Pack Alpha": "Lobo Alfa",
+    "Elder Ent": "Ent Anciano",
+    "Wild Boar": "Jabalí Salvaje",
+    "Satyr Skirmisher": "Hostigador Sátiro",
+    "Elven Warden": "Celador Élfico",
+    "Wind Runner": "Corredor del Viento",
+    "Ancient Oak": "Roble Anciano",
+    "Thorn Thrower": "Lanzaespinas",
+    "Town Guard": "Guardia de la Ciudad",
+    "Bandit": "Bandido",
+    "Knight Errant": "Caballero Errante",
+    "Hired Crossbow": "Ballesta Contratada",
+    "Traveling Bard": "Bardo Viajero",
+    "Ram": "Ariete",
+    "Supply Balloon": "Globo de Suministros",
+    "Energy Pylon": "Pilón de Energía",
+    "Vine Catapult": "Catapulta de Enredaderas",
+    "Junk Launcher": "Lanzador de Chatarra",
+    "Arcane Golem": "Gólem Arcano",
+    "Spellblade": "Espada Mágica",
+    "Mirror Image": "Imagen Reflejo",
+    "Dire Wolf": "Lobo Huargo",
+    "Forest Guardian": "Guardián del Bosque",
+    "Shapeshifter": "Cambiaformas",
+    "Sellsword": "Mercenario",
+    "Bounty Hunter": "Cazarrecompensas",
+    "Apprentice": "Aprendiz",
+    "Sorceress": "Hechicera",
+    "Archon": "Arconte",
+    "Elven Scout": "Explorador Élfico",
+    "Dryad": "Dríade",
+    "Centaur Archer": "Arquero Centauro",
+    "Caravan Guard": "Guardia de Caravana",
+    "Traveling Merchant": "Mercader Viajero",
+    "Mana Battery": "Batería de Maná",
+    "Ether Cannon": "Cañón de Éter",
+    "Ancient Treant": "Antiguo Treant",
+    "Nature Wrath": "Ira de la Naturaleza",
+    "Old Catapult": "Catapulta Antigua",
+    "Supply Wagon": "Vagón de Suministros",
+    "descriptions": {
+      "swordsman": "Unidad básica cuerpo a cuerpo",
+      "knight": "Unidad acorazada cuerpo a cuerpo",
+      "berserker": "Guerrero feroz que inspira a los aliados",
+      "shield_captain": "Más fuerte con otros capitanes",
+      "champion": "Guerrero de élite del reino",
+      "warlord": "Impone respeto en el campo de batalla",
+      "lich_king": "Señor de los muertos congelados",
+      "grave_ghoul": "Se alimenta de los restos de la batalla",
+      "wight": "Espíritus ancestrales ligados a la armadura",
+      "skeleton_warrior": "Huesos ruidosos que nunca se cansan",
+      "death_knight": "Un héroe caído al servicio del vacío",
+      "zombie_horde": "Siguen viniendo...",
+      "crypt_guard": "Protectores eternos de la tumba",
+      "archer": "Atacante básico a distancia",
+      "crossbowman": "Unidad poderosa a distancia",
+      "elven_marksman": "Arquero élfico con puntería mortal",
+      "scout": "Se infiltra en las líneas enemigas",
+      "sniper": "Tirador de élite",
+      "dragon_hunter": "Cazador de las bestias más poderosas",
+      "dark_elf_archer": "Precisión mortal desde las sombras",
+      "soul_harvester": "Cosecha la esencia de los vivos",
+      "banshee": "Su grito es una sentencia de muerte",
+      "void_wizard": "Portador de energía oscura inestable",
+      "shadow_assassin": "Maestro del asesinato silencioso",
+      "necromancer": "Conducto hacia el más allá",
+      "dark_elf_matriarch": "Líder de la aguja de obsidiana",
+      "catapult": "Arma de asedio básica",
+      "ballista": "Arma de asedio pesada",
+      "trebuchet": "Máquina de asedio masiva",
+      "war_elephant": "Bestia de guerra con armadura",
+      "siege_tower": "Fortaleza móvil",
+      "dragon": "El arma definitiva",
+      "bone_catapult": "Máquina de asedio hecha de restos",
+      "plague_spreader": "Infecta el campo de batalla",
+      "abomination": "Cosido a partir de titanes",
+      "demon_prince": "Gobernante de los planos ardientes",
+      "hellhound": "Bestia escupe fuego del abismo",
+      "gargoyle": "Piedra convertida en carne y malicia",
+      "cursed_ballista": "Pernos encantados de sombra",
+      "commanders_horn": "Duplica el poder de una fila",
+      "decoy": "Devuelve una unidad aliada aleatoria a tu mano",
+      "scorch_spell": "Destruye las unidades más fuertes",
+      "resurrection": "Revive a una unidad del cementerio",
+      "dark_pact": "Sacrifica esencia para revivir una unidad",
+      "void_bolt": "Obliterar la unidad enemiga más fuerte",
+      "life_drain": "Extrae poder para impulsar a los aliados",
+      "raise_dead": "Los muertos obedecen a su amo.",
+      "frost": "Establece las unidades cuerpo a cuerpo a 1 de poder",
+      "fog": "Establece las unidades a distancia a 1 de poder",
+      "clear_weather": "Elimina todos los efectos climáticos",
+      "corrupt_ground": "Las unidades cuerpo a cuerpo pierden su determinación",
+      "wailing_fog": "Las unidades a distancia pierden la vista",
+      "arcane_guard": "Centinela mágico",
+      "crystal_construct": "Guerrero resistente ligado a gemas",
+      "spell_thief": "Roba secretos del enemigo",
+      "void_walker": "Una sombra de los reinos exteriores",
+      "mana_wyrm": "Se alimenta de energía cruda",
+      "ethereal_binder": "Une almas entre sí",
+      "arcane_archmage": "Maestro de toda la magia",
+      "leyline_conduit": "Concentra el poder ambiental",
+      "prism_tower": "Refleja energía en el campo de batalla",
+      "bear_spirit": "Fuerza de la montaña",
+      "wolf_alpha": "Líder de la manada",
+      "elder_ent": "El más viejo del bosque",
+      "wild_boar": "Cargando con furia",
+      "satyr_skirmisher": "Rápido y esquivo",
+      "elven_warden": "Guardián de los bosques profundos",
+      "wind_runner": "Más rápido que la brisa",
+      "ancient_oak": "Raíces que nunca ceden",
+      "thorn_thrower": "Defensa espinosa a distancia",
+      "town_guard": "Protege a los inocentes",
+      "bandit": "Se aprovecha de los débiles",
+      "knight_errant": "Héroe en busca de gloria",
+      "hired_crossbow": "Preciso por un precio",
+      "traveling_bard": "Inspira con canciones",
+      "ram": "Arma de avance",
+      "supply_balloon": "Apoyo desde arriba",
+      "energy_pylon": "Fuente estable de energía",
+      "vine_catapult": "Arroja espinas enredadas",
+      "junk_launcher": "Dispara lo que esté disponible",
+      "arcane_golem": "Guardián mecánico de los archivos",
+      "spellblade": "Acero tejido y magia",
+      "mirror_image": "Una copia esquiva de la realidad",
+      "dire_wolf": "Un depredador de inmenso tamaño",
+      "forest_guardian": "Protector de las arboledas sagradas",
+      "shapeshifter": "Toma la forma de lo que mata",
+      "sellsword": "Espada a sueldo, sin preguntas",
+      "bounty_hunter": "Encuentra a los más fuertes y los derrota",
+      "apprentice": "Aprendiendo los primeros pasos de lo arcano",
+      "sorceress": "Maestra de las artes místicas",
+      "archon": "Ser ascendido de luz pura",
+      "elven_scout": "Se mueve sin ser visto a través de la maleza",
+      "dryad": "Espíritu de los árboles antiguos",
+      "centaur_archer": "Arquero Centauro",
+      "caravan_guard": "Protege las rutas comerciales",
+      "traveling_merchant": "Proveedor de bienes raros",
+      "mana_battery": "Almacena energía mágica en exceso",
+      "ether_cannon": "Dispara magia concentrada",
+      "ancient_treant": "Madera viviente con sabiduría antigua",
+      "nature_wrath": "El bosque contraataca",
+      "old_catapult": "Arma de asedio antigua, todavía confiable",
+      "supply_wagon": "Mantiene las líneas del frente alimentadas"
+    },
+    "flavor": {
+      "swordsman": "El acero es la única verdad que conoce.",
+      "knight": "El honor es su escudo, el acero es su espada.",
+      "berserker": "Su rabia es legendaria.",
+      "shield_captain": "La unión hace la fuerza.",
+      "champion": "Invicto en combate singular.",
+      "warlord": "Todos se inclinan ante el señor de la guerra.",
+      "lich_king": "La muerte no es más que un nuevo comienzo.",
+      "grave_ghoul": "Siempre hambriento.",
+      "wight": "No recuerdan nada más que el odio.",
+      "skeleton_warrior": "Levántate y camina.",
+      "death_knight": "El honor murió hace mucho tiempo.",
+      "zombie_horde": "Fuerza en números.",
+      "crypt_guard": "Ninguno pasará.",
+      "archer": "Apunta bien.",
+      "crossbowman": "Un rayo, una muerte.",
+      "elven_marksman": "Nunca falla.",
+      "scout": "La información es poder.",
+      "sniper": "Un disparo es todo lo que se necesita.",
+      "dragon_hunter": "Teme al cazador.",
+      "dark_elf_archer": "Dos ojos, un objetivo.",
+      "soul_harvester": "Tu alma está perdida.",
+      "banshee": "Lo último que escuchas.",
+      "void_wizard": "El vacío nos llama a todos.",
+      "shadow_assassin": "Desapareció antes de que el cuerpo cayera al suelo.",
+      "necromancer": "La tumba es solo una puerta.",
+      "dark_elf_matriarch": "El poder es la única moneda.",
+      "catapult": "¡Piedras entrantes!",
+      "ballista": "Perfora cualquier armadura.",
+      "trebuchet": "Los muros se derrumban ante ella.",
+      "war_elephant": "Fuerza imparable.",
+      "siege_tower": "Acerca la victoria.",
+      "dragon": "Fuego y furia.",
+      "bone_catapult": "Dispara más que rocas.",
+      "plague_spreader": "Deja que la enfermedad se los lleve.",
+      "abomination": "Una obra maestra del gore.",
+      "demon_prince": "Arrodíllate o arde.",
+      "hellhound": "Las mandíbulas que muerden.",
+      "gargoyle": "Mira los cielos.",
+      "cursed_ballista": "Perfora el alma.",
+      "archmage": "Los hilos de la realidad son solo cuerdas de su laúd. Él toca una canción de fuego cósmico.",
+      "ranger": "El bosque habla en susurros de viento y hojas crujientes. Ella es la única que realmente escucha.",
+      "paladin": "El acero y la fe son sus únicos compañeros. En la noche más oscura, su escudo brilla con más fuerza.",
+      "rogue": "¿Por qué luchar por un trono cuando puedes robar la corona? Él juega en todos los bandos para asegurar su propia victoria.",
+      "beserker_hero": "La razón murió hace mucho tiempo en el calor del foso. Ahora, solo queda el ritmo del hacha.",
+      "druid": "Los árboles recuerdan lo que la piedra ha olvidado. Él es la voz de la tierra que despierta."
+    }
+  },
+  "factions": {
+    "order": {
+      "title": "El Bastión Eterno",
+      "desc": "Atado por juramentos antiguos y una jerarquía rígida, la Orden busca imponer una armonía absoluta sobre el caos del mundo."
+    },
+    "shadow": {
+      "title": "El Abismo Susurrante",
+      "desc": "Cultistas y exiliados que han mirado al vacío y han visto que les devolvía la mirada. Ellos manejan la esencia cruda de la entropía."
+    },
+    "nature": {
+      "title": "Las Tierras Salvajes Verdes",
+      "desc": "El mundo mismo tiene memoria. A la Naturaleza no le importan los reyes ni los dioses, solo el ciclo de crecimiento y decadencia."
+    },
+    "arcane": {
+      "title": "La Aguja Astral",
+      "desc": "Eruditos que han dominado las líneas ley. Para un mago arcano, la magia es una ciencia para ser medida y cosechada."
+    },
+    "neutral": {
+      "title": "Los Clanes Mercenarios",
+      "desc": "Aquellos que no pertenecen a ningún reino más que al suyo. Vendiendo sus espadas y su ingenio al mejor postor."
+    }
+  },
+  "talent_tree": {
+    "title": "Ascensión del Héroe",
+    "subtitle": "Despierta el verdadero poder",
+    "ascended": "ASCENDIDO",
+    "ascend_cost": "Ascender ({{cost}} PT)"
+  },
+  "talents": {
+    "hero_commander": {
+      "t_cmd_1": {
+        "name": "Espíritu de Vanguardia",
+        "desc": "+1 Salud del Héroe"
+      },
+      "t_cmd_2": {
+        "name": "Inspiración",
+        "desc": "Comienza con +2 de Maná"
+      },
+      "t_cmd_3": {
+        "name": "Maestría del Orden",
+        "desc": "Las unidades del Orden obtienen +1 de Ataque"
+      },
+      "t_cmd_4": {
+        "name": "Resolución de Acero",
+        "desc": "+2 Salud del Héroe"
+      },
+      "t_cmd_5": {
+        "name": "Ventaja Táctica",
+        "desc": "+1 Tamaño de Mano Inicial"
+      }
+    },
+    "hero_darklord": {
+      "t_dark_1": {
+        "name": "Alcance del Vacío",
+        "desc": "Recarga del Poder de Héroe -1"
+      },
+      "t_dark_2": {
+        "name": "Ritual Oscuro",
+        "desc": "Comienza con +3 de Maná"
+      },
+      "t_dark_3": {
+        "name": "Cosecha de Almas",
+        "desc": "Las unidades de la Sombra obtienen +1 de Ataque"
+      },
+      "t_dark_4": {
+        "name": "Noche Eterna",
+        "desc": "Recarga del Poder de Héroe -1"
+      },
+      "t_dark_5": {
+        "name": "Sabiduría Abisal",
+        "desc": "+2 Maná Inicial"
+      }
+    },
+    "hero_archmage": {
+      "t_mage_1": {
+        "name": "Enfoque Arcano",
+        "desc": "Comienza con +3 de Maná"
+      },
+      "t_mage_2": {
+        "name": "Desbordamiento de Maná",
+        "desc": "+1 Tamaño de Mano Inicial"
+      },
+      "t_mage_3": {
+        "name": "Tejehechizos",
+        "desc": "Las unidades Arcanas obtienen +1 de Ataque"
+      },
+      "t_mage_4": {
+        "name": "Canalización Astral",
+        "desc": "+2 Maná Inicial"
+      },
+      "t_mage_5": {
+        "name": "Maestro de Líneas Ley",
+        "desc": "Recarga del Poder de Héroe -1"
+      }
+    },
+    "hero_ranger": {
+      "t_rng_1": {
+        "name": "Apuntar Firme",
+        "desc": "Las unidades de la Naturaleza obtienen +1 de Ataque"
+      },
+      "t_rng_2": {
+        "name": "Ojo de Águila",
+        "desc": "Recarga del Poder de Héroe -1"
+      },
+      "t_rng_3": {
+        "name": "Resiliencia Salvaje",
+        "desc": "+2 Salud del Héroe"
+      },
+      "t_rng_4": {
+        "name": "Explorador Forestal",
+        "desc": "+1 Tamaño de Mano Inicial"
+      },
+      "t_rng_5": {
+        "name": "Reflejos Rápidos",
+        "desc": "Recarga del Poder de Héroe -1"
+      }
+    },
+    "hero_paladin": {
+      "t_pal_1": {
+        "name": "Devoción Sagrada",
+        "desc": "+2 Salud del Héroe"
+      },
+      "t_pal_2": {
+        "name": "Furia Justa",
+        "desc": "Las unidades del Orden obtienen +1 de Ataque"
+      },
+      "t_pal_3": {
+        "name": "Gracia Divina",
+        "desc": "+1 Salud del Héroe"
+      },
+      "t_pal_4": {
+        "name": "Espíritu Guardián",
+        "desc": "Recarga del Poder de Héroe -1"
+      },
+      "t_pal_5": {
+        "name": "Aura de Valor",
+        "desc": "Las unidades del Orden obtienen +1 de Ataque"
+      }
+    },
+    "hero_druid": {
+      "t_dru_1": {
+        "name": "Crecimiento Verde",
+        "desc": "Las unidades de la Naturaleza obtienen +1 de Ataque"
+      },
+      "t_dru_2": {
+        "name": "Recompensa de la Naturaleza",
+        "desc": "Comienza con +2 de Maná"
+      },
+      "t_dru_3": {
+        "name": "Vínculo Espiritual",
+        "desc": "+1 Tamaño de Mano Inicial"
+      },
+      "t_dru_4": {
+        "name": "Escudo de Tierra",
+        "desc": "+2 Salud del Héroe"
+      },
+      "t_dru_5": {
+        "name": "Ciclo de la Vida",
+        "desc": "Recarga del Poder de Héroe -1"
+      }
+    }
+  },
+  "events": {
+    "mysterious_encounter": "ENCUENTRO MISTERIOSO",
+    "continue_journey": "CONTINUAR VIAJE",
+    "already_completed_desc": "Este lugar se siente tranquilo. Los ecos de tu encuentro anterior aún persisten en el aire, pero las energías se han disipado. No hay nada más que encontrar aquí.",
+    "whispering_void": {
+      "title": "El Vacío Susurrante",
+      "description": "Una grieta en la realidad zumba con una frecuencia baja y vibrante. Parece reaccionar a tu presencia, ofreciendo un vistazo a otro reino.",
+      "choices": {
+        "gift_gold_label": "Abraza el Eco",
+        "gift_gold_desc": "Acepta la bendición de la falla. Gana 50 de Oro.",
+        "gift_card_label": "Drenar lo Arcano",
+        "gift_card_desc": "Extrae poder de la falla. Gana una Carta aleatoria."
+      },
+      "resolution": {
+        "gold": "Al entrar en la falla, se materializan bolsillos de monedas antiguas. El vacío susurra su gratitud.",
+        "card": "Metes la mano en la energía brillante y sacas un pergamino: {{name}}. Tu mazo se vuelve más fuerte."
+      }
+    },
+    "weeping_willow": {
+      "title": "El Sauce Llorón",
+      "description": "Un árbol antiguo y cristalino se encuentra solo en un claro. Su savia brilla con una suave luz azul. La leyenda dice que otorga sabiduría a aquellos que ofrecen un sacrificio.",
+      "choices": {
+        "offer_gold_label": "Hacer una Ofrenda",
+        "offer_gold_desc": "Pierde 25 de Oro para encontrar una Reliquia escondida.",
+        "ignore_label": "Dejarlo Estar",
+        "ignore_desc": "No te arriesgues. Procede con cuidado."
+      },
+      "resolution": {
+        "not_enough_gold": "No tienes suficiente oro. El árbol parece decepcionado.",
+        "success": "El árbol acepta tu tributo. Una cámara oculta se abre en sus raíces, revelando un {{relic}}.",
+        "ignore": "Te alejas, sintiendo la mirada fría del árbol en tu espalda. La seguridad es su propia recompensa."
+      }
+    },
+    "abandoned_caravan": {
+      "title": "Caravana Abandonada",
+      "description": "Tropiezas con un carro mercante destrozado. La mayoría de los bienes están arruinados, pero algo podría ser recuperable entre los escombros.",
+      "choices": {
+        "scavenge_label": "Hurgar",
+        "scavenge_desc": "Busca objetos de valor. Gana 30 de Oro.",
+        "search_carefully_label": "Buscar Profundamente",
+        "search_carefully_desc": "Arriesga una trampa por una mejor recompensa. 50% de probabilidad de 60 de Oro o 0."
+      },
+      "resolution": {
+        "scavenge": "Escarbas entre los escombros y encuentras un alijo escondido de monedas. La victoria pertenece al observador.",
+        "success": "¡La persistencia vale la pena! Encuentras un pesado cofre de oro escondido debajo de las tablas del suelo.",
+        "failed": "¡Salta una trampa! Escapas por poco, pero los objetos de valor restantes se destruyen en el proceso."
+      }
+    }
+  },
+  "tutorial": {
+    "slide1": {
+      "title": "El Viaje Comienza",
+      "desc": "Bienvenido a Sigilborne, un mundo donde la estrategia es tu mayor arma. Construye tu mazo, coloca tus unidades sabiamente y derrota al héroe enemigo para reclamar la victoria."
+    },
+    "slide2": {
+      "title": "Maná y Riqueza",
+      "desc": "El maná potencia tus hechizos e invocaciones. Ganas más maná máximo cada turno. Recoge oro durante tu carrera para comprar poderosos artefactos en la Tienda."
+    },
+    "slide3": {
+      "title": "Leyendo los Sellos",
+      "desc": "Cada carta tiene tres claves: Costo de Maná (Arriba a la Izquierda), Poder de Ataque (Abajo a la Izquierda) y Vitalidad (Abajo a la Derecha). Conoce tu mazo para dominar el tablero."
+    },
+    "slide4": {
+      "title": "Facciones y Sinergia",
+      "desc": "Dirige las facciones Arcana, de la Naturaleza y Neutral. Combinar unidades de la misma facción puede desbloquear poderosas sinergias y habilidades ocultas."
+    },
+    "slide5": {
+      "title": "Clases de Unidades y Clima",
+      "desc": "Las unidades pertenecen a tres clases: Cuerpo a Cuerpo, a Distancia o de Asedio. Cada clase es vulnerable a efectos climáticos específicos como Escarcha o Niebla, que reducen su poder a 1. ¡Las unidades legendarias son inmunes a estos efectos!"
+    },
+    "slide6": {
+      "title": "Personalización del Mazo",
+      "desc": "Tu mazo está completamente desbloqueado durante toda la expedición. Puedes editar tu mazo libremente entre batallas para adaptar tu estrategia, cambiar cartas de facción o integrar poderosas unidades nuevas a medida que avanzas a través de biomas más profundos."
+    },
+    "slide7": {
+      "title": "Combate Táctico",
+      "desc": "Arrastra unidades al campo de batalla. Atacan a los enemigos directamente frente a ellas. ¡Reduce el poder total del enemigo para asegurar tu victoria al final de la ronda!"
+    },
+    "btn": {
+      "play": "Vamos a Jugar",
+      "next": "Siguiente",
+      "skip": "Saltar"
+    }
+  }
+}

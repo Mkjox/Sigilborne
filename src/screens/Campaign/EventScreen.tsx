@@ -14,7 +14,7 @@ import { useDeckStore } from '../../store/deckStore';
 import { colors, spacing, shadows, borderRadius, typography } from '../../theme';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient as ExpoLinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeIn, FadeInDown, SlideInUp } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, FadeInRight, SlideInUp } from 'react-native-reanimated';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '../../components/ui';
@@ -60,7 +60,7 @@ export const EventScreen: React.FC = () => {
     const eventData = useMemo(() => {
         // Deterministic but feels random
         const seed = stageId % 3;
-        
+
         switch (seed) {
             case 0:
                 return {
@@ -184,93 +184,102 @@ export const EventScreen: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            {/* Background */}
+            {/* Background Texture - Obsidian gradient and faded image */}
             <ExpoLinearGradient
-                colors={['#0f172a', '#1e1b4b', '#000000']}
+                colors={[colors.arcane.obsidian, '#050505']}
+                style={StyleSheet.absoluteFillObject}
+            />
+            <Image
+                source={eventData.image}
+                style={[StyleSheet.absoluteFillObject, { opacity: 0.15 }]}
+                resizeMode="cover"
+            />
+            {/* Additional gradient to ensure UI readability */}
+            <ExpoLinearGradient
+                colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.8)']}
                 style={StyleSheet.absoluteFillObject}
             />
 
-            <Animated.ScrollView 
-                entering={FadeIn.duration(800)} 
-                style={styles.content}
-                contentContainerStyle={styles.scrollContent}
-                showsVerticalScrollIndicator={false}
-            >
-                {/* Event Image / Visual */}
-                <View style={styles.imageContainer}>
-                    <Image source={eventData.image} style={styles.eventImage} resizeMode="cover" />
-                    <ExpoLinearGradient
-                        colors={['transparent', 'rgba(0,0,0,0.8)']}
-                        style={styles.imageOverlay}
-                    />
-                </View>
+            {/* Split Layout Container */}
+            <View style={styles.splitContainer}>
 
-                {/* Narrative Section */}
-                <View style={styles.narrativeContainer}>
-                    <Text variant="h2" style={styles.title}>{eventData.title.toUpperCase()}</Text>
-                    <View style={styles.divider} />
-                    <Text style={styles.description}>
-                        {isAlreadyCompleted && !resolved 
-                            ? "This place feels quiet. The echoes of your previous encounter still linger in the air, but the energies have dissipated. There is nothing more to be found here."
-                            : (resolved ? resolutionText : eventData.description)}
-                    </Text>
-                </View>
+                {/* Left Side: Narrative */}
+                <Animated.View entering={FadeIn.duration(1000)} style={styles.leftPane}>
+                    <View style={styles.narrativeContent}>
+                        <Text style={styles.title}>{eventData.title.toUpperCase()}</Text>
+                        <View style={styles.divider} />
+                        <Text style={styles.description}>
+                            {isAlreadyCompleted && !resolved 
+                                ? t('events.already_completed_desc')
+                                : (resolved ? resolutionText : eventData.description)}
+                        </Text>
+                    </View>
+                </Animated.View>
 
-                {/* Choices Section */}
-                <View style={styles.choicesContainer}>
-                    {!resolved && !isAlreadyCompleted ? (
-                        eventData.choices.map((choice, index) => (
-                            <Animated.View 
-                                key={choice.id}
-                                entering={FadeInDown.delay(400 + index * 100).springify()}
-                            >
-                                <TouchableOpacity
-                                    style={styles.choiceButton}
-                                    onPress={() => handleChoice(choice)}
-                                    activeOpacity={0.8}
+                {/* Right Side: Choices */}
+                <Animated.View entering={FadeInRight.duration(800).delay(200)} style={styles.rightPane}>
+                    <View style={styles.choicesContainer}>
+                        {!resolved && !isAlreadyCompleted ? (
+                            eventData.choices.map((choice, index) => (
+                                <Animated.View
+                                    key={choice.id}
+                                    entering={FadeInDown.delay(400 + index * 150)}
+                                    style={styles.choiceWrapper}
                                 >
-                                    <BlurView intensity={30} tint="light" style={styles.choiceBlur}>
-                                        <View style={styles.choiceIconContainer}>
+                                    <TouchableOpacity
+                                        style={styles.entryCard}
+                                        onPress={() => handleChoice(choice)}
+                                        activeOpacity={0.7}
+                                    >
+                                        <ExpoLinearGradient
+                                            colors={['rgba(16,185,129,0.15)', 'transparent']}
+                                            style={StyleSheet.absoluteFillObject}
+                                        />
+
+                                        {/* Icon */}
+                                        <View style={styles.iconContainer}>
                                             {choice.iconType === 'Ionicons' ? (
-                                                <Ionicons name={choice.icon as any} size={24} color={colors.arcane.emerald} />
+                                                <Ionicons name={choice.icon as any} size={22} color={colors.arcane.emerald} />
                                             ) : (
-                                                <MaterialCommunityIcons name={choice.icon as any} size={24} color={colors.arcane.emerald} />
+                                                <MaterialCommunityIcons name={choice.icon as any} size={22} color={colors.arcane.emerald} />
                                             )}
                                         </View>
-                                        <View style={styles.choiceTextContainer}>
-                                            <Text style={styles.choiceLabel}>{choice.label}</Text>
-                                            <Text variant="caption" style={styles.choiceSub}>{choice.description}</Text>
+
+                                        {/* Text content */}
+                                        <View style={styles.entryTextContent}>
+                                            <Text style={styles.entryTitle}>{choice.label.toUpperCase()}</Text>
+                                            <View style={styles.entryDivider} />
+                                            <Text style={styles.entryContent}>{choice.description}</Text>
                                         </View>
-                                    </BlurView>
+                                    </TouchableOpacity>
+                                </Animated.View>
+                            ))
+                        ) : (
+                            <Animated.View entering={FadeInDown.duration(600)} style={{ width: '100%', alignItems: 'center' }}>
+                                <TouchableOpacity
+                                    style={styles.continueButton}
+                                    onPress={handleContinue}
+                                    activeOpacity={0.8}
+                                >
+                                    <ExpoLinearGradient
+                                        colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
+                                        style={styles.continueGradient}
+                                    >
+                                        <Text style={styles.continueText}>{isAlreadyCompleted ? t('common.back').toUpperCase() : t('events.continue_journey').toUpperCase()}</Text>
+                                    </ExpoLinearGradient>
                                 </TouchableOpacity>
                             </Animated.View>
-                        ))
-                    ) : (
-                        <Animated.View entering={SlideInUp.springify()} style={{ width: '100%', alignItems: 'center' }}>
-                            <TouchableOpacity
-                                style={styles.continueButton}
-                                onPress={handleContinue}
-                                activeOpacity={0.8}
-                            >
-                                <ExpoLinearGradient
-                                    colors={[colors.arcane.emerald, colors.arcane.emeraldDark]}
-                                    style={styles.continueGradient}
-                                >
-                                    <Text style={styles.continueText}>{isAlreadyCompleted ? t('common.back').toUpperCase() : t('events.continue_journey')}</Text>
-                                </ExpoLinearGradient>
-                            </TouchableOpacity>
-                        </Animated.View>
-                    )}
-                </View>
-            </Animated.ScrollView>
+                        )}
+                    </View>
+                </Animated.View>
+            </View>
 
             {/* Header / Back */}
-            <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+            {/* <View style={[styles.header, { top: insets.top + spacing.md, left: insets.left + spacing.xl }]}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Ionicons name="chevron-back" size={24} color={colors.arcane.white} />
+                    <MaterialCommunityIcons name="chevron-left" size={32} color={colors.arcane.emerald} />
                 </TouchableOpacity>
-                <Text variant="caption" color={colors.arcane.emerald} style={styles.headerText}>{t('events.mysterious_encounter')}</Text>
-             </View>
+            </View> */}
         </View>
     );
 };
@@ -280,124 +289,117 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: colors.arcane.obsidian,
     },
+    splitContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        paddingHorizontal: spacing['2xl'],
+        alignItems: 'center',
+    },
+    leftPane: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingRight: spacing.xl,
+    },
+    rightPane: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingLeft: spacing.xl,
+    },
     header: {
         position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: spacing.lg,
         zIndex: 10,
     },
     backButton: {
-        padding: spacing.xs,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        borderRadius: 20,
+        width: 40, height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    headerText: {
-        marginLeft: spacing.md,
-        letterSpacing: 3,
-        fontWeight: '900',
-    },
-    content: {
-        flex: 1,
-    },
-    scrollContent: {
-        paddingBottom: spacing['4xl'],
-    },
-    imageContainer: {
-        width: '100%',
-        height: height * 0.4,
-        overflow: 'hidden',
-    },
-    eventImage: {
-        width: '100%',
-        height: '100%',
-    },
-    imageOverlay: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 150,
-    },
-    narrativeContainer: {
-        padding: spacing.xl,
-        marginTop: -spacing.xl,
-        backgroundColor: colors.arcane.obsidian,
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
-        minHeight: 200,
+    narrativeContent: {
+        alignItems: 'center',
+        maxWidth: 500,
+        alignSelf: 'center',
     },
     title: {
+        fontSize: 26,
         color: colors.arcane.white,
-        letterSpacing: 4,
+        fontFamily: 'serif',
+        fontWeight: '900',
+        letterSpacing: 8,
         textAlign: 'center',
         marginBottom: spacing.md,
     },
     divider: {
-        height: 2,
-        width: 100,
-        backgroundColor: colors.arcane.emerald,
-        alignSelf: 'center',
+        height: 1,
+        width: 60,
+        backgroundColor: 'rgba(16,185,129,0.5)',
         marginBottom: spacing.xl,
-        opacity: 0.5,
     },
     description: {
-        color: 'rgba(255,255,255,0.8)',
+        color: 'rgba(255,255,255,0.72)',
         fontSize: 16,
-        lineHeight: 24,
-        textAlign: 'center',
+        lineHeight: 26,
+        fontFamily: 'serif',
         fontStyle: 'italic',
+        textAlign: 'center',
     },
     choicesContainer: {
-        padding: spacing.xl,
-        paddingBottom: spacing['2xl'],
-        backgroundColor: colors.arcane.obsidian,
-    },
-    choiceButton: {
         width: '100%',
-        marginBottom: spacing.md,
-        borderRadius: 16,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        maxWidth: 400,
+        alignSelf: 'center',
     },
-    choiceBlur: {
+    choiceWrapper: {
+        marginBottom: 16,
+    },
+    entryCard: {
         flexDirection: 'row',
-        alignItems: 'center',
-        padding: spacing.lg,
+        borderRadius: 8,
+        padding: 18,
+        borderWidth: 1,
+        borderColor: 'rgba(16,185,129,0.12)',
+        overflow: 'hidden',
+        position: 'relative',
+        backgroundColor: 'rgba(0,0,0,0.2)',
     },
-    choiceIconContainer: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+    iconContainer: {
+        width: 46,
+        height: 46,
+        borderRadius: 23,
+        borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: spacing.md,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        borderColor: colors.arcane.emerald,
+        marginRight: 16,
+        flexShrink: 0,
     },
-    choiceTextContainer: {
+    entryTextContent: {
         flex: 1,
+        justifyContent: 'center',
     },
-    choiceLabel: {
-        color: colors.arcane.white,
+    entryTitle: {
+        fontSize: 13,
         fontWeight: '900',
-        fontSize: 16,
-        letterSpacing: 1,
-        marginBottom: 2,
+        letterSpacing: 2,
+        marginBottom: 8,
+        fontFamily: 'serif',
+        color: colors.arcane.emerald,
     },
-    choiceSub: {
-        color: 'rgba(255,255,255,0.5)',
-        fontSize: 12,
+    entryDivider: {
+        height: 1,
+        width: 36,
+        marginBottom: 10,
+        backgroundColor: colors.arcane.emerald,
+    },
+    entryContent: {
+        fontSize: 13,
+        color: 'rgba(255,255,255,0.72)',
+        lineHeight: 21,
     },
     continueButton: {
-        width: '100%',
-        height: 56,
-        borderRadius: 28,
+        width: 250,
+        height: 52,
+        borderRadius: 8,
         overflow: 'hidden',
-        ...shadows.lg,
     },
     continueGradient: {
         flex: 1,
@@ -407,6 +409,8 @@ const styles = StyleSheet.create({
     continueText: {
         color: colors.arcane.obsidian,
         fontWeight: '900',
-        letterSpacing: 2,
+        letterSpacing: 3,
+        fontSize: 14,
+        fontFamily: 'serif',
     }
 });

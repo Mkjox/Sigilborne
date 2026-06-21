@@ -367,7 +367,8 @@
       "title": "LANGUAGE",
       "select": "Select your language",
       "en": "ENGLISH",
-      "tr": "TÜRKÇE"
+      "tr": "TÜRKÇE",
+      "es": "ESPAÑOL"
     },
     "footer": "✧ FORGED IN THE VOID ✧",
     "version": "ARCANE PROTOCOL v0.1.0",
@@ -820,6 +821,7 @@
   "events": {
     "mysterious_encounter": "MYSTERIOUS ENCOUNTER",
     "continue_journey": "CONTINUE JOURNEY",
+    "already_completed_desc": "This place feels quiet. The echoes of your previous encounter still linger in the air, but the energies have dissipated. There is nothing more to be found here.",
     "whispering_void": {
       "title": "The Whispering Void",
       "description": "A rift in reality hums with a low, vibrating frequency. It seems to react to your presence, offering a glimpse into another realm.",
