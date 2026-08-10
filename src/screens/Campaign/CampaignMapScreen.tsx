@@ -802,11 +802,14 @@ const styles = StyleSheet.create({
         height: 16,
         justifyContent: 'center',
         alignItems: 'center',
+        paddingHorizontal: 4,
     },
     pillBadgeText: {
         color: colors.arcane.obsidian,
         fontSize: 10,
         fontWeight: 'bold',
+        textAlign: 'center',
+        lineHeight: 12,
     },
     biomeHeaderContainer: {
         alignItems: 'center',

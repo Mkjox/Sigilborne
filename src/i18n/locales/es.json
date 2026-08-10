@@ -96,7 +96,8 @@
     },
     "sections": {
       "stock": "Stock Actual",
-      "purify": "Purgar a los Débiles"
+      "purify": "Purgar a los Débiles",
+      "artifacts": "Artefactos"
     },
     "acquired": "ADQUIRIDO",
     "removal_title": "Selecciona una ofrenda para quemar",

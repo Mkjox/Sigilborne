@@ -172,7 +172,8 @@
     },
     "sections": {
       "stock": "Mevcut Stok",
-      "purify": "Zayıfları Ayıkla"
+      "purify": "Zayıfları Ayıkla",
+      "artifacts": "Kalıntılar"
     },
     "acquired": "ALINDI",
     "removal_title": "Kurban edilecek bir sunu seç",

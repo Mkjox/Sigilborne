@@ -173,7 +173,8 @@
     },
     "sections": {
       "stock": "Current Stock",
-      "purify": "Purge the Weak"
+      "purify": "Purge the Weak",
+      "artifacts": "Artifacts"
     },
     "acquired": "ACQUIRED",
     "removal_title": "Select an offering to burn",

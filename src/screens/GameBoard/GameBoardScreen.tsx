@@ -206,7 +206,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
 
     // Dimensions
     const sideColWidth = 100;
-    const TOTAL_PLAY_SPACE = screenHeight - 60 - insets.bottom;
+    const TOTAL_PLAY_SPACE = screenHeight - 50 - insets.bottom;
 
     // Explicit Vertical Zones (35/35/30)
     const BOARD_HALF_HEIGHT = TOTAL_PLAY_SPACE * 0.35;
@@ -347,7 +347,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
 
                             <View style={styles.scoreBoard}>
                                 {stageId ? (
-                                    <Text variant="caption" color={colors.arcane.emerald} style={{ letterSpacing: 2, fontWeight: '900' }}>
+                                    <Text variant="caption" color={colors.arcane.emerald} style={{ letterSpacing: 2, fontWeight: '900', paddingLeft: 2, textAlign: 'center' }}>
                                         {t('common.stage', { num: stageId })}
                                     </Text>
                                 ) : (
@@ -376,7 +376,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                     </View>
 
                     {/* Relic Tray - HUD */}
-                    <View style={[styles.gameRelicTray, { top: insets.top + 65 }]}>
+                    <View style={[styles.gameRelicTray, { bottom: HAND_ZONE_HEIGHT + 50 }]}>
                         <RelicTray />
                     </View>
 
@@ -498,7 +498,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                         style={StyleSheet.absoluteFill}
                                     />
                                     <View style={styles.passButtonInner}>
-                                        <Text variant="button" color={player.hasPassed ? colors.text.disabled : colors.arcane.white} style={{ fontWeight: '900', fontSize: 10, letterSpacing: 2 }}>
+                                        <Text variant="button" numberOfLines={1} adjustsFontSizeToFit color={player.hasPassed ? colors.text.disabled : colors.arcane.white} style={{ fontWeight: '900', fontSize: 10, letterSpacing: 1, textAlign: 'center', paddingHorizontal: 4 }}>
                                             {player.hasPassed ? t('common.passed') : t('common.end_turn')}
                                         </Text>
                                     </View>
@@ -598,7 +598,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                                 numberOfLines={1}
                                                 adjustsFontSizeToFit
                                                 color={colors.arcane.obsidian}
-                                                style={{ letterSpacing: 4, fontWeight: '900' }}
+                                                style={{ letterSpacing: 2, fontWeight: '900', paddingHorizontal: 8, textAlign: 'center' }}
                                             >
                                                 {t('common.continue_expedition')}
                                             </Text>
@@ -621,7 +621,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                             numberOfLines={1}
                                             adjustsFontSizeToFit
                                             color={winner === 'player' ? colors.arcane.white : colors.arcane.obsidian}
-                                            style={{ letterSpacing: 4, fontWeight: winner === 'player' ? '400' : '900' }}
+                                            style={{ letterSpacing: 2, fontWeight: winner === 'player' ? '400' : '900', paddingHorizontal: 8, textAlign: 'center' }}
                                         >
                                             {winner === 'player' ? t('common.replay') : t('common.reawaken')}
                                         </Text>
@@ -633,7 +633,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                             numberOfLines={1}
                                             adjustsFontSizeToFit
                                             color={colors.arcane.emerald}
-                                            style={{ letterSpacing: 4 }}
+                                            style={{ letterSpacing: 2, paddingHorizontal: 8, textAlign: 'center' }}
                                         >
                                             {t('common.abandon')}
                                         </Text>
@@ -679,7 +679,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                         numberOfLines={1}
                                         adjustsFontSizeToFit
                                         color={colors.arcane.white}
-                                        style={{ letterSpacing: 4 }}
+                                        style={{ letterSpacing: 2, paddingHorizontal: 8, textAlign: 'center' }}
                                     >
                                         {t('common.continue')}
                                     </Text>
@@ -765,6 +765,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     scoreBoardText: {
         color: colors.arcane.white,
@@ -890,7 +891,7 @@ const styles = StyleSheet.create({
         height: 2,
         width: '90%',
         alignSelf: 'center',
-        marginVertical: 4,
+        marginVertical: '3%',
         position: 'relative',
         justifyContent: 'center',
     },
@@ -975,7 +976,7 @@ const styles = StyleSheet.create({
     },
     overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center', zIndex: 200 },
     overlayCard: {
-        width: 300,
+        width: 340,
         paddingVertical: 40,
         paddingHorizontal: 32,
         backgroundColor: colors.arcane.obsidian,

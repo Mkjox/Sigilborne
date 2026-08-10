@@ -45,17 +45,17 @@ const FactionIcons: Record<string, keyof typeof Ionicons.glyphMap> = {
 export const ShopScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp>();
     const { t } = useTranslation();
-    
-    const { 
-        gold, 
-        shopStock, 
-        generateShopStock, 
-        buyItem, 
+
+    const {
+        gold,
+        shopStock,
+        generateShopStock,
+        buyItem,
     } = useCampaignStore();
-    
+
     const { getActiveDeck, addCardToDeck } = useDeckStore();
     const activeDeck = getActiveDeck();
-    
+
 
     const [alertConfig, setAlertConfig] = useState<{ visible: boolean; title: string; message: string }>({
         visible: false,
@@ -77,7 +77,7 @@ export const ShopScreen: React.FC = () => {
         if (item.purchased) return;
 
         const result = buyItem(item.id);
-        
+
         if (result.success) {
             if (item.type === 'card' && activeDeck) {
                 const cardData = getAllCards().find(c => c.id === item.itemId);
@@ -104,8 +104,8 @@ export const ShopScreen: React.FC = () => {
                 style={StyleSheet.absoluteFillObject}
             />
 
-            <ScrollView 
-                contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }} 
+            <ScrollView
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
                 showsVerticalScrollIndicator={false}
             >
                 <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
@@ -114,7 +114,7 @@ export const ShopScreen: React.FC = () => {
                             <Ionicons name="chevron-back" size={24} color={colors.arcane.white} />
                         </BlurView>
                     </TouchableOpacity>
-                    
+
                     <Animated.View entering={FadeIn.delay(200)} style={styles.goldContainer}>
                         <BlurView intensity={30} tint="dark" style={styles.goldBlur}>
                             <View style={styles.goldIconCircle}>
@@ -131,14 +131,14 @@ export const ShopScreen: React.FC = () => {
                 </Animated.View>
 
                 <View style={styles.contentContainer}>
-                    
+
                     {/* RELICS SECTION */}
                     {relics.length > 0 && (
                         <View style={styles.sectionContainer}>
                             <View style={styles.sectionHeader}>
                                 <Ionicons name="sparkles" size={16} color="#f59e0b" />
                                 <Text style={[styles.sectionTitle, { color: '#f59e0b' }]}>
-                                    {t('shop.sections.relics', 'ARTIFACTS').toUpperCase()}
+                                    {t('shop.sections.artifacts').toUpperCase()}
                                 </Text>
                                 <View style={[styles.sectionLine, { backgroundColor: 'rgba(245, 158, 11, 0.2)' }]} />
                             </View>
@@ -222,7 +222,7 @@ export const ShopScreen: React.FC = () => {
                     <Animated.View entering={FadeInUp} style={styles.alertContent}>
                         <Text style={styles.alertTitle}>{alertConfig.title}</Text>
                         <Text style={styles.alertMessage}>{alertConfig.message}</Text>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.alertButton}
                             onPress={() => setAlertConfig({ ...alertConfig, visible: false })}
                         >
