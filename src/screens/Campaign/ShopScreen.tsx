@@ -6,6 +6,8 @@ import {
     Dimensions,
     Modal,
     ScrollView,
+    Image,
+    ImageBackground,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -97,13 +99,11 @@ export const ShopScreen: React.FC = () => {
 
 
     return (
-        <View style={styles.container}>
-            {/* Background */}
-            <ExpoLinearGradient
-                colors={['#050505', '#1a0b2e', '#000000']}
-                style={StyleSheet.absoluteFillObject}
-            />
-
+        <ImageBackground
+            source={require('../../../assets/backgrounds/shop_background.png')}
+            style={styles.container}
+            resizeMode="cover"
+        >
             <ScrollView
                 contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}
                 showsVerticalScrollIndicator={false}
@@ -118,7 +118,7 @@ export const ShopScreen: React.FC = () => {
                     <Animated.View entering={FadeIn.delay(200)} style={styles.goldContainer}>
                         <BlurView intensity={30} tint="dark" style={styles.goldBlur}>
                             <View style={styles.goldIconCircle}>
-                                <Ionicons name="cash" size={16} color="#fbbf24" />
+                                <Ionicons name="cash" size={16} color={colors.arcane.emerald} />
                             </View>
                             <Text style={styles.goldText}>{gold}</Text>
                         </BlurView>
@@ -136,11 +136,11 @@ export const ShopScreen: React.FC = () => {
                     {relics.length > 0 && (
                         <View style={styles.sectionContainer}>
                             <View style={styles.sectionHeader}>
-                                <Ionicons name="sparkles" size={16} color="#f59e0b" />
-                                <Text style={[styles.sectionTitle, { color: '#f59e0b' }]}>
+                                <Ionicons name="sparkles" size={16} color={colors.arcane.emerald} />
+                                <Text style={[styles.sectionTitle, { color: colors.arcane.emerald }]}>
                                     {t('shop.sections.artifacts').toUpperCase()}
                                 </Text>
-                                <View style={[styles.sectionLine, { backgroundColor: 'rgba(245, 158, 11, 0.2)' }]} />
+                                <View style={[styles.sectionLine, { backgroundColor: colors.arcane.translucentEmerald }]} />
                             </View>
                             <View style={styles.shopGrid}>
                                 {relics.map((item, index) => (
@@ -150,14 +150,14 @@ export const ShopScreen: React.FC = () => {
                                             onPress={() => handleBuyItem(item)}
                                             disabled={item.purchased}
                                         >
-                                            <ExpoLinearGradient colors={['rgba(245, 158, 11, 0.1)', 'transparent']} style={StyleSheet.absoluteFillObject} />
+                                            <ExpoLinearGradient colors={[colors.arcane.translucentEmerald, 'transparent']} style={StyleSheet.absoluteFillObject} />
                                             <View style={styles.relicIconContainer}>
-                                                <Ionicons name="diamond" size={28} color="#f59e0b" />
+                                                <Ionicons name="diamond" size={28} color={colors.arcane.emerald} />
                                             </View>
                                             <Text style={styles.itemName}>{t(item.name)}</Text>
                                             <View style={styles.priceTag}>
                                                 <Text style={styles.priceText}>{item.purchased ? 'SOLD' : item.price}</Text>
-                                                {!item.purchased && <Ionicons name="cash" size={12} color="#fbbf24" />}
+                                                {!item.purchased && <Ionicons name="cash" size={12} color={colors.arcane.emerald} />}
                                             </View>
                                             {item.purchased && <View style={styles.soldOverlay}><Text style={styles.soldText}>SOLD</Text></View>}
                                         </TouchableOpacity>
@@ -231,7 +231,7 @@ export const ShopScreen: React.FC = () => {
                     </Animated.View>
                 </View>
             </Modal>
-        </View>
+        </ImageBackground>
     );
 };
 
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(251, 191, 36, 0.3)',
+        borderColor: colors.arcane.translucentEmerald,
     },
     goldBlur: {
         flexDirection: 'row',
@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
         width: 24,
         height: 24,
         borderRadius: 12,
-        backgroundColor: 'rgba(251, 191, 36, 0.15)',
+        backgroundColor: colors.arcane.translucentEmerald,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 8,
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     shopGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         gap: spacing.md,
     },
     shopItemWrapper: {
@@ -364,18 +364,18 @@ const styles = StyleSheet.create({
     },
     relicCard: {
         aspectRatio: 0.8,
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: 'rgba(0,0,0,0.75)',
         borderRadius: 8,
         padding: spacing.sm,
         borderWidth: 1,
-        borderColor: 'rgba(245, 158, 11, 0.3)',
+        borderColor: colors.arcane.translucentEmerald,
         alignItems: 'center',
         justifyContent: 'space-between',
         overflow: 'hidden',
     },
     unlockCard: {
         aspectRatio: 0.8,
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: 'rgba(0,0,0,0.75)',
         borderRadius: 8,
         padding: spacing.sm,
         borderWidth: 1,
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
         width: 48,
         height: 48,
         borderRadius: 24,
-        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        backgroundColor: colors.arcane.translucentEmerald,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: spacing.xs,
@@ -414,14 +414,14 @@ const styles = StyleSheet.create({
     priceTag: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: 'rgba(245, 158, 11, 0.15)',
+        backgroundColor: colors.arcane.translucentEmerald,
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 12,
         gap: 4,
     },
     priceText: {
-        color: '#f59e0b',
+        color: colors.arcane.emerald,
         fontWeight: '900',
         fontSize: 11,
     },

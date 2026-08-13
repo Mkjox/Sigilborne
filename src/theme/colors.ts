@@ -116,6 +116,7 @@ export const colors = {
         white: '#F8FAFC',
         teal: '#14B8A6',
         void: '#020617',
+        backgroundGradient: ['#022c22', '#064e3b', '#000000'],
         translucentEmerald: 'rgba(16, 185, 129, 0.2)',
         translucentObsidian: 'rgba(11, 15, 20, 0.8)',
     },

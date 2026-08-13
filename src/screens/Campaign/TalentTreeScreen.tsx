@@ -6,6 +6,7 @@ import {
     Dimensions,
     ScrollView,
     Alert,
+    ImageBackground,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -118,18 +119,16 @@ export const TalentTreeScreen: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
-            {/* Animated Void Background */}
-            <ExpoLinearGradient
-                colors={['#0f172a', '#1e1b4b', '#000000']}
-                locations={[0, 0.5, 1]}
-                style={StyleSheet.absoluteFillObject}
-            />
+        <ImageBackground
+            source={require('../../../assets/backgrounds/talenttree_background.png')}
+            style={styles.container}
+            resizeMode="cover"
+        >
 
             {/* Header */}
             <ExpoLinearGradient
                 colors={['rgba(0,0,0,0.8)', 'rgba(0,0,0,0)']}
-                style={[styles.header, { paddingTop: insets.top + spacing.sm }]}
+                style={[styles.header, { paddingTop: insets.top + spacing.sm, }]}
             >
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Ionicons name="chevron-back" size={28} color={colors.text.primary} />
@@ -256,7 +255,7 @@ export const TalentTreeScreen: React.FC = () => {
                     </BlurView>
                 </Animated.View>
             )}
-        </View>
+        </ImageBackground>
     );
 };
 

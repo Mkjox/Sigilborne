@@ -13,18 +13,18 @@ export const BoardSurface: React.FC<BoardSurfaceProps> = ({ style, children }) =
         <View style={[styles.container, style]}>
             {/* Vignette Overlay for depth */}
             <ImageBackground
-                source={require('../../../assets/board_background.png')}
+                source={require('../../../assets/backgrounds/board_background.png')}
                 style={StyleSheet.absoluteFill}
                 resizeMode='cover'
             >
-            <LinearGradient
-                colors={['rgba(0,0,0,0.5)', 'transparent', 'rgba(0,0,0,0.4)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFill}
-                pointerEvents="none"
-            />
-            {children}
+                <LinearGradient
+                    colors={['rgba(0,0,0,0.5)', 'transparent', 'rgba(0,0,0,0.4)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                    pointerEvents="none"
+                />
+                {children}
             </ImageBackground>
         </View>
     );
