@@ -43,6 +43,15 @@ export const useSettingsStore = create<SettingsState>()(
         {
             name: 'sigilborne-settings-storage',
             storage: createJSONStorage(() => AsyncStorage),
+            onRehydrateStorage: () => (state) => {
+                if (state && state.language) {
+                    import('../i18n').then(({ default: i18n }) => {
+                        if (i18n.language !== state.language) {
+                            i18n.changeLanguage(state.language);
+                        }
+                    });
+                }
+            },
         }
     )
 );

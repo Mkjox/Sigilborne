@@ -287,7 +287,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                         style={styles.headerPill}
                         onPress={() => navigation.navigate('Shop')}
                     >
-                        <MaterialCommunityIcons name="cart" size={18} color="#FBBF24" />
+                        <MaterialCommunityIcons name="cart" size={18} color={colors.arcane.emerald} />
                         <Text style={styles.currencyText}>{gold}</Text>
                     </TouchableOpacity>
 
@@ -787,7 +787,7 @@ const styles = StyleSheet.create({
         letterSpacing: 1,
     },
     currencyText: {
-        color: '#FBBF24',
+        color: colors.arcane.white,
         fontWeight: '900',
         marginLeft: 6,
         fontSize: 12,

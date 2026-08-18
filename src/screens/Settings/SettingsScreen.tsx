@@ -200,7 +200,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
         setAnimationSpeed(speed);
     }, [hapticsEnabled, setAnimationSpeed]);
 
-    const handleSetLanguage = useCallback((lang: 'en' | 'tr' | 'es') => {
+    const handleSetLanguage = useCallback((lang: 'en' | 'tr' | 'es' | 'zh' | 'ja') => {
         if (hapticsEnabled) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         setLanguage(lang);
         i18n.changeLanguage(lang);
@@ -325,8 +325,17 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                         <Section>
                             <Text style={styles.optionLabel}>{t('settings.language.select').toUpperCase()}</Text>
                             <View style={styles.optionRow}>
-                                {(['en', 'tr', 'es'] as const).map((lang) => {
+                                {(['en', 'tr', 'es', 'zh', 'ja'] as const).map((lang) => {
                                     const isActive = i18n.language.startsWith(lang);
+                                    
+                                    const languageNames: Record<string, string> = {
+                                        en: 'ENGLISH',
+                                        tr: 'TÜRKÇE',
+                                        es: 'ESPAÑOL',
+                                        zh: '中文',
+                                        ja: '日本語',
+                                    };
+
                                     return (
                                         <Pressable
                                             key={lang}
@@ -340,7 +349,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                                                 style={StyleSheet.absoluteFill}
                                             />
                                             <Text style={[styles.optionBtnText, isActive && styles.optionBtnTextActive]}>
-                                                {t(`settings.language.${lang}`)}
+                                                {t(`settings.language.${lang}`, languageNames[lang])}
                                             </Text>
                                         </Pressable>
                                     );
@@ -605,10 +614,12 @@ const styles = StyleSheet.create({
     },
     optionRow: {
         flexDirection: 'row',
+        flexWrap: 'wrap',
         gap: 6,
     },
     optionBtn: {
-        flex: 1,
+        flexGrow: 1,
+        minWidth: '30%',
         paddingVertical: 8,
         alignItems: 'center',
         borderRadius: 6,

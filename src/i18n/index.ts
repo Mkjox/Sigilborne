@@ -5,6 +5,8 @@ import * as Localization from 'expo-localization';
 import en from './locales/en.json';
 import tr from './locales/tr.json';
 import es from './locales/es.json';
+import zh from './locales/zh.json';
+import ja from './locales/ja.json';
 
 // Get the device's current locale
 const locales = Localization.getLocales();
@@ -14,6 +16,8 @@ const resources = {
   en: { translation: en },
   tr: { translation: tr },
   es: { translation: es },
+  zh: { translation: zh },
+  ja: { translation: ja },
 };
 
 i18n

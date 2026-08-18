@@ -1,0 +1,908 @@
+{
+  "abilities": {
+    "morale_boost": {
+      "name": "士気高揚",
+      "desc": "隣接するユニットのパワーを {{value}} 増加"
+    },
+    "bond": {
+      "name": "固い絆",
+      "desc": "同名ユニットに隣接している時パワー2倍"
+    },
+    "spy": {
+      "name": "密偵",
+      "desc": "敵陣にプレイし、カードを {{value}} 枚引く"
+    },
+    "medic": {
+      "name": "衛生兵",
+      "desc": "墓地からユニットを1体復活させる"
+    },
+    "scorch": {
+      "name": "焦土",
+      "desc": "盤面で最も強いユニットを破壊する"
+    },
+    "muster": {
+      "name": "招集",
+      "desc": "デッキから同名のカードを全て探し出してプレイする"
+    },
+    "commander_horn": {
+      "name": "指揮官の角笛",
+      "desc": "この列の全ユニットのパワーを2倍にする"
+    },
+    "frost": {
+      "name": "白き霜",
+      "desc": "全ての近接ユニットのパワーを1にする"
+    },
+    "fog": {
+      "name": "濃霧",
+      "desc": "全ての遠距離ユニットのパワーを1にする"
+    },
+    "clear_weather": {
+      "name": "晴天",
+      "desc": "盤面の全ての天候効果を取り除く"
+    },
+    "decoy": {
+      "name": "おとり",
+      "desc": "盤面のユニット1体と入れ替わり、それを手札に戻す"
+    },
+    "ability_rally": {
+      "name": "結集",
+      "desc": "全ての味方ユニットのパワーを+1"
+    },
+    "ability_dark_command": {
+      "name": "闇の指令",
+      "desc": "最も強い敵ユニットに2ダメージを与える"
+    },
+    "ability_arcane_blast": {
+      "name": "魔力爆発",
+      "desc": "全ての敵ユニットに1ダメージを与える"
+    },
+    "ability_precision_strike": {
+      "name": "精密打撃",
+      "desc": "最も弱い敵ユニットを破壊する"
+    },
+    "ability_divine_shield": {
+      "name": "聖なる光",
+      "desc": "ヒーローの体力を2回復する"
+    },
+    "ability_quick_draw": {
+      "name": "迅速なる採掘",
+      "desc": "カードを1枚引く"
+    },
+    "ability_bloodlust": {
+      "name": "血の渇望",
+      "desc": "ランダムな敵ユニット1体に1ダメージを与える"
+    },
+    "ability_nature_growth": {
+      "name": "野生の成長",
+      "desc": "ランダムな味方ユニット1体のパワーを+2"
+    }
+  },
+  "common": {
+    "exit": "終了",
+    "ascend": "昇天",
+    "visit_merchant": "商人を訪ねる",
+    "enter_void": "虚空へ",
+    "completed": "完了",
+    "level": "レベル {{num}}",
+    "stage": "ステージ {{num}}",
+    "boss": "ボス {{num}}",
+    "elite": "エリート {{num}}",
+    "back": "戻る",
+    "back_void": "虚空",
+    "gold": "ゴールド",
+    "points_abbr": "PT",
+    "no_relics": "遺物が見つかりません",
+    "not_enough_gold": "ゴールドが足りません！",
+    "merchant_refusal": "商人は首を横に振った。「もっと金貨を持って出直してきな、旅人さん」",
+    "game_errors": {
+      "not_in_hand": "カードが手札にありません",
+      "not_enough_mana": "マナが足りません",
+      "unit_not_found": "ユニットが見つかりません",
+      "unit_exhausted": "ユニットは疲労しています",
+      "attack_success": "攻撃成功",
+      "ability_cooldown": "アビリティはクールダウン中です",
+      "ability_success": "ヒーローアビリティを使用しました"
+    },
+    "you": "あなた",
+    "opponent": "対戦相手",
+    "rounds": "ラウンド",
+    "power": "パワー",
+    "mana": "マナ",
+    "hand": "手札",
+    "cards": "カード",
+    "deck": "デッキ",
+    "turn": "ターン",
+    "passed": "パス",
+    "rarities": {
+      "common": "コモン",
+      "rare": "レア",
+      "epic": "エピック",
+      "legendary": "レジェンダリー",
+      "boss": "ボス"
+    },
+    "used": "使用済み",
+    "leader": "リーダー",
+    "victory": "勝利",
+    "defeat": "忘却",
+    "draw": "引き分け",
+    "continue": "続ける",
+    "end_turn": "ターン終了",
+    "escape": "逃亡",
+    "void_keeper": "ヴォイドキーパー",
+    "void_keeper_title": "宿屋の主の影",
+    "corruption": "腐敗",
+    "essence": "エッセンス",
+    "round_complete": "ラウンド {{num}} 完了",
+    "continue_expedition": "遠征を続ける",
+    "replay": "リプレイ",
+    "reawaken": "再覚醒",
+    "abandon": "放棄",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "selected": "選択中",
+    "messages": {
+      "game_started": "ゲーム開始",
+      "cannot_play": "カードをプレイできません",
+      "played_card": "{{name}} をプレイしました",
+      "used_hero_ability": "ヒーローアビリティを使用しました",
+      "cannot_use_ability": "アビリティを使用できません",
+      "victory": "勝利！",
+      "stalemate": "膠着状態！",
+      "defeat": "敗北！",
+      "you_won": "あなたの勝ち！",
+      "ai_won": "AIの勝ち！",
+      "draw": "引き分け！",
+      "you_passed": "あなたはパスしました",
+      "round_start": "ラウンド {{num}} 開始！",
+      "attack": "攻撃！",
+      "attack_failed": "攻撃失敗",
+      "ai_passed": "AIがパスしました",
+      "ai_used_ability": "AIが {{name}} を使用しました",
+      "ai_played_card": "AIが {{name}} をプレイしました",
+      "ai_played_generic": "AIがカードをプレイしました",
+      "card_info": "{{name}}: {{desc}}",
+      "no_description": "説明なし"
+    }
+  },
+  "shop": {
+    "title": "虚空の商人",
+    "subtitle": "忘れ去られた時代の遺物...",
+    "tabs": {
+      "buy": "入手",
+      "remove": "浄化"
+    },
+    "sections": {
+      "stock": "現在の在庫",
+      "purify": "弱者の粛清",
+      "artifacts": "アーティファクト"
+    },
+    "acquired": "入手済み",
+    "removal_title": "燃やす供物を選んでください",
+    "purged_title": "浄化済み",
+    "purged_msg": "カードは燃え尽き、神秘の塵となった。デッキが軽くなったように感じる。",
+    "services": {
+      "remove": {
+        "name": "虚空の浄化",
+        "desc": "デッキからカードを完全に削除し、ドローの質を上げるために圧縮する。"
+      }
+    },
+    "select_to_remove": "削除するカードを選択",
+    "confirm_purchase": "購入の確認",
+    "confirm_desc": "「{{name}}」をデッキに追加しますか？",
+    "buy_for": "{{price}} で購入",
+    "confirm_purify": "浄化の確認",
+    "confirm_purify_desc": "「{{name}}」をデッキから完全に削除しますか？",
+    "purify_for": "{{price}} で浄化"
+  },
+  "relics": {
+    "war_banner": {
+      "name": "戦の旗",
+      "desc": "ターン開始時、ランダムな味方1体のパワーを1増加。"
+    },
+    "mana_crystal": {
+      "name": "マナクリスタル",
+      "desc": "各ラウンド開始時、最大マナを1得る。"
+    },
+    "soul_gem": {
+      "name": "ソウルジェム",
+      "desc": "味方が破壊された時、カードを1枚引く。"
+    },
+    "thornmail": {
+      "name": "棘の鎧",
+      "desc": "味方がダメージを受けた時、ランダムな敵1体に1ダメージを与える。"
+    }
+  },
+  "deck_builder": {
+    "deck_locked_title": "デッキロック",
+    "deck_locked_desc": "進行中の遠征中はデッキがロックされます。商人を訪ねてデッキを浄化してください。",
+    "vault_title": "保管庫",
+    "construct_title": "構築",
+    "unlinked": "未リンク",
+    "forge_link": "リンク構築",
+    "active_hero": "アクティブヒーロー",
+    "default_deck_name": "デッキ {{num}}",
+    "hero_count": "{{count}} ヒーロー",
+    "essence_count": "{{count}} エッセンス",
+    "deck_count": "{{count}}/25 エッセンス",
+    "delete_confirm_title": "リンク解体",
+    "delete_confirm_desc": "このデッキを完全に解体してもよろしいですか？全てのカードは保管庫に戻ります。",
+    "filters": {
+      "hero": "ヒーロー",
+      "all": "全て",
+      "unit": "ユニット",
+      "spell": "呪文"
+    }
+  },
+  "lore": {
+    "title": "年代記",
+    "locked": "未知の年代記",
+    "locked_desc": "{{biome}} に到達してこのエントリをアンロックしてください。",
+    "entries": {
+      "verdant_echo_1": {
+        "title": "最初の日食",
+        "content": "光の専制が始まる前、虚空は静かな揺りかごだった。最初の星が燃え上がり、存在の暗闇の布を切り裂いた時、バランスは崩れ去った。"
+      },
+      "verdant_echo_2": {
+        "title": "緑の契約",
+        "content": "緑の響きは、虚空が後退した後に咲いた最初の主権の土であった。ここでは、古代の円陣が途絶えることのない契約を結んだ。"
+      },
+      "verdant_echo_3": {
+        "title": "最初の開花",
+        "content": "響きの中心には母なる木が立っており、その根は原始のレイラインから直接飲み込んでいる。"
+      },
+      "azure_spire_1": {
+        "title": "印の戦争",
+        "content": "印の戦争は大地を汚した。秩序はレイラインを絶対的な法則で縛ろうとし、影はそれを混沌に解き放とうとした。"
+      },
+      "azure_spire_2": {
+        "title": "チャネラーの塔",
+        "content": "紺碧の尖塔は、最初の魔術師建築家によって建てられた。彼らは、領域間のヴェールを突き刺そうとする傲慢な先見者だった。"
+      },
+      "azure_spire_3": {
+        "title": "アストラル天文台",
+        "content": "最も高い尖塔の頂点には、大太陽系儀がある。星々だけでなく、領域全体の魔法のエネルギーの流れもマッピングしている。"
+      },
+      "twilight_rift_1": {
+        "title": "シアンの炎",
+        "content": "魔法使いの巨匠たちは、魔法は単に消費されるリソースではなく、宇宙との生きた対話であることに最終的に気づいた。"
+      },
+      "twilight_rift_2": {
+        "title": "開かれた亀裂",
+        "content": "黄昏の亀裂では、現実の糸そのものが無へとほころびている。"
+      },
+      "twilight_rift_3": {
+        "title": "囁く木霊",
+        "content": "亀裂の近くに長く住みすぎた者は、声を聞き始める——幽霊ではなく、可能性の声だ。"
+      },
+      "crimson_wake_1": {
+        "title": "血の協定",
+        "content": "影の派閥が最終的にレイラインから追い出された時、彼らは静かに逃げたわけではなかった。"
+      },
+      "crimson_wake_2": {
+        "title": "将軍の玉座",
+        "content": "深紅の航跡の黒曜石の玉座は絶対的な力の座であるが、その抱擁を1シーズン以上生き延びた将軍はいない。"
+      },
+      "crimson_wake_3": {
+        "title": "赤い川",
+        "content": "航跡の水はドロドロとして金属性で、影の古代の呪いを帯びている。"
+      },
+      "obsidian_heart_1": {
+        "title": "虚空の心臓",
+        "content": "黒曜石の心臓は物理的な場所ではない——それは宇宙の傷である。"
+      },
+      "obsidian_heart_2": {
+        "title": "ヴォイドキーパーの起源",
+        "content": "現在ヴォイドキーパーとして恐れられている実体は、かつては単なる定命の者——現実の果てをマッピングすることに憑りつかれた地図製作の巨匠だった。"
+      },
+      "obsidian_heart_3": {
+        "title": "最後の残響",
+        "content": "心臓の結晶化した核の奥深くには、ヴォイドキーパーの元の魂の閉じ込められたエッセンスを含む一つの完璧な宝石がある。"
+      }
+    }
+  },
+  "biome": {
+    "verdant_echo": "緑の響き",
+    "azure_spire": "紺碧の尖塔",
+    "twilight_rift": "黄昏の亀裂",
+    "crimson_wake": "深紅の航跡",
+    "obsidian_heart": "黒曜石の心臓"
+  },
+  "hero_classes": {
+    "Warrior": "戦士",
+    "Warlock": "ウォーロック",
+    "Mage": "メイジ",
+    "Hunter": "ハンター",
+    "Cleric": "クレリック",
+    "Rogue": "ローグ",
+    "Fighter": "ファイター",
+    "Shaman": "シャーマン",
+    "Paladin": "パラディン",
+    "Druid": "ドルイド"
+  },
+  "collection": {
+    "title": "コレクション",
+    "hero_label": "ヒーロー",
+    "hero_subtitle": "{{class}} ヒーロー • {{ability}}",
+    "hero_desc": "{{desc}} (クールダウン: {{cooldown}} ラウンド)",
+    "no_flavor": "虚空からの謎の木霊。",
+    "stats": {
+      "total": "合計",
+      "decks": "デッキ"
+    },
+    "categories": {
+      "all": "全て",
+      "units": "ユニット",
+      "heroes": "ヒーロー",
+      "spells": "呪文",
+      "weather": "天候"
+    }
+  },
+  "menu": {
+    "subtitle": "アーケインクロニクル",
+    "enter_void": "虚空へ",
+    "collection": "コレクション",
+    "deck_builder": "デッキ構築",
+    "settings": "設定"
+  },
+  "settings": {
+    "title": "設定",
+    "sensory": {
+      "title": "感覚",
+      "sound_effects": "サウンドエフェクト",
+      "sound_sub": "カードプレイ、インパクト＆環境音",
+      "music": "BGM",
+      "music_sub": "虚空のメロディ",
+      "haptics": "ハプティックフィードバック",
+      "haptics_sub": "アクション時の触覚応答"
+    },
+    "visuals": {
+      "title": "ビジュアル",
+      "animation_speed": "アニメーション速度",
+      "speeds": {
+        "slow": "遅い",
+        "normal": "普通",
+        "fast": "速い"
+      }
+    },
+    "language": {
+      "title": "言語",
+      "select": "言語を選択してください",
+      "en": "ENGLISH",
+      "tr": "TÜRKÇE",
+      "es": "ESPAÑOL",
+      "zh": "中文",
+      "ja": "日本語"
+    },
+    "footer": "✧ 虚空にて鍛造さる ✧",
+    "version": "アーケインプロトコル v0.1.0",
+    "other": {
+      "title": "その他",
+      "replay_tutorial": "📖 遊び方"
+    }
+  },
+  "campaign": {
+    "select_difficulty": "難易度を選択",
+    "difficulty": {
+      "easy": "易しい",
+      "medium": "普通",
+      "hard": "難しい"
+    },
+    "confirm_abandon": "遠征を放棄しますか？",
+    "confirm_abandon_desc": "このプレイの進行状況は全て失われます。",
+    "descriptions": {
+      "boss": "宇宙の恐怖が前方の道を阻む。時代を超えた戦いのために魂を鍛えよ。",
+      "shop": "お金を払える者のために散りばめられた遺物やレアカード。",
+      "event": "虚空で渦巻く予測不可能なエネルギー。幸運は勇者に味方する。",
+      "battle": "敵軍がこのセクターに集結している。前進するために道を切り開け。"
+    },
+    "echo_victory_no_rewards": "勝利の響き (報酬なし)"
+  },
+  "cards": {
+    "Commander": "コマンダー",
+    "Dark Lord": "ダークロード",
+    "Archmage": "アークメイジ",
+    "Ranger": "レンジャー",
+    "Paladin": "パラディン",
+    "Trickster": "トリックスター",
+    "Druid": "ドルイド",
+    "Swordsman": "剣士",
+    "Knight": "騎士",
+    "Berserker": "狂戦士",
+    "Shield Captain": "シールドキャプテン",
+    "Champion": "チャンピオン",
+    "Warlord": "ウォーロード",
+    "Lich King": "リッチキング",
+    "Grave Ghoul": "グレイブグール",
+    "Wight": "ワイト",
+    "Skeleton Warrior": "スケルトンウォリアー",
+    "Death Knight": "デスナイト",
+    "Zombie Horde": "ゾンビの大群",
+    "Crypt Guard": "クリプトガード",
+    "Archer": "アーチャー",
+    "Crossbowman": "クロスボウマン",
+    "Elven Marksman": "エルフの射手",
+    "Scout": "スカウト",
+    "Sniper": "スナイパー",
+    "Dragon Hunter": "ドラゴンハンター",
+    "Dark Elf Archer": "ダークエルフのアーチャー",
+    "Soul Harvester": "ソウルハーベスター",
+    "Banshee": "バンシー",
+    "Void Wizard": "ヴォイドウィザード",
+    "Shadow Assassin": "シャドウアサシン",
+    "Necromancer": "ネクロマンサー",
+    "Dark Elf Matriarch": "ダークエルフの家長",
+    "Catapult": "カタパルト",
+    "Ballista": "バリスタ",
+    "Trebuchet": "トレビュシェット",
+    "War Elephant": "ウォーエレファント",
+    "Siege Tower": "シージタワー",
+    "Dragon": "ドラゴン",
+    "Bone Catapult": "ボーンカタパルト",
+    "Plague Spreader": "プレイグスプレッダー",
+    "Abomination": "アボミネーション",
+    "Demon Prince": "デーモンプリンス",
+    "Hellhound": "ヘルハウンド",
+    "Gargoyle": "ガーゴイル",
+    "Cursed Ballista": "呪われたバリスタ",
+    "Commander's Horn": "指揮官の角笛",
+    "Decoy": "おとり",
+    "Scorch": "焦土",
+    "Resurrection": "復活",
+    "Dark Pact": "闇の契約",
+    "Void Bolt": "ヴォイドボルト",
+    "Life Drain": "ライフドレイン",
+    "Raise Dead": "死者蘇生",
+    "Biting Frost": "白き霜",
+    "Impenetrable Fog": "濃霧",
+    "Clear Skies": "晴天",
+    "Corrupt Ground": "腐敗の地",
+    "Wailing Fog": "嘆きの霧",
+    "Arcane Guard": "アーケインガード",
+    "Crystal Construct": "クリスタルコンストラクト",
+    "Spell-Thief": "スペルシーフ",
+    "Void Walker": "ヴォイドウォーカー",
+    "Mana Wyrm": "マナウィルム",
+    "Ethereal Binder": "イーサリアルバインダー",
+    "Arcane Arch-Mage": "アーケイン・アークメイジ",
+    "Leyline Conduit": "レイラインコンジット",
+    "Prism Tower": "プリズムタワー",
+    "Bear Spirit": "ベアスピリット",
+    "Wolf Pack Alpha": "ウルフパックアルファ",
+    "Elder Ent": "エルダーエント",
+    "Wild Boar": "ワイルドボア",
+    "Satyr Skirmisher": "サテュロスの散兵",
+    "Elven Warden": "エルフのウォーデン",
+    "Wind Runner": "ウィンドランナー",
+    "Ancient Oak": "エンシェントオーク",
+    "Thorn Thrower": "ソーンスロワー",
+    "Town Guard": "タウンスガード",
+    "Bandit": "盗賊",
+    "Knight Errant": "遍歴の騎士",
+    "Hired Crossbow": "雇われクロスボウ",
+    "Traveling Bard": "旅の吟遊詩人",
+    "Ram": "破城槌",
+    "Supply Balloon": "サプライバルーン",
+    "Energy Pylon": "エナジーパイロン",
+    "Vine Catapult": "ヴァインカタパルト",
+    "Junk Launcher": "ジャンクランチャー",
+    "Arcane Golem": "アーケインゴーレム",
+    "Spellblade": "スペルブレード",
+    "Mirror Image": "ミラーイメージ",
+    "Dire Wolf": "ダイアウルフ",
+    "Forest Guardian": "森の守護者",
+    "Shapeshifter": "シェイプシフター",
+    "Sellsword": "傭兵",
+    "Bounty Hunter": "バウンティハンター",
+    "Apprentice": "見習い",
+    "Sorceress": "ソーサレス",
+    "Archon": "アルコン",
+    "Elven Scout": "エルフのスカウト",
+    "Dryad": "ドライアド",
+    "Centaur Archer": "ケンタウロスの射手",
+    "Caravan Guard": "キャラバンガード",
+    "Traveling Merchant": "旅の商人",
+    "Mana Battery": "マナバッテリー",
+    "Ether Cannon": "エーテルキャノン",
+    "Ancient Treant": "エンシェントトレント",
+    "Nature Wrath": "自然の怒り",
+    "Old Catapult": "古びたカタパルト",
+    "Supply Wagon": "サプライワゴン",
+    "descriptions": {
+      "swordsman": "基本的な近接ユニット",
+      "knight": "重装の近接ユニット",
+      "berserker": "味方を鼓舞する猛将",
+      "shield_captain": "仲間と一緒だと強くなる",
+      "champion": "王国のエリート戦士",
+      "warlord": "戦場で畏怖を集める",
+      "lich_king": "凍てつく死者の主",
+      "grave_ghoul": "戦場の遺骸を食らう",
+      "wight": "鎧に縛られた古代の魂",
+      "skeleton_warrior": "疲れることを知らない骨",
+      "death_knight": "虚空に仕える堕ちた英雄",
+      "zombie_horde": "彼らは次々とやってくる...",
+      "crypt_guard": "墓の永遠の守護者",
+      "archer": "基本的な遠距離アタッカー",
+      "crossbowman": "強力な遠距離ユニット",
+      "elven_marksman": "致命的な精度を持つエルフの射手",
+      "scout": "敵の戦線に潜入する",
+      "sniper": "エリートの射手",
+      "dragon_hunter": "強大な獣の殺し屋",
+      "dark_elf_archer": "影からの致命的な精度",
+      "soul_harvester": "生者のエッセンスを刈り取る",
+      "banshee": "彼女の悲鳴は死の宣告",
+      "void_wizard": "不安定な闇のエネルギーの使い手",
+      "shadow_assassin": "無音の暗殺の達人",
+      "necromancer": "死後の世界のパイプ役",
+      "dark_elf_matriarch": "黒曜石の尖塔の指導者",
+      "catapult": "基本的な攻城兵器",
+      "ballista": "重い攻城兵器",
+      "trebuchet": "巨大な攻城兵器",
+      "war_elephant": "装甲を施された戦争の獣",
+      "siege_tower": "移動する要塞",
+      "dragon": "究極の兵器",
+      "bone_catapult": "遺骸から作られた攻城兵器",
+      "plague_spreader": "戦場を感染させる",
+      "abomination": "巨人を縫い合わせた怪物",
+      "demon_prince": "燃える次元の支配者",
+      "hellhound": "深淵の火を吹く獣",
+      "gargoyle": "肉と悪意に変わった石",
+      "cursed_ballista": "魅惑された影のボルト",
+      "commanders_horn": "1列のパワーを2倍にする",
+      "decoy": "ランダムな味方ユニット1体を手札に戻す",
+      "scorch_spell": "最も強いユニットを破壊する",
+      "resurrection": "墓地からユニットを復活させる",
+      "dark_pact": "エッセンスを犠牲にしてユニットを復活させる",
+      "void_bolt": "最も強い敵ユニットを消滅させる",
+      "life_drain": "力を吸い取って味方を強化する",
+      "raise_dead": "死者は主人に従う。",
+      "frost": "近接ユニットのパワーを1にする",
+      "fog": "遠距離ユニットのパワーを1にする",
+      "clear_weather": "すべての天候効果を取り除く",
+      "corrupt_ground": "近接ユニットの決意を失わせる",
+      "wailing_fog": "遠距離ユニットの視力を失わせる",
+      "arcane_guard": "魔法の歩哨",
+      "crystal_construct": "頑丈な宝石結びの戦士",
+      "spell_thief": "敵から秘密を吸い取る",
+      "void_walker": "外の領域からの影",
+      "mana_wyrm": "生のエネルギーを餌とする",
+      "ethereal_binder": "魂を結びつける",
+      "arcane_archmage": "すべての魔法の達人",
+      "leyline_conduit": "周囲の力を集中させる",
+      "prism_tower": "戦場全体にエネルギーを反射する",
+      "bear_spirit": "山の強さ",
+      "wolf_alpha": "狩りのリーダー",
+      "elder_ent": "森の最長老",
+      "wild_boar": "怒りで突撃する",
+      "satyr_skirmisher": "素早く捉えどころがない",
+      "elven_warden": "深い森の守護者",
+      "wind_runner": "そよ風よりも速い",
+      "ancient_oak": "決して屈しない根",
+      "thorn_thrower": "棘のある遠距離防御",
+      "town_guard": "無実の者を守る",
+      "bandit": "弱者を食い物にする",
+      "knight_errant": "栄光を求める英雄",
+      "hired_crossbow": "金のために正確",
+      "traveling_bard": "歌で鼓舞する",
+      "ram": "突破兵器",
+      "supply_balloon": "上空からの支援",
+      "energy_pylon": "安定したエネルギー源",
+      "vine_catapult": "絡みつく茨を投げる",
+      "junk_launcher": "利用可能なものを何でも撃つ",
+      "arcane_golem": "アーカイブの機械の守護者",
+      "spellblade": "鋼鉄と魔法の織り合わせ",
+      "mirror_image": "捉えどころのない現実のコピー",
+      "dire_wolf": "巨大な捕食者",
+      "forest_guardian": "神聖な森の保護者",
+      "shapeshifter": "殺したものの形をとる",
+      "sellsword": "雇われの剣士、質問なし",
+      "bounty_hunter": "最強の者を見つけて倒す",
+      "apprentice": "奥義の第一歩を学ぶ",
+      "sorceress": "神秘の芸術の達人",
+      "archon": "純粋な光の昇天者",
+      "elven_scout": "茂みの中を目立たずに移動する",
+      "dryad": "古代の木々の精霊",
+      "centaur_archer": "スピードと精度の組み合わせ",
+      "caravan_guard": "貿易路を保護する",
+      "traveling_merchant": "珍しい品の供給者",
+      "mana_battery": "余剰魔法エネルギーを蓄える",
+      "ether_cannon": "濃縮魔法を撃つ",
+      "ancient_treant": "古代の知恵を持つ生きた木",
+      "nature_wrath": "森の逆襲",
+      "old_catapult": "古代の攻城兵器、今でも信頼できる",
+      "supply_wagon": "最前線に食糧を供給する"
+    },
+    "flavor": {
+      "swordsman": "彼が知る真実は鋼鉄だけだ。",
+      "knight": "名誉は彼の盾、鋼鉄は彼の剣。",
+      "berserker": "彼の怒りは伝説的だ。",
+      "shield_captain": "団結は力。",
+      "champion": "一騎打ちでは無敗。",
+      "warlord": "すべてが将軍の前にひれ伏す。",
+      "lich_king": "死は新たな始まりに過ぎない。",
+      "grave_ghoul": "いつもお腹が空いている。",
+      "wight": "彼らは憎しみ以外何も覚えていない。",
+      "skeleton_warrior": "起きて、歩け。",
+      "death_knight": "名誉はとうの昔に死んだ。",
+      "zombie_horde": "数こそ力。",
+      "crypt_guard": "誰も通さない。",
+      "archer": "正確に狙え。",
+      "crossbowman": "一矢、一殺。",
+      "elven_marksman": "絶対に外さない。",
+      "scout": "情報は力。",
+      "sniper": "必要なのは一発だけ。",
+      "dragon_hunter": "狩人を恐れよ。",
+      "dark_elf_archer": "二つの目、一つの標的。",
+      "soul_harvester": "あなたの魂は没収された。",
+      "banshee": "あなたが聞く最後の音。",
+      "void_wizard": "虚空は私たち皆を呼んでいる。",
+      "shadow_assassin": "体が床に落ちる前に消えている。",
+      "necromancer": "墓はただの扉に過ぎない。",
+      "dark_elf_matriarch": "力は唯一の通貨。",
+      "catapult": "石が来るぞ！",
+      "ballista": "どんな鎧も貫く。",
+      "trebuchet": "城壁はそれの前に崩れ落ちる。",
+      "war_elephant": "止められない力。",
+      "siege_tower": "勝利を引き寄せる。",
+      "dragon": "火と怒り。",
+      "bone_catapult": "石以上のものを撃つ。",
+      "plague_spreader": "病に連れて行かせよ。",
+      "abomination": "血の塊の傑作。",
+      "demon_prince": "ひざまずけ、さもなくば燃えろ。",
+      "hellhound": "噛みつく顎。",
+      "gargoyle": "空に気をつけろ。",
+      "cursed_ballista": "魂を貫く。",
+      "archmage": "現実の糸は彼のリュートの弦に過ぎない。彼は宇宙の火の歌を奏でる。",
+      "ranger": "森はそよ風と葉のざわめきで囁く。彼女は真に耳を傾ける唯一の者だ。",
+      "paladin": "鋼鉄と信仰は彼の唯一の仲間。最も暗い夜に、彼の盾は最も明るく輝く。",
+      "rogue": "王冠を盗めるのに、なぜ王座のために戦うのか？ 彼は自分の勝利を確実にするためにあらゆる側を操る。",
+      "beserker_hero": "理性は熱狂の中でとうの昔に死んだ。今、あるのは斧のリズムだけだ。",
+      "druid": "木々は石が忘れたことを覚えている。彼は目覚める地球の声だ。"
+    }
+  },
+  "factions": {
+    "order": {
+      "title": "永遠の砦",
+      "desc": "古代の誓いと厳格な階層制度に縛られ、秩序は世界の混沌に絶対的な調和を押し付けようとする。"
+    },
+    "shadow": {
+      "title": "囁きの深淵",
+      "desc": "虚空を覗き込み、虚空に見つめ返されたカルト教徒や追放者たち。彼らはエントロピーの生の真髄を振るう。"
+    },
+    "nature": {
+      "title": "緑の荒野",
+      "desc": "世界そのものが記憶を持っている。自然は王や神を気にとめず、成長と衰退のサイクルのみを気にする。"
+    },
+    "arcane": {
+      "title": "アストラルスパイア",
+      "desc": "レイラインを習得した学者たち。アーケインの魔術師にとって、魔法は測定し収穫されるべき科学である。"
+    },
+    "neutral": {
+      "title": "傭兵クラン",
+      "desc": "どの領域にも属さず、自分自身のみに属する者たち。彼らの剣と知恵を最も高い値をつける者に売る。"
+    }
+  },
+  "talent_tree": {
+    "title": "ヒーローの昇天",
+    "subtitle": "真の力を目覚めさせる",
+    "ascended": "昇天済み",
+    "ascend_cost": "昇天 ({{cost}} PT)"
+  },
+  "talents": {
+    "hero_commander": {
+      "t_cmd_1": {
+        "name": "先駆の精神",
+        "desc": "ヒーローの体力 +1"
+      },
+      "t_cmd_2": {
+        "name": "鼓舞",
+        "desc": "マナ +2 で開始"
+      },
+      "t_cmd_3": {
+        "name": "秩序の達人",
+        "desc": "秩序ユニットの攻撃力 +1"
+      },
+      "t_cmd_4": {
+        "name": "鋼の意志",
+        "desc": "ヒーローの体力 +2"
+      },
+      "t_cmd_5": {
+        "name": "戦術的優位",
+        "desc": "初期手札上限 +1"
+      }
+    },
+    "hero_darklord": {
+      "t_dark_1": {
+        "name": "虚空の到達範囲",
+        "desc": "ヒーローアビリティのクールダウン -1"
+      },
+      "t_dark_2": {
+        "name": "闇の儀式",
+        "desc": "マナ +3 で開始"
+      },
+      "t_dark_3": {
+        "name": "魂の収穫",
+        "desc": "影のユニットの攻撃力 +1"
+      },
+      "t_dark_4": {
+        "name": "永遠の夜",
+        "desc": "ヒーローアビリティのクールダウン -1"
+      },
+      "t_dark_5": {
+        "name": "深淵の知恵",
+        "desc": "初期マナ +2"
+      }
+    },
+    "hero_archmage": {
+      "t_mage_1": {
+        "name": "アーケインの集中",
+        "desc": "マナ +3 で開始"
+      },
+      "t_mage_2": {
+        "name": "マナの溢れ",
+        "desc": "初期手札上限 +1"
+      },
+      "t_mage_3": {
+        "name": "呪文織り",
+        "desc": "アーケインユニットの攻撃力 +1"
+      },
+      "t_mage_4": {
+        "name": "星の導き",
+        "desc": "初期マナ +2"
+      },
+      "t_mage_5": {
+        "name": "レイラインマスター",
+        "desc": "ヒーローアビリティのクールダウン -1"
+      }
+    },
+    "hero_ranger": {
+      "t_rng_1": {
+        "name": "安定した狙い",
+        "desc": "自然ユニットの攻撃力 +1"
+      },
+      "t_rng_2": {
+        "name": "鷹の目",
+        "desc": "ヒーローアビリティのクールダウン -1"
+      },
+      "t_rng_3": {
+        "name": "野生の回復力",
+        "desc": "ヒーローの体力 +2"
+      },
+      "t_rng_4": {
+        "name": "森のスカウト",
+        "desc": "初期手札上限 +1"
+      },
+      "t_rng_5": {
+        "name": "素早い反射神経",
+        "desc": "ヒーローアビリティのクールダウン -1"
+      }
+    },
+    "hero_paladin": {
+      "t_pal_1": {
+        "name": "神聖な献身",
+        "desc": "ヒーローの体力 +2"
+      },
+      "t_pal_2": {
+        "name": "正義の怒り",
+        "desc": "秩序ユニットの攻撃力 +1"
+      },
+      "t_pal_3": {
+        "name": "神の恩寵",
+        "desc": "ヒーローの体力 +1"
+      },
+      "t_pal_4": {
+        "name": "守護精霊",
+        "desc": "ヒーローアビリティのクールダウン -1"
+      },
+      "t_pal_5": {
+        "name": "勇気のオーラ",
+        "desc": "秩序ユニットの攻撃力 +1"
+      }
+    },
+    "hero_druid": {
+      "t_dru_1": {
+        "name": "自然の絆",
+        "desc": "マナ +2 で開始"
+      },
+      "t_dru_2": {
+        "name": "野生の成長",
+        "desc": "ヒーローの体力 +2"
+      },
+      "t_dru_3": {
+        "name": "大地の怒り",
+        "desc": "自然ユニットの攻撃力 +1"
+      },
+      "t_dru_4": {
+        "name": "星の落下",
+        "desc": "ヒーローアビリティのクールダウン -1"
+      },
+      "t_dru_5": {
+        "name": "バランスの道",
+        "desc": "初期マナ +2"
+      }
+    }
+  },
+  "events": {
+    "mysterious_encounter": "神秘的な遭遇",
+    "continue_journey": "旅を続ける",
+    "already_completed_desc": "ここは静かだ。以前の遭遇の余韻がまだ空気に残っているが、エネルギーは散逸している。ここで見つかるものはもう何もない。",
+    "whispering_void": {
+      "title": "囁く虚空",
+      "description": "現実の亀裂が低く振動する周波数で唸っている。それはあなたの存在に反応し、別の領域を垣間見せてくれるようだ。",
+      "choices": {
+        "gift_gold_label": "木霊を受け入れる",
+        "gift_gold_desc": "亀裂の祝福を受け入れる。50ゴールドを獲得。",
+        "gift_card_label": "アーケインを吸収する",
+        "gift_card_desc": "亀裂から力を引き出す。ランダムなカードを1枚獲得。"
+      },
+      "resolution": {
+        "gold": "亀裂に足を踏み入れると、ポケットいっぱいの古代の硬幣が現れた。虚空が感謝の意を囁く。",
+        "card": "輝くエネルギーに手を伸ばし、巻物を引き出した：{{name}}。あなたのデッキがより強くなった。"
+      }
+    },
+    "weeping_willow": {
+      "title": "枝垂れ柳",
+      "description": "空き地にぽつんと立つ古代の結晶質の木。その樹液は柔らかい紺碧の光を放っている。伝説によれば、供物を捧げる者に知恵を授けるという。",
+      "choices": {
+        "offer_gold_label": "供物を捧げる",
+        "offer_gold_desc": "25ゴールドを失って隠された遺物を見つける。",
+        "ignore_label": "そのままにしておく",
+        "ignore_desc": "危険を冒さない。慎重に進む。"
+      },
+      "resolution": {
+        "not_enough_gold": "ゴールドが足りない。木はがっかりしているようだ。",
+        "success": "木はあなたの貢物を受け入れた。根元の隠し部屋が開き、{{relic}} が現れた。",
+        "ignore": "あなたは背中に木の冷たい視線を感じながら立ち去った。安全こそが最大の報酬だ。"
+      }
+    },
+    "abandoned_caravan": {
+      "title": "放棄されたキャラバン",
+      "description": "あなたは破壊された商人の馬車に出くわした。商品のほとんどは台無しになっているが、残骸の中にまだ使えるものが残っているかもしれない。",
+      "choices": {
+        "scavenge_label": "漁る",
+        "scavenge_desc": "貴重品を探す。30ゴールドを獲得。",
+        "search_carefully_label": "深く探す",
+        "search_carefully_desc": "より良い報酬のために罠の危険を冒す。50%の確率で60ゴールドか0ゴールド。"
+      },
+      "resolution": {
+        "scavenge": "あなたは瓦礫を掘り起こし、隠された硬貨の隠し場所を見つけた。勝利は観察眼のある者のものだ。",
+        "success": "粘り強さが実を結んだ！床板の下に隠されていた重い金の箱を見つけた。",
+        "failed": "罠が作動した！間一髪で逃れたが、残っていた貴重品はその過程で破壊されてしまった。"
+      }
+    }
+  },
+  "tutorial": {
+    "slide1": {
+      "title": "旅の始まり",
+      "desc": "戦略が最大の武器となる世界、Sigilborneへようこそ。デッキを構築し、ユニットを賢く配置し、敵ヒーローを倒して勝利を掴め。"
+    },
+    "slide2": {
+      "title": "マナと富",
+      "desc": "マナは呪文と召喚のエネルギーとなる。毎ターン、より多くの最大マナを獲得できる。プレイ中にゴールドを集めて、ショップで強力なアーティファクトを購入しよう。"
+    },
+    "slide3": {
+      "title": "印を読む",
+      "desc": "各カードには3つの重要な情報がある：マナコスト（左上）、攻撃力（左下）、体力（右下）。デッキを知り尽くして盤面を支配しよう。"
+    },
+    "slide4": {
+      "title": "派閥とシナジー",
+      "desc": "アーケイン、ネイチャー、ニュートラルの派閥を指揮しよう。同じ派閥のユニットを組み合わせることで、強力なシナジーや隠された能力をアンロックできる。"
+    },
+    "slide5": {
+      "title": "ユニットのクラスと天候",
+      "desc": "ユニットは3つのクラスに属している：近接、遠距離、または攻城。各クラスは、パワーを1に下げる霜や霧のような特定の天候効果に弱い。レジェンダリーユニットはこれらの効果を免疫する！"
+    },
+    "slide6": {
+      "title": "デッキのカスタマイズ",
+      "desc": "遠征中、あなたのデッキは完全にアンロックされている。戦闘の間に自由にデッキを編集して戦略を適応させたり、派閥カードを入れ替えたり、より深いバイオームに進むにつれて強力な新しいユニットを統合したりできる。"
+    },
+    "slide7": {
+      "title": "戦術的な戦闘",
+      "desc": "ユニットを戦場にドラッグしよう。彼らは真正面の敵を攻撃する。ラウンドの終了時に敵の総パワーを減らして、勝利を確実なものにしよう！"
+    },
+    "btn": {
+      "play": "プレイ",
+      "next": "次へ",
+      "skip": "スキップ"
+    }
+  }
+}

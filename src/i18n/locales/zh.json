@@ -1,0 +1,908 @@
+{
+  "abilities": {
+    "morale_boost": {
+      "name": "士气提升",
+      "desc": "提升相邻单位 {{value}} 点力量"
+    },
+    "bond": {
+      "name": "紧密连结",
+      "desc": "与同名单位相邻时力量翻倍"
+    },
+    "spy": {
+      "name": "间谍",
+      "desc": "在敌方场地打出并抽取 {{value}} 张牌"
+    },
+    "medic": {
+      "name": "医疗兵",
+      "desc": "从墓地复活一个单位"
+    },
+    "scorch": {
+      "name": "烧毁",
+      "desc": "摧毁场上最强的单位"
+    },
+    "muster": {
+      "name": "集结",
+      "desc": "从牌库中寻找所有同名牌并打出"
+    },
+    "commander_horn": {
+      "name": "指挥官号角",
+      "desc": "使该排所有单位的力量翻倍"
+    },
+    "frost": {
+      "name": "刺骨寒霜",
+      "desc": "将所有近战单位的力量设为1"
+    },
+    "fog": {
+      "name": "无法穿透的浓雾",
+      "desc": "将所有远程单位的力量设为1"
+    },
+    "clear_weather": {
+      "name": "晴空",
+      "desc": "清除场上所有天气效果"
+    },
+    "decoy": {
+      "name": "诱饵",
+      "desc": "与场上一个单位交换，将其收回手牌"
+    },
+    "ability_rally": {
+      "name": "集结",
+      "desc": "使所有友方单位力量+1"
+    },
+    "ability_dark_command": {
+      "name": "黑暗指令",
+      "desc": "对最强的敌方单位造成2点伤害"
+    },
+    "ability_arcane_blast": {
+      "name": "奥术冲击",
+      "desc": "对所有敌方单位造成1点伤害"
+    },
+    "ability_precision_strike": {
+      "name": "精准打击",
+      "desc": "摧毁最弱的敌方单位"
+    },
+    "ability_divine_shield": {
+      "name": "神圣之光",
+      "desc": "为你的英雄恢复2点生命值"
+    },
+    "ability_quick_draw": {
+      "name": "快速挖掘",
+      "desc": "抽一张牌"
+    },
+    "ability_bloodlust": {
+      "name": "嗜血",
+      "desc": "对一个随机敌方单位造成1点伤害"
+    },
+    "ability_nature_growth": {
+      "name": "野性生长",
+      "desc": "使一个随机友方单位力量+2"
+    }
+  },
+  "common": {
+    "exit": "退出",
+    "ascend": "晋升",
+    "visit_merchant": "拜访商人",
+    "enter_void": "进入虚空",
+    "completed": "已完成",
+    "level": "等级 {{num}}",
+    "stage": "阶段 {{num}}",
+    "boss": "首领 {{num}}",
+    "elite": "精英 {{num}}",
+    "back": "返回",
+    "back_void": "虚空",
+    "gold": "金币",
+    "points_abbr": "分数",
+    "no_relics": "未发现遗物",
+    "not_enough_gold": "金币不足！",
+    "merchant_refusal": "商人摇了摇头。\"旅行者，等你有了更多硬币再来吧。\"",
+    "game_errors": {
+      "not_in_hand": "卡牌不在手牌中",
+      "not_enough_mana": "法力值不足",
+      "unit_not_found": "找不到单位",
+      "unit_exhausted": "单位已疲劳",
+      "attack_success": "攻击成功",
+      "ability_cooldown": "技能冷却中",
+      "ability_success": "已使用英雄技能"
+    },
+    "you": "你",
+    "opponent": "对手",
+    "rounds": "回合",
+    "power": "力量",
+    "mana": "法力",
+    "hand": "手牌",
+    "cards": "卡牌",
+    "deck": "牌库",
+    "turn": "回合",
+    "passed": "已跳过",
+    "rarities": {
+      "common": "普通",
+      "rare": "稀有",
+      "epic": "史诗",
+      "legendary": "传说",
+      "boss": "首领"
+    },
+    "used": "已使用",
+    "leader": "首领",
+    "victory": "胜利",
+    "defeat": "湮灭",
+    "draw": "僵局",
+    "continue": "继续",
+    "end_turn": "结束回合",
+    "escape": "逃跑",
+    "void_keeper": "虚空守护者",
+    "void_keeper_title": "旅店老板的暗影",
+    "corruption": "腐化",
+    "essence": "精华",
+    "round_complete": "第 {{num}} 回合完成",
+    "continue_expedition": "继续远征",
+    "replay": "重放",
+    "reawaken": "重新唤醒",
+    "abandon": "放弃",
+    "cancel": "取消",
+    "delete": "删除",
+    "selected": "已选择",
+    "messages": {
+      "game_started": "游戏开始",
+      "cannot_play": "无法打出卡牌",
+      "played_card": "打出了 {{name}}",
+      "used_hero_ability": "使用了英雄技能",
+      "cannot_use_ability": "无法使用技能",
+      "victory": "胜利！",
+      "stalemate": "僵局！",
+      "defeat": "失败！",
+      "you_won": "你赢了！",
+      "ai_won": "AI 赢了！",
+      "draw": "平局！",
+      "you_passed": "你跳过了",
+      "round_start": "第 {{num}} 回合开始！",
+      "attack": "攻击！",
+      "attack_failed": "攻击失败",
+      "ai_passed": "AI 跳过了",
+      "ai_used_ability": "AI 使用了 {{name}}",
+      "ai_played_card": "AI 打出了 {{name}}",
+      "ai_played_generic": "AI 打出了一张牌",
+      "card_info": "{{name}}: {{desc}}",
+      "no_description": "无描述"
+    }
+  },
+  "shop": {
+    "title": "虚空商人",
+    "subtitle": "被遗忘时代的遗物...",
+    "tabs": {
+      "buy": "获取",
+      "remove": "净化"
+    },
+    "sections": {
+      "stock": "当前库存",
+      "purify": "清除弱者",
+      "artifacts": "神器"
+    },
+    "acquired": "已获取",
+    "removal_title": "选择一个祭品进行焚毁",
+    "purged_title": "已净化",
+    "purged_msg": "卡牌燃烧化作奥术尘埃。你的牌库感觉更轻了。",
+    "services": {
+      "remove": {
+        "name": "虚空净化",
+        "desc": "从牌库中永久移除一张牌，精简卡组以获得更好的抽牌体验。"
+      }
+    },
+    "select_to_remove": "选择要移除的卡牌",
+    "confirm_purchase": "确认购买",
+    "confirm_desc": "你确定要将\"{{name}}\"加入你的牌库吗？",
+    "buy_for": "花费 {{price}} 购买",
+    "confirm_purify": "确认净化",
+    "confirm_purify_desc": "你确定要从牌库中永久移除\"{{name}}\"吗？",
+    "purify_for": "花费 {{price}} 净化"
+  },
+  "relics": {
+    "war_banner": {
+      "name": "战争旗帜",
+      "desc": "在你的回合开始时，随机使一个友军力量+1。"
+    },
+    "mana_crystal": {
+      "name": "法力水晶",
+      "desc": "在每回合开始时，获得1点最大法力值。"
+    },
+    "soul_gem": {
+      "name": "灵魂宝石",
+      "desc": "当一个友军被摧毁时，抽1张牌。"
+    },
+    "thornmail": {
+      "name": "荆棘之甲",
+      "desc": "当一个友军受到伤害时，对随机一个敌人造成1点伤害。"
+    }
+  },
+  "deck_builder": {
+    "deck_locked_title": "牌库已锁定",
+    "deck_locked_desc": "在远征期间你的牌库被锁定。请前往商人处净化你的牌库。",
+    "vault_title": "金库",
+    "construct_title": "构建",
+    "unlinked": "未链接",
+    "forge_link": "锻造链接",
+    "active_hero": "当前英雄",
+    "default_deck_name": "牌组 {{num}}",
+    "hero_count": "{{count}} 英雄",
+    "essence_count": "{{count}} 精华",
+    "deck_count": "{{count}}/25 精华",
+    "delete_confirm_title": "解除链接",
+    "delete_confirm_desc": "你确定要永久解散这个牌组吗？所有卡牌将退回金库。",
+    "filters": {
+      "hero": "英雄",
+      "all": "全部",
+      "unit": "单位",
+      "spell": "法术"
+    }
+  },
+  "lore": {
+    "title": "编年史",
+    "locked": "未知的编年史",
+    "locked_desc": "到达 {{biome}} 以解锁此条目。",
+    "entries": {
+      "verdant_echo_1": {
+        "title": "第一次日食",
+        "content": "在光明的暴政之前，虚空是一个安静的摇篮。直到第一颗星星点燃，撕裂了存在的黑暗结构，平衡才被打破。"
+      },
+      "verdant_echo_2": {
+        "title": "绿色誓约",
+        "content": "回音森林是虚空退去后第一片绽放的生机之土。在这里，古老的循环形成了它们未被打破的契约。"
+      },
+      "verdant_echo_3": {
+        "title": "初绽",
+        "content": "在森林的中心矗立着母树，其根部直接饮用原始地脉。"
+      },
+      "azure_spire_1": {
+        "title": "印记之战",
+        "content": "印记之战染红了大地。秩序试图以绝对的律法约束地脉，而暗影则试图将其解开，化为混乱。"
+      },
+      "azure_spire_2": {
+        "title": "引导者之塔",
+        "content": "蔚蓝尖塔由第一批法师建筑师建立，他们是傲慢的远见者，试图刺穿领域之间的帷幕。"
+      },
+      "azure_spire_3": {
+        "title": "星界天文台",
+        "content": "在最高尖塔的顶点是宏伟的太阳系仪，它不仅绘制星星，还绘制了奥术能量流。"
+      },
+      "twilight_rift_1": {
+        "title": "青色火焰",
+        "content": "奥术大师最终发现，魔法不是一种可以消耗的资源，而是与宇宙的生动对话。"
+      },
+      "twilight_rift_2": {
+        "title": "裂隙开启",
+        "content": "在暮色裂隙处，现实的线条渐渐虚无。"
+      },
+      "twilight_rift_3": {
+        "title": "窃窃私语的回声",
+        "content": "那些在裂隙附近停留太久的人开始听到声音——不是鬼魂的声音，而是可能性的声音。"
+      },
+      "crimson_wake_1": {
+        "title": "鲜血协约",
+        "content": "当暗影派系最终被赶出地脉时，他们并没有安静地逃离。"
+      },
+      "crimson_wake_2": {
+        "title": "军阀的王座",
+        "content": "觉醒者的黑曜石王座是一个拥有绝对权力的座位，但没有哪个军阀能在其拥抱中幸存超过一个季节。"
+      },
+      "crimson_wake_3": {
+        "title": "红色的河流",
+        "content": "觉醒的水域浓稠且带有金属味，承载着暗影的古老诅咒。"
+      },
+      "obsidian_heart_1": {
+        "title": "虚空之心",
+        "content": "黑曜石之心不是一个物理上的地方——它是一个宇宙创伤。"
+      },
+      "obsidian_heart_2": {
+        "title": "虚空守护者的起源",
+        "content": "如今被恐惧的虚空守护者曾经只是一个凡人——一个痴迷于绘制现实边缘地图的大师制图师。"
+      },
+      "obsidian_heart_3": {
+        "title": "最后的回声",
+        "content": "在核心结晶深处，有一颗完美无瑕的宝石，其中包含虚空守护者最初灵魂的被困精华。"
+      }
+    }
+  },
+  "biome": {
+    "verdant_echo": "葱郁回声",
+    "azure_spire": "蔚蓝尖塔",
+    "twilight_rift": "暮色裂隙",
+    "crimson_wake": "猩红觉醒",
+    "obsidian_heart": "黑曜石之心"
+  },
+  "hero_classes": {
+    "Warrior": "战士",
+    "Warlock": "术士",
+    "Mage": "法师",
+    "Hunter": "猎人",
+    "Cleric": "牧师",
+    "Rogue": "盗贼",
+    "Fighter": "斗士",
+    "Shaman": "萨满",
+    "Paladin": "圣骑士",
+    "Druid": "德鲁伊"
+  },
+  "collection": {
+    "title": "收藏",
+    "hero_label": "英雄",
+    "hero_subtitle": "{{class}} 英雄 • {{ability}}",
+    "hero_desc": "{{desc}} (冷却: {{cooldown}} 回合)",
+    "no_flavor": "来自虚空的神秘回声。",
+    "stats": {
+      "total": "总计",
+      "decks": "牌组"
+    },
+    "categories": {
+      "all": "全部",
+      "units": "单位",
+      "heroes": "英雄",
+      "spells": "法术",
+      "weather": "天气"
+    }
+  },
+  "menu": {
+    "subtitle": "奥术编年史",
+    "enter_void": "进入虚空",
+    "collection": "收藏",
+    "deck_builder": "牌组构建",
+    "settings": "设置"
+  },
+  "settings": {
+    "title": "设置",
+    "sensory": {
+      "title": "感官",
+      "sound_effects": "音效",
+      "sound_sub": "卡牌打出、撞击和环境音",
+      "music": "背景音乐",
+      "music_sub": "奥术虚空旋律",
+      "haptics": "触觉反馈",
+      "haptics_sub": "操作时的触觉响应"
+    },
+    "visuals": {
+      "title": "视觉",
+      "animation_speed": "动画速度",
+      "speeds": {
+        "slow": "慢速",
+        "normal": "普通",
+        "fast": "快速"
+      }
+    },
+    "language": {
+      "title": "语言",
+      "select": "选择你的语言",
+      "en": "ENGLISH",
+      "tr": "TÜRKÇE",
+      "es": "ESPAÑOL",
+      "zh": "中文",
+      "ja": "日本語"
+    },
+    "footer": "✧ 在虚空中锻造 ✧",
+    "version": "奥术协议 v0.1.0",
+    "other": {
+      "title": "其他",
+      "replay_tutorial": "📖 怎么玩"
+    }
+  },
+  "campaign": {
+    "select_difficulty": "选择难度",
+    "difficulty": {
+      "easy": "简单",
+      "medium": "中等",
+      "hard": "困难"
+    },
+    "confirm_abandon": "放弃远征？",
+    "confirm_abandon_desc": "此次所有的进度都将丢失。",
+    "descriptions": {
+      "boss": "宇宙的恐怖守卫着前进的道路。为了时代的战斗而武装你的灵魂。",
+      "shop": "为那些有能力支付金币的人散落的遗物和稀有卡牌。",
+      "event": "在虚空中盘旋的不可预测的能量。财富偏爱勇敢的人。",
+      "battle": "敌军聚集在这个区域。清理道路以继续前进。"
+    },
+    "echo_victory_no_rewards": "胜利的回声 (无奖励)"
+  },
+  "cards": {
+    "Commander": "指挥官",
+    "Dark Lord": "黑暗领主",
+    "Archmage": "大法师",
+    "Ranger": "游侠",
+    "Paladin": "圣骑士",
+    "Trickster": "骗子",
+    "Druid": "德鲁伊",
+    "Swordsman": "剑士",
+    "Knight": "骑士",
+    "Berserker": "狂战士",
+    "Shield Captain": "盾牌队长",
+    "Champion": "冠军",
+    "Warlord": "军阀",
+    "Lich King": "巫妖王",
+    "Grave Ghoul": "墓地食尸鬼",
+    "Wight": "尸妖",
+    "Skeleton Warrior": "骷髅战士",
+    "Death Knight": "死亡骑士",
+    "Zombie Horde": "僵尸群",
+    "Crypt Guard": "地穴卫士",
+    "Archer": "弓箭手",
+    "Crossbowman": "弩手",
+    "Elven Marksman": "精灵神射手",
+    "Scout": "斥候",
+    "Sniper": "狙击手",
+    "Dragon Hunter": "猎龙者",
+    "Dark Elf Archer": "暗精灵弓箭手",
+    "Soul Harvester": "灵魂收割者",
+    "Banshee": "女妖",
+    "Void Wizard": "虚空巫师",
+    "Shadow Assassin": "暗影刺客",
+    "Necromancer": "死灵法师",
+    "Dark Elf Matriarch": "暗精灵主母",
+    "Catapult": "投石车",
+    "Ballista": "弩车",
+    "Trebuchet": "巨型投石车",
+    "War Elephant": "战象",
+    "Siege Tower": "攻城塔",
+    "Dragon": "龙",
+    "Bone Catapult": "骨制投石车",
+    "Plague Spreader": "瘟疫传播者",
+    "Abomination": "憎恶",
+    "Demon Prince": "恶魔王子",
+    "Hellhound": "地狱犬",
+    "Gargoyle": "石像鬼",
+    "Cursed Ballista": "被诅咒的弩车",
+    "Commander's Horn": "指挥官号角",
+    "Decoy": "诱饵",
+    "Scorch": "烧毁",
+    "Resurrection": "复活",
+    "Dark Pact": "黑暗契约",
+    "Void Bolt": "虚空箭",
+    "Life Drain": "生命吸取",
+    "Raise Dead": "死者苏生",
+    "Biting Frost": "刺骨寒霜",
+    "Impenetrable Fog": "无法穿透的浓雾",
+    "Clear Skies": "晴空",
+    "Corrupt Ground": "腐败之地",
+    "Wailing Fog": "哀嚎之雾",
+    "Arcane Guard": "奥术守卫",
+    "Crystal Construct": "水晶构造体",
+    "Spell-Thief": "法术窃贼",
+    "Void Walker": "虚空行者",
+    "Mana Wyrm": "法力浮龙",
+    "Ethereal Binder": "虚灵束缚者",
+    "Arcane Arch-Mage": "奥术大法师",
+    "Leyline Conduit": "地脉导管",
+    "Prism Tower": "棱镜塔",
+    "Bear Spirit": "熊灵",
+    "Wolf Pack Alpha": "狼群首领",
+    "Elder Ent": "长者树精",
+    "Wild Boar": "野猪",
+    "Satyr Skirmisher": "萨特散兵",
+    "Elven Warden": "精灵守望者",
+    "Wind Runner": "风行者",
+    "Ancient Oak": "古老橡树",
+    "Thorn Thrower": "荆棘投掷者",
+    "Town Guard": "城镇守卫",
+    "Bandit": "强盗",
+    "Knight Errant": "游侠骑士",
+    "Hired Crossbow": "雇佣弩手",
+    "Traveling Bard": "旅行吟游诗人",
+    "Ram": "攻城槌",
+    "Supply Balloon": "补给气球",
+    "Energy Pylon": "能量水晶",
+    "Vine Catapult": "藤蔓投石车",
+    "Junk Launcher": "垃圾发射器",
+    "Arcane Golem": "奥术魔像",
+    "Spellblade": "魔剑士",
+    "Mirror Image": "镜像",
+    "Dire Wolf": "恐狼",
+    "Forest Guardian": "森林守护者",
+    "Shapeshifter": "变形者",
+    "Sellsword": "佣兵",
+    "Bounty Hunter": "赏金猎人",
+    "Apprentice": "学徒",
+    "Sorceress": "女巫师",
+    "Archon": "执政官",
+    "Elven Scout": "精灵斥候",
+    "Dryad": "树妖",
+    "Centaur Archer": "半人马弓箭手",
+    "Caravan Guard": "商队护卫",
+    "Traveling Merchant": "旅行商人",
+    "Mana Battery": "法力电池",
+    "Ether Cannon": "以太炮",
+    "Ancient Treant": "远古树人",
+    "Nature Wrath": "自然之怒",
+    "Old Catapult": "旧投石车",
+    "Supply Wagon": "补给车",
+    "descriptions": {
+      "swordsman": "基础近战单位",
+      "knight": "重甲近战单位",
+      "berserker": "激励盟友的猛将",
+      "shield_captain": "和同伴在一起时更强",
+      "champion": "王国的精英战士",
+      "warlord": "在战场上令人敬畏",
+      "lich_king": "冰冻死者的领主",
+      "grave_ghoul": "以战场的遗骸为食",
+      "wight": "束缚在盔甲中的古老灵魂",
+      "skeleton_warrior": "不知疲倦的枯骨",
+      "death_knight": "为虚空效劳的堕落英雄",
+      "zombie_horde": "他们不断涌来...",
+      "crypt_guard": "古墓的永恒保护者",
+      "archer": "基础远程攻击者",
+      "crossbowman": "强大的远程单位",
+      "elven_marksman": "致命准确的精灵弓箭手",
+      "scout": "潜入敌军阵线",
+      "sniper": "精英神射手",
+      "dragon_hunter": "最强巨兽的屠杀者",
+      "dark_elf_archer": "来自阴影的致命精准",
+      "soul_harvester": "收割生者的精华",
+      "banshee": "她的尖叫宣告死亡",
+      "void_wizard": "不稳定暗能量的持有者",
+      "shadow_assassin": "无声刺杀大师",
+      "necromancer": "死后世界的导管",
+      "dark_elf_matriarch": "黑曜石尖塔的领袖",
+      "catapult": "基础攻城武器",
+      "ballista": "重型攻城武器",
+      "trebuchet": "巨型攻城引擎",
+      "war_elephant": "全副武装的战争巨兽",
+      "siege_tower": "移动的堡垒",
+      "dragon": "终极武器",
+      "bone_catapult": "由遗骸制成的攻城引擎",
+      "plague_spreader": "感染战场",
+      "abomination": "由巨怪缝合而成",
+      "demon_prince": "燃烧位面的统治者",
+      "hellhound": "深渊的喷火猛兽",
+      "gargoyle": "石头化作的血肉与恶意",
+      "cursed_ballista": "附魔的暗影弩箭",
+      "commanders_horn": "使一排的力量翻倍",
+      "decoy": "将一个随机友军收回手牌",
+      "scorch_spell": "摧毁最强的单位",
+      "resurrection": "从墓地复活一个单位",
+      "dark_pact": "牺牲精华以复活单位",
+      "void_bolt": "抹杀最强的敌方单位",
+      "life_drain": "吸取力量以增强盟友",
+      "raise_dead": "死者服从他们的主人。",
+      "frost": "将近战单位力量设为1",
+      "fog": "将远程单位力量设为1",
+      "clear_weather": "清除所有天气效果",
+      "corrupt_ground": "近战单位失去决心",
+      "wailing_fog": "远程单位失去视力",
+      "arcane_guard": "魔法哨兵",
+      "crystal_construct": "坚韧的宝石绑定战士",
+      "spell_thief": "从敌人那里吸取秘密",
+      "void_walker": "来自外域的阴影",
+      "mana_wyrm": "以原始能量为食",
+      "ethereal_binder": "将灵魂连结在一起",
+      "arcane_archmage": "全系魔法大师",
+      "leyline_conduit": "聚集环境能量",
+      "prism_tower": "将能量反射到战场各地",
+      "bear_spirit": "山脉的力量",
+      "wolf_alpha": "狩猎领袖",
+      "elder_ent": "森林中最古老的存在",
+      "wild_boar": "愤怒地冲锋",
+      "satyr_skirmisher": "敏捷且难以捉摸",
+      "elven_warden": "深林的守卫者",
+      "wind_runner": "比微风还快",
+      "ancient_oak": "永不屈服的根",
+      "thorn_thrower": "带刺的远程防御",
+      "town_guard": "保护无辜者",
+      "bandit": "掠食弱者",
+      "knight_errant": "寻求荣耀的英雄",
+      "hired_crossbow": "为了钱百发百中",
+      "traveling_bard": "用歌声鼓舞人心",
+      "ram": "突破武器",
+      "supply_balloon": "来自空中的支援",
+      "energy_pylon": "稳定的能量源",
+      "vine_catapult": "投掷纠缠的荆棘",
+      "junk_launcher": "发射任何可用的东西",
+      "arcane_golem": "档案馆的机械守卫",
+      "spellblade": "交织着钢铁与魔法",
+      "mirror_image": "难以捉摸的现实复制品",
+      "dire_wolf": "体型巨大的捕食者",
+      "forest_guardian": "神圣树林的保护者",
+      "shapeshifter": "化作它杀死的形态",
+      "sellsword": "雇佣兵，不问问题",
+      "bounty_hunter": "找出最强者并将其击倒",
+      "apprentice": "学习奥术的初步",
+      "sorceress": "神秘艺术的大师",
+      "archon": "纯净光芒的飞升存在",
+      "elven_scout": "在灌木丛中隐秘移动",
+      "dryad": "古树之灵",
+      "centaur_archer": "速度与精准的结合",
+      "caravan_guard": "保护贸易路线",
+      "traveling_merchant": "稀有物品的供应商",
+      "mana_battery": "储存多余的魔法能量",
+      "ether_cannon": "发射浓缩的魔法",
+      "ancient_treant": "拥有古老智慧的活木",
+      "nature_wrath": "森林的反击",
+      "old_catapult": "古老的攻城武器，依然可靠",
+      "supply_wagon": "保证前线部队的口粮"
+    },
+    "flavor": {
+      "swordsman": "钢铁是他唯一知道的真相。",
+      "knight": "荣誉是他的盾，钢铁是他的剑。",
+      "berserker": "他的愤怒是传奇的。",
+      "shield_captain": "团结就是力量。",
+      "champion": "在单挑中未尝败绩。",
+      "warlord": "所有人在军阀面前鞠躬。",
+      "lich_king": "死亡只是一个新的开始。",
+      "grave_ghoul": "总是很饿。",
+      "wight": "他们只记得仇恨。",
+      "skeleton_warrior": "站起来，走。",
+      "death_knight": "荣誉早已死去。",
+      "zombie_horde": "数量即力量。",
+      "crypt_guard": "谁也别想通过。",
+      "archer": "瞄准。",
+      "crossbowman": "一箭，一杀。",
+      "elven_marksman": "从不失手。",
+      "scout": "信息就是力量。",
+      "sniper": "只需要一枪。",
+      "dragon_hunter": "畏惧猎手。",
+      "dark_elf_archer": "两只眼睛，一个目标。",
+      "soul_harvester": "你的灵魂已没收。",
+      "banshee": "你听到的最后声音。",
+      "void_wizard": "虚空在呼唤我们所有人。",
+      "shadow_assassin": "在尸体倒地前已经消失。",
+      "necromancer": "坟墓仅仅是一扇门。",
+      "dark_elf_matriarch": "力量是唯一的货币。",
+      "catapult": "石头来了！",
+      "ballista": "刺穿任何盔甲。",
+      "trebuchet": "城墙在它面前崩溃。",
+      "war_elephant": "不可阻挡的力量。",
+      "siege_tower": "将胜利拉近。",
+      "dragon": "火与怒。",
+      "bone_catapult": "发射的不只是石头。",
+      "plague_spreader": "让疾病带走他们。",
+      "abomination": "血块的杰作。",
+      "demon_prince": "下跪，或者燃烧。",
+      "hellhound": "会咬人的下巴。",
+      "gargoyle": "注意天空。",
+      "cursed_ballista": "刺穿灵魂。",
+      "archmage": "现实的线只是他鲁特琴上的弦。他弹奏一曲宇宙之火的歌。",
+      "ranger": "森林在微风和树叶的沙沙声中低语。她是唯一真正倾听的人。",
+      "paladin": "钢铁和信仰是他唯一的同伴。在最黑暗的夜晚，他的盾牌闪耀得最亮。",
+      "rogue": "既然你可以偷走王冠，为什么还要为王座而战？他玩弄各方以确保自己的胜利。",
+      "beserker_hero": "理智早在深坑的狂热中死去。现在，只剩下斧头的节奏。",
+      "druid": "树木记得石头已经忘记的东西。他是苏醒地球的声音。"
+    }
+  },
+  "factions": {
+    "order": {
+      "title": "永恒堡垒",
+      "desc": "受古老誓言和严格等级制度的约束，秩序试图对世界的混乱施加绝对的和谐。"
+    },
+    "shadow": {
+      "title": "低语深渊",
+      "desc": "看着虚空，发现虚空也在注视他们的邪教徒和流放者。他们挥舞着熵的原始精华。"
+    },
+    "nature": {
+      "title": "葱郁荒野",
+      "desc": "世界本身也有记忆。自然不关心国王或神灵，只关心生长和衰落的循环。"
+    },
+    "arcane": {
+      "title": "星界尖塔",
+      "desc": "掌握了地脉的学者。对奥术法师来说，魔法是一门需要测量和收获的科学。"
+    },
+    "neutral": {
+      "title": "佣兵氏族",
+      "desc": "那些不属于任何领域只属于自己的人。将他们的刀剑和智慧卖给出价最高的人。"
+    }
+  },
+  "talent_tree": {
+    "title": "英雄飞升",
+    "subtitle": "觉醒真正的力量",
+    "ascended": "已飞升",
+    "ascend_cost": "飞升 ({{cost}} PT)"
+  },
+  "talents": {
+    "hero_commander": {
+      "t_cmd_1": {
+        "name": "先锋精神",
+        "desc": "英雄生命值 +1"
+      },
+      "t_cmd_2": {
+        "name": "鼓舞",
+        "desc": "开局 +2 法力"
+      },
+      "t_cmd_3": {
+        "name": "秩序精通",
+        "desc": "秩序单位攻击力 +1"
+      },
+      "t_cmd_4": {
+        "name": "钢铁意志",
+        "desc": "英雄生命值 +2"
+      },
+      "t_cmd_5": {
+        "name": "战术优势",
+        "desc": "起始手牌上限 +1"
+      }
+    },
+    "hero_darklord": {
+      "t_dark_1": {
+        "name": "虚空延伸",
+        "desc": "英雄技能冷却 -1"
+      },
+      "t_dark_2": {
+        "name": "黑暗仪式",
+        "desc": "开局 +3 法力"
+      },
+      "t_dark_3": {
+        "name": "灵魂收割",
+        "desc": "暗影单位攻击力 +1"
+      },
+      "t_dark_4": {
+        "name": "永恒之夜",
+        "desc": "英雄技能冷却 -1"
+      },
+      "t_dark_5": {
+        "name": "深渊智慧",
+        "desc": "起始法力 +2"
+      }
+    },
+    "hero_archmage": {
+      "t_mage_1": {
+        "name": "奥术专注",
+        "desc": "开局 +3 法力"
+      },
+      "t_mage_2": {
+        "name": "法力溢出",
+        "desc": "起始手牌上限 +1"
+      },
+      "t_mage_3": {
+        "name": "法术编织",
+        "desc": "奥术单位攻击力 +1"
+      },
+      "t_mage_4": {
+        "name": "星界引导",
+        "desc": "起始法力 +2"
+      },
+      "t_mage_5": {
+        "name": "地脉大师",
+        "desc": "英雄技能冷却 -1"
+      }
+    },
+    "hero_ranger": {
+      "t_rng_1": {
+        "name": "稳固瞄准",
+        "desc": "自然单位攻击力 +1"
+      },
+      "t_rng_2": {
+        "name": "鹰眼",
+        "desc": "英雄技能冷却 -1"
+      },
+      "t_rng_3": {
+        "name": "荒野韧性",
+        "desc": "英雄生命值 +2"
+      },
+      "t_rng_4": {
+        "name": "森林斥候",
+        "desc": "起始手牌上限 +1"
+      },
+      "t_rng_5": {
+        "name": "迅捷反应",
+        "desc": "英雄技能冷却 -1"
+      }
+    },
+    "hero_paladin": {
+      "t_pal_1": {
+        "name": "神圣虔诚",
+        "desc": "英雄生命值 +2"
+      },
+      "t_pal_2": {
+        "name": "正义之怒",
+        "desc": "秩序单位攻击力 +1"
+      },
+      "t_pal_3": {
+        "name": "神圣恩典",
+        "desc": "英雄生命值 +1"
+      },
+      "t_pal_4": {
+        "name": "守护之灵",
+        "desc": "英雄技能冷却 -1"
+      },
+      "t_pal_5": {
+        "name": "勇气光环",
+        "desc": "秩序单位攻击力 +1"
+      }
+    },
+    "hero_druid": {
+      "t_dru_1": {
+        "name": "自然纽带",
+        "desc": "开局 +2 法力"
+      },
+      "t_dru_2": {
+        "name": "野性成长",
+        "desc": "英雄生命值 +2"
+      },
+      "t_dru_3": {
+        "name": "大地之怒",
+        "desc": "自然单位攻击力 +1"
+      },
+      "t_dru_4": {
+        "name": "星辰之陨",
+        "desc": "英雄技能冷却 -1"
+      },
+      "t_dru_5": {
+        "name": "平衡之道",
+        "desc": "起始法力 +2"
+      }
+    }
+  },
+  "events": {
+    "mysterious_encounter": "神秘遭遇",
+    "continue_journey": "继续旅程",
+    "already_completed_desc": "这里感觉很安静。你之前遭遇的回声仍在该处萦绕，但能量已经消散。这里再也没有什么可发现的了。",
+    "whispering_void": {
+      "title": "低语的虚空",
+      "description": "现实的裂缝发出低沉的振动频率。它似乎对你的存在做出了反应，提供了瞥见另一个领域的机会。",
+      "choices": {
+        "gift_gold_label": "拥抱回声",
+        "gift_gold_desc": "接受裂缝的祝福。获得 50 金币。",
+        "gift_card_label": "吸取奥术",
+        "gift_card_desc": "从裂缝中汲取力量。获得一张随机卡牌。"
+      },
+      "resolution": {
+        "gold": "当你踏入裂缝时，满满一堆古老硬币显现。虚空低语着它的感激。",
+        "card": "你伸进闪烁的能量中，拉出一张卷轴：{{name}}。你的牌库变得更强了。"
+      }
+    },
+    "weeping_willow": {
+      "title": "垂泣柳",
+      "description": "一棵古老的水晶树独自矗立在空地中。它的汁液闪烁着柔和的蔚蓝光芒。传说它会赋予那些献上祭品的人智慧。",
+      "choices": {
+        "offer_gold_label": "献上祭品",
+        "offer_gold_desc": "失去 25 金币以找到一个隐藏的遗物。",
+        "ignore_label": "随它去吧",
+        "ignore_desc": "不要冒险。小心前进。"
+      },
+      "resolution": {
+        "not_enough_gold": "你没有足够的金币。树似乎有些失望。",
+        "success": "树接受了你的贡品。它的根部打开了一个隐藏的腔室，揭示了一个 {{relic}}。",
+        "ignore": "你走开了，感觉到树冷冷的目光落在你背上。安全就是对你最大的回报。"
+      }
+    },
+    "abandoned_caravan": {
+      "title": "废弃的商队",
+      "description": "你偶然发现了一辆坠毁的商人马车。大部分货物都毁了，但在废墟中可能还有一些可以回收的东西。",
+      "choices": {
+        "scavenge_label": "拾荒",
+        "scavenge_desc": "寻找有价值的东西。获得 30 金币。",
+        "search_carefully_label": "深入搜查",
+        "search_carefully_desc": "冒着陷阱的风险以获得更好的奖励。50% 几率获得 60 金币或 0 金币。"
+      },
+      "resolution": {
+        "scavenge": "你在废墟中挖掘，发现了一批隐藏的硬币。胜利属于细心的人。",
+        "success": "坚持得到了回报！你在地板下发现了一个沉重的金币箱。",
+        "failed": "陷阱触发！你侥幸逃脱，但剩余的贵重物品在过程中被摧毁了。"
+      }
+    }
+  },
+  "tutorial": {
+    "slide1": {
+      "title": "旅程开始",
+      "desc": "欢迎来到 Sigilborne，一个策略是你最强武器的世界。构建你的牌库，明智地部署单位，击败敌方英雄以获取胜利。"
+    },
+    "slide2": {
+      "title": "法力与财富",
+      "desc": "法力为你释放法术和召唤提供能量。每回合你都会获得更多最大法力值。在旅途中收集金币，在商店购买强大的神器。"
+    },
+    "slide3": {
+      "title": "解读印记",
+      "desc": "每张卡牌都有三个关键信息：法力消耗（左上角）、攻击力（左下角）和生命值（右下角）。了解你的牌库以掌控战场。"
+    },
+    "slide4": {
+      "title": "派系与协同",
+      "desc": "指挥奥术、自然和中立派系。结合同一派系的单位可以解锁强大的协同作用和隐藏技能。"
+    },
+    "slide5": {
+      "title": "单位职业与天气",
+      "desc": "单位分为三种职业：近战、远程或攻城。每种职业都容易受到特定的天气效果（如冰霜或浓雾）影响，这些效果会将它们的力量降至 1。传说中的单位免疫这些效果！"
+    },
+    "slide6": {
+      "title": "牌库定制",
+      "desc": "在整个远征过程中，你的牌库完全解锁。你可以在战斗之间自由编辑牌库以调整策略、交换派系卡牌，或在推进至更深层生态群落时整合强大的新单位。"
+    },
+    "slide7": {
+      "title": "战术战斗",
+      "desc": "将单位拖到战场上。它们会直接攻击前方的敌人。在回合结束时减少敌人的总力量，以确保你的胜利！"
+    },
+    "btn": {
+      "play": "开始游戏",
+      "next": "下一步",
+      "skip": "跳过"
+    }
+  }
+}
