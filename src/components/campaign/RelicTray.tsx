@@ -33,7 +33,12 @@ export const RelicTray: React.FC = () => {
                 showsHorizontalScrollIndicator={false} 
                 contentContainerStyle={styles.contentContainer}
             >
-                {relics.map((relicId, index) => {
+                {Object.entries(
+                    relics.reduce((acc, relicId) => {
+                        acc[relicId] = (acc[relicId] || 0) + 1;
+                        return acc;
+                    }, {} as Record<string, number>)
+                ).map(([relicId, count], index) => {
                     const relic = getRelicById(relicId);
                     if (!relic) return null;
                     
@@ -57,6 +62,11 @@ export const RelicTray: React.FC = () => {
                                 color={isBoss ? '#fbbf24' : (isRare ? colors.arcane.cyan : colors.arcane.emerald)} 
                             />
                             {isBoss && <View style={styles.bossCrown} />}
+                            {count > 1 && (
+                                <View style={styles.countBadge}>
+                                    <Text style={styles.countText}>{count}</Text>
+                                </View>
+                            )}
                         </TouchableOpacity>
                     );
                 })}
@@ -116,7 +126,11 @@ export const RelicTray: React.FC = () => {
 
                                 <View style={styles.divider} />
 
-                                <Text style={styles.description}>{t(selectedRelic.description)}</Text>
+                                <Text style={styles.description}>
+                                    {t(selectedRelic.description, { 
+                                        value: ((selectedRelic.effect?.operation as { value?: number })?.value || 1) * relics.filter(r => r === selectedRelic.id).length 
+                                    })}
+                                </Text>
                                 
                                 <TouchableOpacity 
                                     style={styles.closeButton}
@@ -135,7 +149,7 @@ export const RelicTray: React.FC = () => {
 
 const styles = StyleSheet.create({
     outerContainer: {
-        height: 40,
+        height: 48,
         justifyContent: 'center',
     },
     contentContainer: {
@@ -172,6 +186,26 @@ const styles = StyleSheet.create({
         backgroundColor: '#fbbf24',
         borderWidth: 1,
         borderColor: colors.arcane.obsidian,
+    },
+    countBadge: {
+        position: 'absolute',
+        bottom: -4,
+        right: -4,
+        backgroundColor: colors.arcane.obsidian,
+        borderRadius: 8,
+        minWidth: 16,
+        height: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
+    },
+    countText: {
+        color: colors.arcane.white,
+        fontSize: 9,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        lineHeight: 11,
     },
     modalBackdrop: {
         flex: 1,

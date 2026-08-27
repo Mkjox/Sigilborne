@@ -120,19 +120,19 @@
   "relics": {
     "war_banner": {
       "name": "Estandarte de Guerra",
-      "desc": "Al comienzo de tu turno, aumenta el poder de un aliado aleatorio en 1."
+      "desc": "Al comienzo de tu turno, aumenta el poder de un aliado aleatorio en {{value}}."
     },
     "mana_crystal": {
       "name": "Cristal de Maná",
-      "desc": "Al comienzo de cada ronda, gana 1 de Maná Máximo."
+      "desc": "Al comienzo de cada ronda, gana {{value}} de Maná Máximo."
     },
     "soul_gem": {
       "name": "Gema de Alma",
-      "desc": "Cuando un aliado es destruido, roba 1 carta."
+      "desc": "Cuando un aliado es destruido, roba {{value}} carta(s)."
     },
     "thornmail": {
       "name": "Cota de Espinas",
-      "desc": "Cuando un aliado recibe daño, inflige 1 de daño a un enemigo aleatorio."
+      "desc": "Cuando un aliado recibe daño, inflige {{value}} de daño a un enemigo aleatorio."
     }
   },
   "deck_builder": {
@@ -265,7 +265,8 @@
     "enter_void": "Entrar Al Vacío",
     "collection": "Colección",
     "deck_builder": "Constructor de Mazos",
-    "settings": "Ajustes"
+    "settings": "Ajustes",
+    "version": "v{{version}} — Arcane Beta"
   },
   "settings": {
     "title": "AJUSTES",
@@ -295,7 +296,7 @@
       "es": "ESPAÑOL"
     },
     "footer": "✧ FORJADO EN EL VACÍO ✧",
-    "version": "PROTOCOLO ARCANO v0.1.0",
+    "version": "PROTOCOLO ARCANO v{{version}}",
     "other": {
       "title": "OTROS",
       "replay_tutorial": "📖 Cómo Jugar"

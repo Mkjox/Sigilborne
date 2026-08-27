@@ -197,19 +197,19 @@
   "relics": {
     "war_banner": {
       "name": "War Banner",
-      "desc": "At the start of your turn, boost a random ally by 1."
+      "desc": "At the start of your turn, boost a random ally by {{value}}."
     },
     "mana_crystal": {
       "name": "Mana Crystal",
-      "desc": "At the start of each round, gain 1 Max Mana."
+      "desc": "At the start of each round, gain {{value}} Max Mana."
     },
     "soul_gem": {
       "name": "Soul Gem",
-      "desc": "When an ally is destroyed, draw 1 card."
+      "desc": "When an ally is destroyed, draw {{value}} card(s)."
     },
     "thornmail": {
       "name": "Thornmail",
-      "desc": "When an ally is damaged, deal 1 damage to a random enemy."
+      "desc": "When an ally is damaged, deal {{value}} damage to a random enemy."
     }
   },
   "deck_builder": {
@@ -342,7 +342,8 @@
     "enter_void": "Enter The Void",
     "collection": "Collection",
     "deck_builder": "Deck Builder",
-    "settings": "Settings"
+    "settings": "Settings",
+    "version": "v{{version}} — Arcane Beta"
   },
   "settings": {
     "title": "SETTINGS",
@@ -372,7 +373,7 @@
       "es": "ESPAÑOL"
     },
     "footer": "✧ FORGED IN THE VOID ✧",
-    "version": "ARCANE PROTOCOL v0.1.0",
+    "version": "ARCANE PROTOCOL v{{version}}",
     "other": {
       "title": "OTHER",
       "replay_tutorial": "📖 How to Play"

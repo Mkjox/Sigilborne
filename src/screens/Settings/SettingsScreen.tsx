@@ -23,6 +23,7 @@ import Animated, {
 import { RootStackParamList } from '../../types';
 import { Text, BoardSurface } from '../../components/ui';
 import { colors, typography } from '../../theme';
+import packageJson from '../../../package.json';
 import { useTranslation } from 'react-i18next';
 import i18n from '../../i18n';
 import { useSettingsStore } from '../../store';
@@ -327,7 +328,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                             <View style={styles.optionRow}>
                                 {(['en', 'tr', 'es', 'zh', 'ja'] as const).map((lang) => {
                                     const isActive = i18n.language.startsWith(lang);
-                                    
+
                                     const languageNames: Record<string, string> = {
                                         en: 'ENGLISH',
                                         tr: 'TÜRKÇE',
@@ -388,7 +389,7 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                 style={[styles.footer, { paddingBottom: insets.bottom + 8 }]}
             >
                 {/* <Text style={styles.footerText}>{t('settings.footer')}</Text> */}
-                <Text style={styles.footerVersion}>{t('settings.version')}</Text>
+                <Text style={styles.footerVersion}>{t('settings.version', { version: packageJson.version })}</Text>
             </Animated.View>
         </BoardSurface>
     );

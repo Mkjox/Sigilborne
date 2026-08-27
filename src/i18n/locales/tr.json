@@ -196,19 +196,19 @@
   "relics": {
     "war_banner": {
       "name": "Savaş Sancağı",
-      "desc": "Sıranın başında rastgele bir dosta +1 güç verir."
+      "desc": "Sıranın başında rastgele bir dosta +{{value}} güç verir."
     },
     "mana_crystal": {
       "name": "Mana Kristali",
-      "desc": "Her rauntun başında +1 Maksimum Mana kazan."
+      "desc": "Her rauntun başında +{{value}} Maksimum Mana kazan."
     },
     "soul_gem": {
       "name": "Ruh Taşı",
-      "desc": "Bir dost birim yok edildiğinde, 1 kart çek."
+      "desc": "Bir dost birim yok edildiğinde, {{value}} kart çek."
     },
     "thornmail": {
       "name": "Dikenli Zırh",
-      "desc": "Bir dost birim hasar aldığında, rastgele bir düşmana 1 hasar ver."
+      "desc": "Bir dost birim hasar aldığında, rastgele bir düşmana {{value}} hasar ver."
     }
   },
   "deck_builder": {
@@ -341,7 +341,8 @@
     "enter_void": "Hiçliğe Gir",
     "collection": "Koleksiyon",
     "deck_builder": "Deste Oluşturucu",
-    "settings": "Ayarlar"
+    "settings": "Ayarlar",
+    "version": "v{{version}} — Arcane Beta"
   },
   "settings": {
     "title": "AYARLAR",
@@ -370,7 +371,7 @@
       "tr": "TÜRKÇE"
     },
     "footer": "✧ HİÇLİKTE DÖVÜLDÜ ✧",
-    "version": "GİZEMLİ PROTOKOL v0.1.0",
+    "version": "GİZEMLİ PROTOKOL v{{version}}",
     "other": {
       "title": "DİĞER",
       "replay_tutorial": "📖 Nasıl Oynanır"

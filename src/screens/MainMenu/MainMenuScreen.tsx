@@ -18,6 +18,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { RootStackParamList } from '../../types';
 import { Text } from '../../components/ui';
+import packageJson from '../../../package.json';
 import { colors, spacing, typography } from '../../theme';
 import { useTranslation } from 'react-i18next';
 import { useSettingsStore } from '../../store/settingsStore';
@@ -142,7 +143,7 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                     </MenuPanel>
 
                     <View style={styles.footer}>
-                        <Text style={styles.versionText}>v0.1.0 — Arcane Beta</Text>
+                        <Text style={styles.versionText}>{t('menu.version', { version: packageJson.version })}</Text>
                     </View>
                 </Animated.View>
             </View>

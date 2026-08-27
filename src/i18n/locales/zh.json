@@ -197,19 +197,19 @@
   "relics": {
     "war_banner": {
       "name": "战争旗帜",
-      "desc": "在你的回合开始时，随机使一个友军力量+1。"
+      "desc": "在你的回合开始时，随机使一个友军力量+{{value}}。"
     },
     "mana_crystal": {
       "name": "法力水晶",
-      "desc": "在每回合开始时，获得1点最大法力值。"
+      "desc": "在每回合开始时，获得{{value}}点最大法力值。"
     },
     "soul_gem": {
       "name": "灵魂宝石",
-      "desc": "当一个友军被摧毁时，抽1张牌。"
+      "desc": "当一个友军被摧毁时，抽{{value}}张牌。"
     },
     "thornmail": {
       "name": "荆棘之甲",
-      "desc": "当一个友军受到伤害时，对随机一个敌人造成1点伤害。"
+      "desc": "当一个友军受到伤害时，对随机一个敌人造成{{value}}点伤害。"
     }
   },
   "deck_builder": {
@@ -342,7 +342,8 @@
     "enter_void": "进入虚空",
     "collection": "收藏",
     "deck_builder": "牌组构建",
-    "settings": "设置"
+    "settings": "设置",
+    "version": "v{{version}} — Arcane Beta"
   },
   "settings": {
     "title": "设置",
@@ -374,7 +375,7 @@
       "ja": "日本語"
     },
     "footer": "✧ 在虚空中锻造 ✧",
-    "version": "奥术协议 v0.1.0",
+    "version": "奥术协议 v{{version}}",
     "other": {
       "title": "其他",
       "replay_tutorial": "📖 怎么玩"

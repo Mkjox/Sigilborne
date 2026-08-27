@@ -197,19 +197,19 @@
   "relics": {
     "war_banner": {
       "name": "戦の旗",
-      "desc": "ターン開始時、ランダムな味方1体のパワーを1増加。"
+      "desc": "ターン開始時、ランダムな味方1体のパワーを{{value}}増加。"
     },
     "mana_crystal": {
       "name": "マナクリスタル",
-      "desc": "各ラウンド開始時、最大マナを1得る。"
+      "desc": "各ラウンド開始時、最大マナを{{value}}得る。"
     },
     "soul_gem": {
       "name": "ソウルジェム",
-      "desc": "味方が破壊された時、カードを1枚引く。"
+      "desc": "味方が破壊された時、カードを{{value}}枚引く。"
     },
     "thornmail": {
       "name": "棘の鎧",
-      "desc": "味方がダメージを受けた時、ランダムな敵1体に1ダメージを与える。"
+      "desc": "味方がダメージを受けた時、ランダムな敵1体に{{value}}ダメージを与える。"
     }
   },
   "deck_builder": {
@@ -342,7 +342,8 @@
     "enter_void": "虚空へ",
     "collection": "コレクション",
     "deck_builder": "デッキ構築",
-    "settings": "設定"
+    "settings": "設定",
+    "version": "v{{version}} — Arcane Beta"
   },
   "settings": {
     "title": "設定",
@@ -374,7 +375,7 @@
       "ja": "日本語"
     },
     "footer": "✧ 虚空にて鍛造さる ✧",
-    "version": "アーケインプロトコル v0.1.0",
+    "version": "アーケインプロトコル v{{version}}",
     "other": {
       "title": "その他",
       "replay_tutorial": "📖 遊び方"

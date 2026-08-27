@@ -2,7 +2,7 @@
   "expo": {
     "name": "Sigilborne",
     "slug": "sigilborne",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "landscape",
     "icon": "./assets/icons/icon.png",
     "userInterfaceStyle": "light",
