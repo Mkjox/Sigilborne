@@ -48,14 +48,12 @@ export const advanceTurnPhase = (state: GameState, eventBus?: EventBus): GameSta
 const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: Hero, talents: Talent[] = []): PlayerState => {
     let healthBonus = 0;
     let manaBonus = 0;
-    let cooldownReduction = 0;
     let startingHandBonus = 0;
 
     talents.forEach(talent => {
         if (talent.effect.type === 'stat_boost') {
             if (talent.effect.target === 'hero_health') healthBonus += talent.effect.value;
             if (talent.effect.target === 'starting_mana') manaBonus += talent.effect.value;
-            if (talent.effect.target === 'hero_power_cooldown') cooldownReduction += talent.effect.value;
             if (talent.effect.target === 'starting_hand_size') startingHandBonus += talent.effect.value;
         }
     });
@@ -71,8 +69,7 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: He
         id: `hero_${id}`, 
         ability: { 
             ...hero.ability, 
-            cooldown: Math.max(1, hero.ability.cooldown - cooldownReduction),
-            currentCooldown: 0 
+            usedThisRound: false
         } 
     } : {
         id: `hero_${id}`,
@@ -86,8 +83,7 @@ const createPlayerState = (id: string, type: PlayerType, deck: Card[], hero?: He
             type: type === 'player' ? 'boost_all' : 'damage_strongest',
             trigger: 'activate',
             description: type === 'player' ? 'abilities.ability_rally.desc' : 'abilities.ability_dark_command.desc',
-            cooldown: Math.max(1, 3 - cooldownReduction),
-            currentCooldown: 0,
+            usedThisRound: false,
         },
         artwork: type === 'player'
             ? require('../../assets/heroes/hero_commander.jpg')
@@ -485,8 +481,8 @@ export const useHeroAbility = (state: GameState, eventBus?: EventBus): { newStat
     const player = state.currentTurn;
     const playerState = state[player];
 
-    if (playerState.hero.ability.currentCooldown > 0) {
-        return { newState: state, success: false, message: "common.game_errors.ability_cooldown" };
+    if (playerState.hero.ability.usedThisRound) {
+        return { newState: state, success: false, message: "common.game_errors.ability_used" };
     }
 
     // Execute ability
@@ -517,9 +513,14 @@ export const useHeroAbility = (state: GameState, eventBus?: EventBus): { newStat
 
     executeAbility(dummyAbilityCard.abilities[0], context);
 
-    // Set cooldown to the hero's configured cooldown (resets each round)
     const newState = { ...state };
-    newState[player].hero.ability.currentCooldown = playerState.hero.ability.cooldown;
+    newState[player].hero = {
+        ...playerState.hero,
+        ability: {
+            ...playerState.hero.ability,
+            usedThisRound: true,
+        },
+    };
 
     eventBus?.emit('HERO_ABILITY_USED', { player, abilityType, abilityName: playerState.hero.ability.name });
 
@@ -528,7 +529,7 @@ export const useHeroAbility = (state: GameState, eventBus?: EventBus): { newStat
 
 // Setup next round
 export const startNextRound = (state: GameState): GameState => {
-    // Move all board cards to graveyard and reset hero ability cooldown
+    // Move all board cards to graveyard and make the hero power available for the next round.
     const moveToGraveyard = (player: PlayerState): PlayerState => {
         const allBoardCards = [...player.board];
 
@@ -542,7 +543,7 @@ export const startNextRound = (state: GameState): GameState => {
                 ...player.hero,
                 ability: {
                     ...player.hero.ability,
-                    currentCooldown: 0, // Reset hero ability each round
+                    usedThisRound: false,
                 },
             },
         };

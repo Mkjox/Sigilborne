@@ -198,7 +198,44 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                     style={styles.artOverlay}
                                 />
                                 
-                                {!hideStats && (
+                                {!hideStats && card.isHero && (
+                                    <View style={[
+                                        styles.statOrb,
+                                        {
+                                            width: badgeSize,
+                                            height: badgeSize,
+                                            borderRadius: badgeSize / 2,
+                                            top: padding,
+                                            left: padding,
+                                            borderColor: colors.arcane.emeraldLight,
+                                            borderWidth: 2,
+                                            backgroundColor: colors.arcane.obsidian,
+                                            shadowColor: colors.arcane.emeraldLight,
+                                            shadowOffset: { width: 0, height: 0 },
+                                            shadowOpacity: 0.9,
+                                            shadowRadius: 5,
+                                            elevation: 6,
+                                        }
+                                    ]}>
+                                        <Text
+                                            variant="caption"
+                                            style={[
+                                                styles.statText,
+                                                {
+                                                    fontSize: badgeFontSize * 0.7,
+                                                    lineHeight: badgeFontSize * 0.7,
+                                                    color: colors.arcane.white,
+                                                    fontWeight: '900',
+                                                    fontFamily: undefined,
+                                                }
+                                            ]}
+                                        >
+                                            {`L${card.heroLevel ?? 1}`}
+                                        </Text>
+                                    </View>
+                                )}
+
+                                {!hideStats && !card.isHero && (
                                     <>
                                         {/* Mana Cost (Top Left) */}
                                         <View style={[
@@ -305,35 +342,6 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                                             </View>
                                         )}
                                     </>
-                                )}
-
-                                {/* Hero Indicator */}
-                                {card.isHero && (
-                                    <View style={[
-                                        styles.statOrb,
-                                        {
-                                            width: badgeSize,
-                                            height: badgeSize,
-                                            borderRadius: badgeSize / 2,
-                                            top: padding,
-                                            left: padding,
-                                            borderColor: colors.warning,
-                                            backgroundColor: 'rgba(218, 165, 32, 0.2)', // Golden mist
-                                        }
-                                    ]}>
-                                        <Text 
-                                            variant="caption"
-                                            style={[
-                                                styles.statText,
-                                                { 
-                                                    fontSize: badgeFontSize * 0.8,
-                                                    lineHeight: badgeFontSize * 0.8,
-                                                    color: undefined, 
-                                                    fontFamily: undefined 
-                                                }
-                                            ]}
-                                        >👑</Text>
-                                    </View>
                                 )}
 
                                 {/* Info Button (Spells Only - Top Right) */}

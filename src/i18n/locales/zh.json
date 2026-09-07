@@ -323,7 +323,7 @@
     "title": "收藏",
     "hero_label": "英雄",
     "hero_subtitle": "{{class}} 英雄 • {{ability}}",
-    "hero_desc": "{{desc}} (冷却: {{cooldown}} 回合)",
+    "hero_desc": "{{desc}}",
     "no_flavor": "来自虚空的神秘回声。",
     "stats": {
       "total": "总计",

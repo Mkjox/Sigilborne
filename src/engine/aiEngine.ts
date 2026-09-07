@@ -33,7 +33,7 @@ class EasyAI implements AIStrategy {
         }
 
         // Pick best unit, but 50% chance to forget hero ability
-        if (Math.random() > 0.5 && state.ai.hero.ability.currentCooldown === 0 && getTotalPower(state, 'ai') < getTotalPower(state, 'player')) {
+        if (Math.random() > 0.5 && !state.ai.hero.ability.usedThisRound && getTotalPower(state, 'ai') < getTotalPower(state, 'player')) {
             return { action: 'ability' };
         }
 
@@ -55,7 +55,7 @@ class MediumAI implements AIStrategy {
         
         if (affordableCards.length === 0) return { action: 'pass' };
 
-        if (state.ai.hero.ability.currentCooldown === 0 && getTotalPower(state, 'ai') < getTotalPower(state, 'player')) {
+        if (!state.ai.hero.ability.usedThisRound && getTotalPower(state, 'ai') < getTotalPower(state, 'player')) {
             const clone = deepCloneState(state);
             const { newState, success } = engineUseHeroAbility(clone);
             if (success && (getTotalPower(newState, 'ai') > getTotalPower(state, 'ai') || getTotalPower(newState, 'player') < getTotalPower(state, 'player'))) {
@@ -139,7 +139,7 @@ class HardAI implements AIStrategy {
             return { action: 'pass' };
         }
 
-        if (affordableCards.length === 0 && state.ai.hero.ability.currentCooldown > 0) {
+        if (affordableCards.length === 0 && state.ai.hero.ability.usedThisRound) {
             return { action: 'pass' };
         }
 
@@ -148,7 +148,7 @@ class HardAI implements AIStrategy {
         let bestDelta = currentDelta; 
 
         // 1. Evaluate Ability Simulation
-        if (state.ai.hero.ability.currentCooldown === 0) {
+        if (!state.ai.hero.ability.usedThisRound) {
             const clone = deepCloneState(state);
             const { newState, success } = engineUseHeroAbility(clone);
             if (success) {

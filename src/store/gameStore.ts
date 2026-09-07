@@ -78,8 +78,7 @@ const createEmptyState = (): GameState => ({
                 type: 'boost_all',
                 trigger: 'activate',
                 description: 'Boost all units by 1',
-                cooldown: 3,
-                currentCooldown: 0,
+                usedThisRound: false,
             },
             artwork: '',
             className: 'Warrior',
@@ -109,8 +108,7 @@ const createEmptyState = (): GameState => ({
                 type: 'damage_strongest',
                 trigger: 'activate',
                 description: 'Dummy',
-                cooldown: 0,
-                currentCooldown: 0,
+                usedThisRound: false,
             },
             artwork: require('../../assets/heroes/hero_darklord.jpg'),
             className: 'Dummy',
@@ -161,7 +159,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
         // Get unlocked talents from campaign
         const campaignState = useCampaignStore.getState();
-        const unlockedTalentIds = campaignState.unlockedTalentIds;
+        const unlockedTalentIds = Array.isArray(campaignState.unlockedTalentIds) ? campaignState.unlockedTalentIds : [];
         const heroTalentTree = playerHero ? getTalentTreeForHero(playerHero.id) : undefined;
         const playerTalents = heroTalentTree 
             ? heroTalentTree.talents.filter(t => unlockedTalentIds.includes(t.id)) 

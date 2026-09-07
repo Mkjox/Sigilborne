@@ -18,8 +18,9 @@ import { Hero } from '../../types/hero.types';
 import { Text, BoardSurface } from '../../components/ui';
 import { CardComponent } from '../../components/game';
 import { colors, spacing, getCardDimensions, getLayoutDimensions } from '../../theme';
-import { getAllCards, AVAILABLE_HEROES } from '../../data/cardData';
+import { getAllCards, AVAILABLE_HEROES, getTalentTreeForHero } from '../../data/cardData';
 import { useDeckStore } from '../../store/deckStore';
+import { useCampaignStore } from '../../store/campaignStore';
 import { useTranslation } from 'react-i18next';
 
 type CollectionScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Collection'>;
@@ -31,7 +32,7 @@ interface Props {
 const ALL_CARDS = getAllCards();
 
 // Helper to wrap Hero in a Card interface for the grid
-const heroToCard = (hero: Hero): Card => ({
+const heroToCard = (hero: Hero, unlockedTalentIds: string[] = []): Card => ({
     id: hero.id,
     name: hero.name,
     type: 'unit', // Heroes behave like units in terms of display
@@ -44,6 +45,7 @@ const heroToCard = (hero: Hero): Card => ({
     flavorText: `${hero.className} Hero`,
     artwork: hero.artwork,
     isHero: true,
+    heroLevel: 1 + (getTalentTreeForHero(hero.id)?.talents.filter(talent => unlockedTalentIds.includes(talent.id)).length || 0),
 });
 
 const CollectionCardItem = React.memo(({ item, width, height, isSelected, onPress }: any) => {
@@ -84,6 +86,9 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
     const { t } = useTranslation();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
     const { decks } = useDeckStore();
+    const unlockedTalentIds = useCampaignStore(state =>
+        Array.isArray(state.unlockedTalentIds) ? state.unlockedTalentIds : []
+    );
 
     const [selectedCategory, setSelectedCategory] = useState<'all' | CardType | 'hero'>('all');
     const [selectedCardId, setSelectedCardId] = useState<string | null>(null);
@@ -106,12 +111,12 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
         const units = ALL_CARDS.filter(c => c.type === 'unit');
         const spells = ALL_CARDS.filter(c => c.type === 'spell');
         const weather = ALL_CARDS.filter(c => c.type === 'weather');
-        const heroes = AVAILABLE_HEROES.map(heroToCard);
+        const heroes = AVAILABLE_HEROES.map(hero => heroToCard(hero, unlockedTalentIds));
 
         if (selectedCategory === 'all') return [...heroes, ...units, ...spells, ...weather];
         if (selectedCategory === 'hero') return heroes;
         return ALL_CARDS.filter(card => card.type === selectedCategory);
-    }, [selectedCategory]);
+    }, [selectedCategory, unlockedTalentIds]);
 
     const numColumns = Math.floor((screenWidth - layout.contentPadding * 2) / (cardWidth + 16));
 
@@ -218,7 +223,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
             {selectedCardId && (() => {
                 // Search in all sources for the full data
                 const card = ALL_CARDS.find(c => c.id === selectedCardId) ||
-                    AVAILABLE_HEROES.map(heroToCard).find(c => c.id === selectedCardId);
+                    AVAILABLE_HEROES.map(hero => heroToCard(hero, unlockedTalentIds)).find(c => c.id === selectedCardId);
 
                 const hero = AVAILABLE_HEROES.find(h => h.id === selectedCardId);
                 const isHero = !!hero;
@@ -254,7 +259,7 @@ export const CollectionScreen: React.FC<Props> = ({ navigation }) => {
                                 {isHero ? t('collection.hero_subtitle', { class: hero?.className, ability: t(hero?.ability.name || '') }) : (t(card.flavorText || "collection.no_flavor"))}
                             </Text>
                             <Text variant="body" color={colors.arcane.white} style={{ fontSize: 13, lineHeight: 18, opacity: 0.9 }}>
-                                {isHero ? t('collection.hero_desc', { desc: t(hero?.ability.description || ''), cooldown: hero?.ability.cooldown }) : t(card.description)}
+                                {isHero ? t('collection.hero_desc', { desc: t(hero?.ability.description || '') }) : t(card.description)}
                             </Text>
                         </View>
                     </Animated.View>

@@ -458,16 +458,16 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                 {/* Hero Ability — compact pill */}
                                 <Pressable
                                     onPress={useHeroAbility}
-                                    disabled={!isPlayerTurn || player.hero.ability.currentCooldown > 0 || player.hasPassed}
+                                    disabled={!isPlayerTurn || player.hero.ability.usedThisRound || player.hasPassed}
                                     style={({ pressed }) => [
                                         styles.heroAbilityButton,
-                                        isPlayerTurn && player.hero.ability.currentCooldown === 0 && !player.hasPassed && styles.heroAbilityActive,
-                                        player.hero.ability.currentCooldown > 0 && styles.heroAbilityDisabled,
-                                        pressed && isPlayerTurn && player.hero.ability.currentCooldown === 0 && { transform: [{ scale: 0.93 }] },
+                                        isPlayerTurn && !player.hero.ability.usedThisRound && !player.hasPassed && styles.heroAbilityActive,
+                                        player.hero.ability.usedThisRound && styles.heroAbilityDisabled,
+                                        pressed && isPlayerTurn && !player.hero.ability.usedThisRound && { transform: [{ scale: 0.93 }] },
                                     ]}
                                 >
                                     <View style={styles.heroAbilityContent}>
-                                        {player.hero.ability.currentCooldown === 0 && (
+                                        {!player.hero.ability.usedThisRound && (
                                             <Text style={styles.heroAbilityIcon}>⚡</Text>
                                         )}
                                         <Text
@@ -475,10 +475,10 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                             adjustsFontSizeToFit
                                             style={[
                                                 styles.heroAbilityText,
-                                                { color: player.hero.ability.currentCooldown > 0 ? colors.text.disabled : colors.arcane.white }
+                                                { color: player.hero.ability.usedThisRound ? colors.text.disabled : colors.arcane.white }
                                             ]}
                                         >
-                                            {player.hero.ability.currentCooldown > 0 ? t('common.used') : t(player.hero.ability.name).toUpperCase()}
+                                            {player.hero.ability.usedThisRound ? t('common.used') : t(player.hero.ability.name).toUpperCase()}
                                         </Text>
                                     </View>
                                 </Pressable>

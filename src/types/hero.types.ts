@@ -1,8 +1,8 @@
 import { Ability, Faction } from './card.types';
 
 export interface HeroAbility extends Ability {
-    cooldown: number;
-    currentCooldown: number;
+    /** Hero powers can be used once during each round/stage. */
+    usedThisRound: boolean;
     manaCost?: number;
 }
 

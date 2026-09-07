@@ -246,7 +246,7 @@
     "title": "COLECCIÓN",
     "hero_label": "HÉROE",
     "hero_subtitle": "Héroe {{class}} • {{ability}}",
-    "hero_desc": "{{desc}} (Recarga: {{cooldown}} Rondas)",
+    "hero_desc": "{{desc}}",
     "no_flavor": "Un eco misterioso del vacío.",
     "stats": {
       "total": "TOTAL",

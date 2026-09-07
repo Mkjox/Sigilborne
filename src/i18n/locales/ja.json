@@ -323,7 +323,7 @@
     "title": "コレクション",
     "hero_label": "ヒーロー",
     "hero_subtitle": "{{class}} ヒーロー • {{ability}}",
-    "hero_desc": "{{desc}} (クールダウン: {{cooldown}} ラウンド)",
+    "hero_desc": "{{desc}}",
     "no_flavor": "虚空からの謎の木霊。",
     "stats": {
       "total": "合計",

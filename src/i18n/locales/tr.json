@@ -322,7 +322,7 @@
     "title": "KOLEKSİYON",
     "hero_label": "KAHRAMAN",
     "hero_subtitle": "{{class}} Kahramanı • {{ability}}",
-    "hero_desc": "{{desc}} (Bekleme Süresi: {{cooldown}} Raunt)",
+    "hero_desc": "{{desc}}",
     "no_flavor": "Hiçlikten gelen gizemli bir yankı.",
     "stats": {
       "total": "TOPLAM",

@@ -323,7 +323,7 @@
     "title": "COLLECTION",
     "hero_label": "HERO",
     "hero_subtitle": "{{class}} Hero • {{ability}}",
-    "hero_desc": "{{desc}} (Cooldown: {{cooldown}} Rounds)",
+    "hero_desc": "{{desc}}",
     "no_flavor": "A mysterious echo from the void.",
     "stats": {
       "total": "TOTAL",

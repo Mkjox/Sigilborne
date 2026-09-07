@@ -123,16 +123,20 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
     const [deckToDelete, setDeckToDelete] = useState<string | null>(null);
 
     const activeDeck = useMemo(() => decks.find(d => d.id === activeDeckId), [decks, activeDeckId]);
-    const filteredCards = useMemo(() => {
-        if (filter === 'hero') return []; // Heroes are handled separately
-        if (filter === 'all') return ALL_CARDS;
-        return ALL_CARDS.filter(c => c.type === filter);
-    }, [filter]);
-
     const activeHero = useMemo(() => {
         if (!activeDeck) return null;
         return AVAILABLE_HEROES.find(h => h.id === activeDeck.heroId) || null;
     }, [activeDeck]);
+
+    const filteredCards = useMemo(() => {
+        if (filter === 'hero') return []; // Heroes are handled separately
+
+        return ALL_CARDS.filter(card => {
+            if (filter !== 'all' && card.type !== filter) return false;
+            if (card.type !== 'unit') return true;
+            return !!activeHero && (card.faction === 'neutral' || card.faction === activeHero.faction);
+        });
+    }, [activeHero, filter]);
 
     const cardCountInDeck = (cardId: string) => {
         if (!activeDeck) return 0;
@@ -296,8 +300,12 @@ export const DeckBuilderScreen: React.FC<Props> = ({ navigation }) => {
                                             isPlayable={isLinkable && !isDeckLocked}
                                         />
                                         {count > 0 && (
-                                            <View style={styles.countBadge}>
-                                                <Text style={styles.countBadgeText}>{count}</Text>
+                                            <View pointerEvents="none" style={styles.selectedCardIndicator}>
+                                                <View style={styles.selectedCardOutline} />
+                                                <View style={styles.countBadge}>
+                                                    <Text style={styles.countBadgeLabel}>DECK</Text>
+                                                    <Text style={styles.countBadgeText}>×{count}</Text>
+                                                </View>
                                             </View>
                                         )}
                                     </View>
@@ -663,21 +671,52 @@ const styles = StyleSheet.create({
         padding: 5,
         position: 'relative',
     },
-    countBadge: {
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        width: 18,
-        height: 18,
-        borderRadius: 9,
-        backgroundColor: colors.arcane.emerald,
-        justifyContent: 'center',
-        alignItems: 'center',
+    selectedCardIndicator: {
+        ...StyleSheet.absoluteFillObject,
         zIndex: 10,
     },
+    selectedCardOutline: {
+        ...StyleSheet.absoluteFillObject,
+        borderWidth: 2,
+        borderColor: colors.arcane.emeraldLight,
+        borderRadius: 4,
+        shadowColor: colors.arcane.emeraldLight,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 6,
+        elevation: 6,
+    },
+    countBadge: {
+        position: 'absolute',
+        top: 7,
+        right: 7,
+        height: 22,
+        paddingHorizontal: 7,
+        borderRadius: 11,
+        backgroundColor: colors.arcane.emerald,
+        borderWidth: 2,
+        borderColor: colors.arcane.obsidian,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        justifyContent: 'center',
+        shadowColor: colors.arcane.emeraldLight,
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.75,
+        shadowRadius: 5,
+        elevation: 6,
+    },
+    countBadgeLabel: {
+        fontSize: 7,
+        lineHeight: 9,
+        color: colors.arcane.obsidian,
+        fontWeight: '900',
+        letterSpacing: 0.5,
+    },
     countBadgeText: {
-        fontSize: 10,
-        color: '#000',
+        fontSize: 11,
+        lineHeight: 13,
+        color: colors.arcane.obsidian,
         fontWeight: '900',
     },
 

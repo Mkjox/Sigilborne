@@ -132,15 +132,15 @@ export const PlayerInfo: React.FC<PlayerInfoProps> = ({
                     {isPlayer && onUseHeroAbility && hero && (
                         <Pressable
                             onPress={onUseHeroAbility}
-                            disabled={!isCurrentTurn || hero.ability.currentCooldown > 0}
+                            disabled={!isCurrentTurn || hero.ability.usedThisRound}
                             style={({ pressed }) => [
                                 styles.abilityButton,
-                                (hero.ability.currentCooldown > 0) && styles.abilityDisabled,
+                                hero.ability.usedThisRound && styles.abilityDisabled,
                                 pressed && styles.abilityPressed
                             ]}
                         >
                             <Text variant="caption" style={styles.abilityText}>
-                                {hero.ability.currentCooldown > 0
+                                {hero.ability.usedThisRound
                                     ? t('common.used')
                                     : t('common.leader')}
                             </Text>
