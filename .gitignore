@@ -55,6 +55,7 @@ install_check_results.txt
 # local scripts
 debug-all.ps1
 create-apk.ps1
+create-apk-lin.sh
 scripts-guide.md
 .vscode/launch.json
 faction-art-prompts.md
