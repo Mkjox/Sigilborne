@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import Animated, {
     FadeIn,
     FadeOut,
@@ -39,6 +40,7 @@ interface Props {
 }
 
 // Single Board Zone Component
+// Single Board Zone Component
 const BoardZone: React.FC<{
     cards: Card[];
     isPlayer: boolean;
@@ -49,7 +51,25 @@ const BoardZone: React.FC<{
     isActive?: boolean;
     highlightedCardIds?: string[];
     selectedCardId?: string | null;
-}> = ({ cards, isPlayer, cardWidth, cardHeight, onPress, onCardPress, isActive, highlightedCardIds = [], selectedCardId }) => {
+    attackingCardId?: string | null;
+    combatState?: {
+        attackerId: string;
+        targetId: string;
+        direction: 'up' | 'down';
+    } | null;
+}> = ({
+    cards,
+    isPlayer,
+    cardWidth,
+    cardHeight,
+    onPress,
+    onCardPress,
+    isActive,
+    highlightedCardIds = [],
+    selectedCardId,
+    attackingCardId,
+    combatState,
+}) => {
     const weather = useGameStore(state => state.weather);
     const talents = useGameStore(state => (isPlayer ? state.player.unlockedTalents : state.ai.unlockedTalents) || []);
     const anim = useAnimationMultiplier();
@@ -82,10 +102,15 @@ const BoardZone: React.FC<{
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.boardZoneContent}
+                style={{ overflow: 'visible' }}
             >
                 {cards.map((card, index) => {
                     const isHighlighted = highlightedCardIds.includes(card.id);
                     const isSelected = selectedCardId === card.id;
+                    const isAttacking = combatState?.attackerId === card.id;
+                    const isTakingHit = combatState?.targetId === card.id;
+                    const isCombatReady = attackingCardId === card.id && !combatState;
+                    const attackDirection = combatState?.direction ?? (isPlayer ? 'up' : 'down');
                     const effectivePower = calculateCardPower(card, cards, weather, factionBoosts);
 
                     return (
@@ -93,19 +118,28 @@ const BoardZone: React.FC<{
                             key={`${card.id}-${index}`}
                             entering={FadeIn.duration(anim(400)).delay(index * anim(100))}
                             exiting={FadeOut.duration(anim(300))}
+                            style={{
+                                zIndex: isAttacking ? 100 : (isTakingHit ? 80 : (isCombatReady || isSelected || isHighlighted ? 25 : 1)),
+                            }}
                         >
                             <Animated.View
                                 style={{
                                     marginHorizontal: spacing.sm,
-                                    transform: [{ scale: isHighlighted ? 1.08 : (isSelected ? 1.04 : 1) }],
-                                    opacity: (highlightedCardIds.length > 0 && !isHighlighted && !isSelected) ? 0.4 : 1,
-                                    zIndex: isSelected || isHighlighted ? 20 : 1,
+                                    transform: [{ scale: isCombatReady ? 1.08 : (isHighlighted ? 1.08 : (isSelected ? 1.04 : 1)) }],
+                                    opacity: (highlightedCardIds.length > 0 && !isHighlighted && !isSelected && !isCombatReady) ? 0.45 : 1,
                                 }}
                             >
-                                {/* Target indicator - Arcane Sigil */}
+                                {/* Attacker Aggro indicator */}
+                                {isCombatReady && isPlayer && (
+                                    <View style={[styles.targetIndicator, { borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.25)' }]}>
+                                        <Text style={{ fontSize: 14 }}>⚔️</Text>
+                                    </View>
+                                )}
+
+                                {/* Target indicator - Reticle */}
                                 {isHighlighted && !isPlayer && (
-                                    <View style={styles.targetIndicator}>
-                                        <Text style={{ fontSize: 18, color: colors.arcane.emerald }}>✧</Text>
+                                    <View style={[styles.targetIndicator, { borderColor: colors.error, backgroundColor: 'rgba(239, 68, 68, 0.25)' }]}>
+                                        <Text style={{ fontSize: 14, color: colors.error }}>🎯</Text>
                                     </View>
                                 )}
 
@@ -118,7 +152,12 @@ const BoardZone: React.FC<{
                                     hideStats={false}
                                     isSelected={isSelected}
                                     isTargeted={isHighlighted && !isPlayer}
+                                    isCombatReady={isCombatReady}
+                                    isAttacking={isAttacking}
+                                    isTakingHit={isTakingHit}
+                                    attackDirection={attackDirection}
                                     onPress={() => onCardPress?.(card)}
+                                    animateEntry={true}
                                 />
                             </Animated.View>
                         </Animated.View>
@@ -248,9 +287,15 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
         }
     };
 
+    const [combatState, setCombatState] = React.useState<{
+        attackerId: string;
+        targetId: string;
+        direction: 'up' | 'down';
+    } | null>(null);
+
     // Targeted Attack Logic
     const handleBoardCardPress = (card: Card, isPlayerSide: boolean) => {
-        if (!isPlayerTurn) return;
+        if (!isPlayerTurn || combatState) return;
 
         if (isPlayerSide) {
             if (attackingCardId === card.id) {
@@ -258,11 +303,34 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
             } else {
                 if (!card.isExhausted) {
                     setAttackingCard(card.id);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 }
             }
         } else {
             if (attackingCardId) {
-                attackCard(card.id);
+                const attackerId = attackingCardId;
+                const targetId = card.id;
+
+                setCombatState({ attackerId, targetId, direction: 'up' });
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+                // Strike impact connections at 180ms
+                setTimeout(() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+                    boardShake.value = withSequence(
+                        withTiming(5, { duration: anim(40) }),
+                        withTiming(-5, { duration: anim(40) }),
+                        withTiming(2.5, { duration: anim(40) }),
+                        withTiming(0, { duration: anim(40) })
+                    );
+                    triggerVFX('scorch', screenWidth / 2, screenHeight * 0.35);
+                    attackCard(targetId);
+                }, anim(180));
+
+                // Clear visual combat state after recoil finishes
+                setTimeout(() => {
+                    setCombatState(null);
+                }, anim(460));
             }
         }
     };
@@ -405,7 +473,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                         {/* CENTER BOARD */}
                         <View style={styles.boardArea}>
                             {/* AI ZONE (35%) */}
-                            <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT }]}>
+                            <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT, zIndex: combatState?.direction === 'down' ? 30 : 1 }]}>
                                 <BoardZone
                                     cards={ai.board}
                                     isPlayer={false}
@@ -413,6 +481,8 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     cardHeight={cardHeight}
                                     onCardPress={(card) => handleBoardCardPress(card, false)}
                                     highlightedCardIds={validTargets}
+                                    attackingCardId={attackingCardId}
+                                    combatState={combatState}
                                 />
                             </View>
 
@@ -423,7 +493,7 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                             </View>
 
                             {/* PLAYER ZONE (35%) */}
-                            <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT }]}>
+                            <View style={[styles.boardHalf, { height: BOARD_HALF_HEIGHT, zIndex: combatState?.direction === 'up' ? 30 : 1 }]}>
                                 <BoardZone
                                     cards={player.board}
                                     isPlayer={true}
@@ -432,7 +502,9 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                     isActive={isPlayerTurn && !!selectedCardId}
                                     onPress={handleBoardPress}
                                     onCardPress={(card) => handleBoardCardPress(card, true)}
-                                    selectedCardId={attackingCardId}
+                                    selectedCardId={selectedCardId}
+                                    attackingCardId={attackingCardId}
+                                    combatState={combatState}
                                 />
                             </View>
                         </View>
@@ -590,7 +662,21 @@ const GameBoardContent: React.FC<Props> = ({ navigation, route }) => {
                                 <View style={styles.overlayBtnGroup}>
                                     {winner === 'player' && (
                                         <Pressable
-                                            onPress={() => { resetGame(); navigation.navigate('CampaignMap'); }}
+                                            onPress={() => {
+                                                resetGame();
+                                                const nextConnections = stageData?.connections ?? [];
+                                                if (nextConnections.length === 1) {
+                                                    const nextStageId = nextConnections[0];
+                                                    const stages = generateCampaignMap();
+                                                    const nextStage = stages.find(s => s.id === nextStageId);
+                                                    navigation.replace('GameBoard', {
+                                                        difficulty: nextStage?.difficulty || difficulty,
+                                                        stageId: nextStageId,
+                                                    });
+                                                } else {
+                                                    navigation.navigate('CampaignMap');
+                                                }
+                                            }}
                                             style={[styles.overlayBtn, { backgroundColor: colors.arcane.emerald }]}
                                         >
                                             <Text

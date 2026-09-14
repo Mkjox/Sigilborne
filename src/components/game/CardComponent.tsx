@@ -9,6 +9,7 @@ import Animated, {
     interpolate,
     interpolateColor,
     withRepeat,
+    withSequence,
     Easing,
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -31,6 +32,11 @@ interface CardComponentProps {
     isTargeted?: boolean;
     effectivePower?: number;
     onInfoPress?: () => void;
+    animateEntry?: boolean;
+    isAttacking?: boolean;
+    isTakingHit?: boolean;
+    isCombatReady?: boolean;
+    attackDirection?: 'up' | 'down';
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -57,13 +63,22 @@ export const CardComponent: React.FC<CardComponentProps> = ({
     hideStats,
     effectivePower,
     onInfoPress,
+    animateEntry = false,
+    isAttacking = false,
+    isTakingHit = false,
+    isCombatReady = false,
+    attackDirection = 'up',
 }) => {
     const { t } = useTranslation();
     const { width: windowWidth, height: windowHeight } = useWindowDimensions();
     const anim = useAnimationMultiplier();
     const springConfig = useSpringConfig();
-    const scale = useSharedValue(1);
-    const translateY = useSharedValue(0);
+    const scale = useSharedValue(animateEntry ? 1.15 : 1);
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(animateEntry ? -36 : 0);
+    const rotateX = useSharedValue(0);
+    const rotateZ = useSharedValue(0);
+    const damageFlash = useSharedValue(0);
     const energyPulse = useSharedValue(0);
 
     const defaultDims = getCardDimensions(windowWidth, windowHeight);
@@ -89,33 +104,129 @@ export const CardComponent: React.FC<CardComponentProps> = ({
         scale.value = withSpring(1, springConfig);
     };
 
+    // Arcane Slam Entry Animation
     React.useEffect(() => {
-        translateY.value = withSpring(isSelected ? -8 : 0, springConfig); // Further softened lift
+        if (animateEntry) {
+            translateY.value = withSequence(
+                withTiming(3, { duration: anim(150), easing: Easing.bezier(0.7, 0, 0.84, 0) }),
+                withSpring(0, { mass: 0.7, stiffness: 220, damping: 14 })
+            );
+            scale.value = withSequence(
+                withTiming(0.92, { duration: anim(150), easing: Easing.bezier(0.2, 0, 0, 1) }),
+                withSpring(1, { mass: 0.7, stiffness: 220, damping: 14 })
+            );
+        }
+    }, [animateEntry]);
 
-        if (card.rarity === 'legendary' || isSelected || isTargeted) {
+    // Combat Attack Lunge Animation
+    React.useEffect(() => {
+        if (isAttacking) {
+            const dir = attackDirection === 'down' ? 1 : -1;
+
+            // 1. Anticipation coil (0-70ms): pulls back slightly away from target
+            // 2. Explosive strike lunge (70-180ms): rushes into target
+            // 3. Elastic spring recoil back to home slot (180-460ms)
+            translateY.value = withSequence(
+                withTiming(-dir * 16, { duration: anim(70), easing: Easing.bezier(0.25, 0.1, 0.25, 1) }),
+                withTiming(dir * 85, { duration: anim(110), easing: Easing.bezier(0.12, 0.8, 0.32, 1) }),
+                withSpring(0, { mass: 0.8, stiffness: 200, damping: 14 })
+            );
+
+            scale.value = withSequence(
+                withTiming(0.92, { duration: anim(70) }),
+                withTiming(1.18, { duration: anim(110) }),
+                withSpring(1.0, { mass: 0.7, stiffness: 220, damping: 13 })
+            );
+
+            rotateX.value = withSequence(
+                withTiming(dir * 16, { duration: anim(110) }),
+                withSpring(0, { mass: 0.6, stiffness: 200, damping: 12 })
+            );
+
+            rotateZ.value = withSequence(
+                withTiming(-3, { duration: anim(70) }),
+                withTiming(3, { duration: anim(110) }),
+                withSpring(0, { mass: 0.5, stiffness: 260, damping: 14 })
+            );
+        }
+    }, [isAttacking, attackDirection, anim]);
+
+    // Combat Hit Reaction (Impact Shudder + Crimson Flash)
+    React.useEffect(() => {
+        if (isTakingHit) {
+            translateX.value = withSequence(
+                withTiming(-12, { duration: anim(25) }),
+                withTiming(12, { duration: anim(25) }),
+                withTiming(-8, { duration: anim(25) }),
+                withTiming(8, { duration: anim(25) }),
+                withTiming(-3, { duration: anim(25) }),
+                withTiming(0, { duration: anim(25) })
+            );
+
+            scale.value = withSequence(
+                withTiming(0.86, { duration: anim(50) }),
+                withSpring(1.0, { mass: 0.5, stiffness: 260, damping: 10 })
+            );
+
+            damageFlash.value = withSequence(
+                withTiming(0.85, { duration: anim(35) }),
+                withTiming(0, { duration: anim(300) })
+            );
+        }
+    }, [isTakingHit, anim]);
+
+    // Idle & Hover / Combat Ready Lift
+    React.useEffect(() => {
+        if (!isAttacking && !animateEntry && !isTakingHit) {
+            if (isCombatReady) {
+                translateY.value = withSpring(-12, springConfig);
+            } else {
+                translateY.value = withSpring(isSelected ? -8 : 0, springConfig);
+            }
+        }
+
+        if (card.rarity === 'legendary' || isSelected || isTargeted || isCombatReady) {
             energyPulse.value = withRepeat(
-                withTiming(1, { duration: anim(1500), easing: Easing.inOut(Easing.ease) }),
+                withTiming(1, { duration: anim(isCombatReady ? 700 : 1500), easing: Easing.inOut(Easing.ease) }),
                 -1,
                 true
             );
         } else {
             energyPulse.value = 0;
         }
-    }, [isSelected, isTargeted, card.rarity, anim, springConfig]);
+    }, [isSelected, isTargeted, isCombatReady, isAttacking, isTakingHit, card.rarity, anim, springConfig, animateEntry]);
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { scale: scale.value },
+            { translateX: translateX.value },
             { translateY: translateY.value },
+            { perspective: 850 },
+            { rotateX: `${rotateX.value}deg` },
+            { rotateZ: `${rotateZ.value}deg` },
+            { scale: scale.value },
         ],
     }));
 
-    const energyStyle = useAnimatedStyle(() => ({
-        opacity: interpolate(energyPulse.value, [0, 1], [0.3, 0.6]),
-        transform: [{ scale: interpolate(energyPulse.value, [0, 1], [1, isTargeted ? 1.05 : 1.02]) }],
+    const damageFlashStyle = useAnimatedStyle(() => ({
+        opacity: damageFlash.value,
     }));
 
-    const gradientColors = isTargeted ? [colors.error, '#991111'] : (isSelected ? [colors.arcane.emerald, colors.arcane.emeraldDark] : rarityColors[card.rarity]);
+    const energyStyle = useAnimatedStyle(() => ({
+        opacity: interpolate(energyPulse.value, [0, 1], [0.35, 0.75]),
+        transform: [{ scale: interpolate(energyPulse.value, [0, 1], [1, isCombatReady ? 1.06 : (isTargeted ? 1.05 : 1.02)]) }],
+    }));
+
+    const glowColor = isCombatReady
+        ? '#f59e0b'
+        : (isTargeted ? colors.error : (isSelected ? colors.arcane.emerald : rarityColors[card.rarity][0]));
+
+    const gradientColors = isCombatReady
+        ? ['#f59e0b', '#b45309']
+        : (isTargeted
+            ? [colors.error, '#991111']
+            : (isSelected
+                ? [colors.arcane.emerald, colors.arcane.emeraldDark]
+                : rarityColors[card.rarity]));
 
     return (
         <Animated.View 
@@ -133,14 +244,14 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                 style={[styles.card, { width: cardWidth, height: cardHeight }]}
             >
                 {/* Spectral Energy Glow */}
-                {(card.rarity !== 'common' || isSelected || isTargeted) && !faceDown && (
+                {(card.rarity !== 'common' || isSelected || isTargeted || isCombatReady) && !faceDown && (
                     <Animated.View
                         pointerEvents="none"
                         style={[
                             styles.glowEffect,
                             energyStyle,
                             {
-                                backgroundColor: isTargeted ? colors.error : (isSelected ? colors.arcane.emerald : rarityColors[card.rarity][0]),
+                                backgroundColor: glowColor,
                                 borderRadius: 2,
                                 top: -2, left: -2, right: -2, bottom: -2,
                                 zIndex: -1,
@@ -156,17 +267,26 @@ export const CardComponent: React.FC<CardComponentProps> = ({
                         { 
                             width: cardWidth, 
                             height: cardHeight,
-                            padding: isSelected || isTargeted ? 2 : 1
+                            padding: isSelected || isTargeted || isCombatReady ? 2 : 1
                         }
                     ]}
                 >
                     <View style={[
                         styles.cardInner, 
                         { 
-                            width: cardWidth - (isSelected || isTargeted ? 4 : 2), 
-                            height: cardHeight - (isSelected || isTargeted ? 4 : 2) 
+                            width: cardWidth - (isSelected || isTargeted || isCombatReady ? 4 : 2), 
+                            height: cardHeight - (isSelected || isTargeted || isCombatReady ? 4 : 2) 
                         }
                     ]}>
+                        {/* Combat Damage Flash Overlay */}
+                        <Animated.View
+                            pointerEvents="none"
+                            style={[
+                                StyleSheet.absoluteFill,
+                                { backgroundColor: '#ef4444', borderRadius: 4, zIndex: 99 },
+                                damageFlashStyle,
+                            ]}
+                        />
                         {faceDown ? (
                             <View style={[styles.cardBack, { backgroundColor: colors.arcane.obsidian }]}>
                                 <View style={[styles.cardBackPattern, { borderColor: colors.arcane.emeraldDark }]} />

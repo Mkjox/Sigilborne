@@ -15,4 +15,5 @@ export type RootStackParamList = {
     Tutorial: undefined;
     Victory: { rewards: any };
     Defeat: undefined;
+    CardTrial: undefined;
 };

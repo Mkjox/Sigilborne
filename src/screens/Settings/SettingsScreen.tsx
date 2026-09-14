@@ -319,6 +319,21 @@ export const SettingsScreen: React.FC<Props> = ({ navigation }) => {
                                     );
                                 })}
                             </View>
+
+                            <View style={{ marginTop: 16 }}>
+                                <Pressable
+                                    onPress={() => navigation.navigate('CardTrial')}
+                                    style={[styles.optionBtn, { paddingVertical: 12 }]}
+                                >
+                                    <LinearGradient
+                                        colors={['rgba(16,185,129,0.15)', 'rgba(6,95,70,0.1)']}
+                                        style={StyleSheet.absoluteFill}
+                                    />
+                                    <Text style={[styles.optionBtnText, { color: colors.arcane.emeraldLight, fontWeight: '700' }]}>
+                                        ✧ TEST CARD SLAM ANIMATION ✧
+                                    </Text>
+                                </Pressable>
+                            </View>
                         </Section>
                     )}
 

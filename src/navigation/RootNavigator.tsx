@@ -12,6 +12,7 @@ import { CollectionScreen } from '../screens/Collection';
 import { SettingsScreen } from '../screens/Settings';
 import { CampaignMapScreen, ShopScreen, TalentTreeScreen, EventScreen, LoreScreen } from '../screens/Campaign';
 import { TutorialScreen } from '../screens/Tutorial';
+import { CardTrialScreen } from '../screens/CardTrial';
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -118,6 +119,13 @@ export const RootNavigator: React.FC = () => {
                 <Stack.Screen
                     name="Tutorial"
                     component={TutorialScreen}
+                    options={{
+                        animationEnabled: true,
+                    }}
+                />
+                <Stack.Screen
+                    name="CardTrial"
+                    component={CardTrialScreen}
                     options={{
                         animationEnabled: true,
                     }}
