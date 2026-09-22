@@ -3,7 +3,7 @@ import {
     View,
     StyleSheet,
     Pressable,
-    ScrollView,
+    FlatList,
     useWindowDimensions,
     Modal,
     Dimensions,
@@ -54,11 +54,17 @@ interface Props {
     navigation: CampaignMapNavigationProp;
 }
 
+interface CampaignMapRow {
+    key: string;
+    index: number;
+    stages: MapNodeTypeData[];
+}
+
 export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
     const { t } = useTranslation();
     const insets = useSafeAreaInsets();
     const { width: screenWidth, height: screenHeight } = useWindowDimensions();
-    const mapRef = React.useRef<ScrollView>(null);
+    const mapRef = React.useRef<FlatList<CampaignMapRow>>(null);
     const scrollY = useSharedValue(0);
 
     const scrollHandler = useAnimatedScrollHandler({
@@ -128,6 +134,28 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
         return { layouts, totalHeight: maxTop + 200 };
     }, [stages, screenWidth]);
 
+    const mapRows = useMemo<CampaignMapRow[]>(() => {
+        const rows = new Map<number, MapNodeTypeData[]>();
+
+        stages.forEach((stage) => {
+            const layout = stageLayouts.layouts[stage.id];
+            if (!layout) return;
+
+            const rowIndex = Math.round(layout.top / 114);
+            const rowStages = rows.get(rowIndex) || [];
+            rowStages.push(stage);
+            rows.set(rowIndex, rowStages);
+        });
+
+        return Array.from(rows.entries())
+            .sort(([firstIndex], [secondIndex]) => firstIndex - secondIndex)
+            .map(([index, rowStages]) => ({
+                key: `campaign-row-${index}`,
+                index,
+                stages: rowStages,
+            }));
+    }, [stages, stageLayouts.layouts]);
+
 
     const viewportHeight = screenHeight;
 
@@ -140,7 +168,10 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                 // Center the current node vertically in the viewport
                 // We offset by (screenHeight / 2) and add back half the node distance (57) for centering
                 const centeredY = currentLayout.top - (screenHeight / 2) + 57;
-                mapRef.current?.scrollTo({ y: Math.max(0, centeredY), animated: true });
+                mapRef.current?.scrollToOffset({
+                    offset: Math.max(0, centeredY + 120),
+                    animated: true,
+                });
             } else {
                 // Fallback to start of the path (bottom of ScrollView)
                 mapRef.current?.scrollToEnd({ animated: true });
@@ -193,40 +224,56 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
             <MapParallaxLayers scrollY={scrollY} totalHeight={stageLayouts.totalHeight} />
 
             {/* Scrollable Map */}
-            <Animated.ScrollView
-                ref={mapRef as any}
+            <Animated.FlatList
+                ref={mapRef}
+                data={mapRows}
+                extraData={{ selectedStage, currentNodeId, completedNodes }}
+                keyExtractor={(row) => row.key}
                 contentContainerStyle={[styles.mapContent, { height: stageLayouts.totalHeight }]}
                 showsVerticalScrollIndicator={false}
                 onScroll={scrollHandler}
                 scrollEventThrottle={16}
-            >
-                <View style={[styles.roadContainer, { width: screenWidth, height: stageLayouts.totalHeight }]}>
-                    {stages.map((stage) => {
-                        const isBoss = stage.id % 20 === 0;
-                        const layout = stageLayouts.layouts[stage.id];
-                        if (!layout) return null;
+                removeClippedSubviews
+                windowSize={5}
+                initialNumToRender={8}
+                maxToRenderPerBatch={8}
+                updateCellsBatchingPeriod={16}
+                getItemLayout={(_, index) => ({
+                    length: 114,
+                    offset: 120 + index * 114,
+                    index,
+                })}
+                renderItem={({ item: row }) => (
+                    <View
+                        style={[styles.mapRow, { width: screenWidth }]}
+                    >
+                        {row.stages.map((stage) => {
+                            const isBoss = stage.id % 20 === 0;
+                            const layout = stageLayouts.layouts[stage.id];
+                            if (!layout) return null;
 
-                        return (
-                            <MapNodeComponent
-                                key={stage.id}
-                                stage={stage}
-                                isBoss={isBoss}
-                                layout={layout}
-                                isActive={selectedStage === stage.id}
-                                isCurrent={currentNodeId === stage.id}
-                                isCompleted={completedNodes.includes(stage.id)}
-                                isLocked={stage.id > currentNodeId}
-                                onPress={() => {
-                                    if (stage.id > currentNodeId) {
-                                        return; // Locked!
-                                    }
-                                    handleStagePress(stage.id);
-                                }}
-                            />
-                        );
-                    })}
-                </View>
-            </Animated.ScrollView>
+                            return (
+                                <MapNodeComponent
+                                    key={stage.id}
+                                    stage={stage}
+                                    isBoss={isBoss}
+                                    layout={{ ...layout, top: 0 }}
+                                    isActive={selectedStage === stage.id}
+                                    isCurrent={currentNodeId === stage.id}
+                                    isCompleted={completedNodes.includes(stage.id)}
+                                    isLocked={stage.id > currentNodeId}
+                                    onPress={() => {
+                                        if (stage.id > currentNodeId) {
+                                            return; // Locked!
+                                        }
+                                        handleStagePress(stage.id);
+                                    }}
+                                />
+                            );
+                        })}
+                    </View>
+                )}
+            />
 
             {/* Map Header - Glassmorphism fallback for better FPS */}
             <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
@@ -849,6 +896,10 @@ const styles = StyleSheet.create({
     },
     roadContainer: {
         width: '100%',
+    },
+    mapRow: {
+        height: 114,
+        position: 'relative',
     },
     stageNode: {
         justifyContent: 'center',

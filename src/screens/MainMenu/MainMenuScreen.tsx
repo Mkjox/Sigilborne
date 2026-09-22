@@ -137,10 +137,6 @@ export const MainMenuScreen: React.FC<Props> = ({ navigation }) => {
                             onPress={() => navigation.navigate('DeckBuilder')}
                         />
                         <MenuButton
-                            title="✧ CARD SLAM LAB ✧"
-                            onPress={() => navigation.navigate('CardTrial')}
-                        />
-                        <MenuButton
                             title={t('menu.settings')}
                             onPress={() => navigation.navigate('Settings')}
                         />

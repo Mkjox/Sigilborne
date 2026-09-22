@@ -3,6 +3,8 @@ import {
     StyleSheet,
     Pressable,
     View,
+    ImageBackground,
+    ImageSourcePropType,
 } from 'react-native';
 import Animated, {
     useAnimatedStyle,
@@ -75,14 +77,6 @@ export const MenuButton: React.FC<MenuButtonProps> = ({
                 )}
 
                 <View style={buttonBodyStyles}>
-                    {/* Obsidian Texture (Dark Gradient) */}
-                    <LinearGradient
-                        colors={[colors.arcane.graphite, colors.arcane.obsidian]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={styles.gradient}
-                    />
-
                     {/* Emerald Energy Seams (Borders) */}
                     <View style={[styles.energySeam, styles.seamTop]} />
                     <View style={[styles.energySeam, styles.seamBottom]} />
@@ -106,6 +100,7 @@ export const MenuButton: React.FC<MenuButtonProps> = ({
                     </View>
                 </View>
             </Pressable>
+
         </Animated.View>
     );
 };
@@ -137,10 +132,9 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#000',
         borderRadius: 2,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
+        borderColor: 'rgba(16,185,129,0.5)',
         overflow: 'hidden',
     },
     largeBody: {
@@ -156,9 +150,6 @@ const styles = StyleSheet.create({
     },
     secondaryBody: {
         opacity: 0.9,
-    },
-    gradient: {
-        ...StyleSheet.absoluteFillObject,
     },
     energySeam: {
         position: 'absolute',
