@@ -383,10 +383,16 @@
   },
   "campaign": {
     "select_difficulty": "选择难度",
+    "difficulty_subtitle": "选择敌人的战术水平。",
+    "close_difficulty": "关闭难度选择",
+    "apply_difficulty": "确认难度",
     "difficulty": {
       "easy": "简单",
       "medium": "中等",
-      "hard": "困难"
+      "hard": "困难",
+      "easy_description": "敌人的决策较不稳定，反应也更慢。",
+      "medium_description": "敌人倾向于打出强力卡牌，并在有帮助时使用技能。",
+      "hard_description": "敌人会采取战术决策，也可能选择跳过以保留卡牌。"
     },
     "confirm_abandon": "放弃远征？",
     "confirm_abandon_desc": "此次所有的进度都将丢失。",

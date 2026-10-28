@@ -381,10 +381,16 @@
   },
   "campaign": {
     "select_difficulty": "SELECT DIFFICULTY",
+    "difficulty_subtitle": "Choose how tactically the enemy plays.",
+    "close_difficulty": "Close difficulty selection",
+    "apply_difficulty": "APPLY DIFFICULTY",
     "difficulty": {
       "easy": "EASY",
       "medium": "MEDIUM",
-      "hard": "HARD"
+      "hard": "HARD",
+      "easy_description": "The enemy makes less consistent choices and reacts more slowly.",
+      "medium_description": "The enemy favors strong plays and uses abilities when they help.",
+      "hard_description": "The enemy makes tactical choices and may pass to conserve cards."
     },
     "confirm_abandon": "Abandon Expedition?",
     "confirm_abandon_desc": "All progress in this run will be lost.",

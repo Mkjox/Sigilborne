@@ -383,10 +383,16 @@
   },
   "campaign": {
     "select_difficulty": "難易度を選択",
+    "difficulty_subtitle": "敵の戦術レベルを選択します。",
+    "close_difficulty": "難易度選択を閉じる",
+    "apply_difficulty": "難易度を決定",
     "difficulty": {
       "easy": "易しい",
       "medium": "普通",
-      "hard": "難しい"
+      "hard": "難しい",
+      "easy_description": "敵の判断が不安定になり、行動も遅くなります。",
+      "medium_description": "敵は有効な強い手を選び、役立つ場面で能力を使います。",
+      "hard_description": "敵は戦術的に判断し、カードを温存するためにパスすることがあります。"
     },
     "confirm_abandon": "遠征を放棄しますか？",
     "confirm_abandon_desc": "このプレイの進行状況は全て失われます。",

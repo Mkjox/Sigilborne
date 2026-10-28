@@ -4,6 +4,7 @@ import {
     StyleSheet,
     Pressable,
     FlatList,
+    ScrollView,
     useWindowDimensions,
     Modal,
     Dimensions,
@@ -74,6 +75,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
     });
 
     const [difficultyModalVisible, setDifficultyModalVisible] = useState(false);
+    const [pendingDifficulty, setPendingDifficulty] = useState<Difficulty>('medium');
     const [selectedStage, setSelectedStage] = useState<number | null>(null);
     const [stageModalVisible, setStageModalVisible] = useState(false);
     const [abandonModalVisible, setAbandonModalVisible] = useState(false);
@@ -328,6 +330,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
 
                     <TouchableOpacity
                         onPress={() => {
+                            setPendingDifficulty(selectedDifficulty);
                             setDifficultyModalVisible(true);
                         }}
                         style={styles.headerPill}
@@ -359,43 +362,92 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                     exiting={FadeOut.duration(200)}
                     style={styles.modalBackdropWrapper}
                 >
-                    <BlurView intensity={30} tint="dark" style={styles.modalBackdrop}>
+                    <BlurView intensity={40} tint="dark" style={styles.modalBackdrop}>
                         <Pressable style={StyleSheet.absoluteFillObject} onPress={() => setDifficultyModalVisible(false)} />
                         <Animated.View
                             entering={FadeIn.duration(300)}
                             exiting={FadeOut.duration(200)}
-                            style={[styles.difficultyModalContainer, { width: screenWidth * 0.85, maxHeight: screenHeight * 0.7, borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.4)' }]}
+                            style={[styles.difficultyModalContainer, {
+                                width: Math.min(screenWidth - spacing.xl * 2, 440),
+                                maxHeight: screenHeight - insets.top - insets.bottom - spacing.xl * 2,
+                            }]}
                         >
-                            <ExpoLinearGradient colors={['rgba(30, 30, 60, 0.98)', 'rgba(10, 10, 20, 0.98)']} style={styles.difficultyGradient}>
-                                <Text style={styles.difficultyHeader}>{t('campaign.select_difficulty')}</Text>
-                                <View style={styles.difficultyList}>
-                                    {(['easy', 'medium', 'hard'] as Difficulty[]).map((diff) => {
-                                        const isActive = selectedDifficulty === diff;
-                                        return (
-                                            <TouchableOpacity
-                                                key={diff}
-                                                style={[
-                                                    styles.difficultyItem,
-                                                    isActive && styles.difficultyItemActive
-                                                ]}
-                                                onPress={() => {
-                                                    setDifficulty(diff);
-                                                    setDifficultyModalVisible(false);
-                                                }}
-                                                activeOpacity={0.7}
-                                            >
-                                                <View style={styles.difficultyIconWrapper}>
-                                                    {diff === 'easy' && <Ionicons name="leaf-outline" size={18} color={isActive ? colors.arcane.emerald : 'rgba(255,255,255,0.4)'} />}
-                                                    {diff === 'medium' && <MaterialCommunityIcons name="shield-outline" size={18} color={isActive ? colors.arcane.emerald : 'rgba(255,255,255,0.4)'} />}
-                                                    {diff === 'hard' && <MaterialCommunityIcons name="skull-outline" size={18} color={isActive ? colors.arcane.emerald : 'rgba(255,255,255,0.4)'} />}
-                                                </View>
-                                                <Text style={[styles.difficultyLabel, isActive && styles.difficultyLabelActive]}>
-                                                    {t(`campaign.difficulty.${diff}`)}
-                                                </Text>
-                                            </TouchableOpacity>
-                                        );
-                                    })}
+                            <ExpoLinearGradient colors={[colors.arcane.graphite, colors.arcane.obsidian]} style={styles.difficultyGradient}>
+                                <View style={styles.difficultyModalHeader}>
+                                    <View style={styles.difficultyHeading}>
+                                        <Text style={styles.difficultyHeader}>{t('campaign.select_difficulty')}</Text>
+                                        <Text style={styles.difficultySubtitle}>{t('campaign.difficulty_subtitle')}</Text>
+                                    </View>
+                                    <TouchableOpacity
+                                        onPress={() => setDifficultyModalVisible(false)}
+                                        style={styles.difficultyCloseButton}
+                                        accessibilityRole="button"
+                                        accessibilityLabel={t('campaign.close_difficulty')}
+                                        hitSlop={8}
+                                    >
+                                        <Ionicons name="close" size={22} color="rgba(255,255,255,0.7)" />
+                                    </TouchableOpacity>
                                 </View>
+                                <ScrollView
+                                    style={[styles.difficultyScroll, { maxHeight: screenHeight * 0.7 }]}
+                                    contentContainerStyle={styles.difficultyContent}
+                                    showsVerticalScrollIndicator={false}
+                                >
+                                    <View style={styles.difficultyList}>
+                                        {(['easy', 'medium', 'hard'] as Difficulty[]).map((diff) => {
+                                            const isActive = pendingDifficulty === diff;
+                                            const accentColor = diff === 'easy'
+                                                ? colors.arcane.emerald
+                                                : diff === 'medium'
+                                                    ? colors.arcane.cyan
+                                                    : colors.error;
+                                            return (
+                                                <TouchableOpacity
+                                                    key={diff}
+                                                    style={[
+                                                        styles.difficultyItem,
+                                                        isActive && { borderColor: accentColor, backgroundColor: `${accentColor}18` },
+                                                    ]}
+                                                    onPress={() => setPendingDifficulty(diff)}
+                                                    activeOpacity={0.7}
+                                                    accessibilityRole="radio"
+                                                    accessibilityState={{ checked: isActive }}
+                                                >
+                                                    <View style={styles.difficultyIconWrapper}>
+                                                        {diff === 'easy' && <Ionicons name="leaf-outline" size={20} color={accentColor} />}
+                                                        {diff === 'medium' && <MaterialCommunityIcons name="shield-outline" size={20} color={accentColor} />}
+                                                        {diff === 'hard' && <MaterialCommunityIcons name="skull-outline" size={20} color={accentColor} />}
+                                                    </View>
+                                                    {isActive && (
+                                                        <Ionicons name="checkmark-circle" size={16} color={accentColor} style={styles.difficultyItemCheck} />
+                                                    )}
+                                                    <Text style={[styles.difficultyLabel, isActive && styles.difficultyLabelActive]}>
+                                                        {t(`campaign.difficulty.${diff}`)}
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            );
+                                        })}
+                                    </View>
+                                    <View style={styles.difficultyDescriptionPanel}>
+                                        <Text style={[styles.difficultyLabel, styles.difficultyDescriptionTitle]}>
+                                            {t(`campaign.difficulty.${pendingDifficulty}`)}
+                                        </Text>
+                                        <Text style={styles.difficultyDescription}>
+                                            {t(`campaign.difficulty.${pendingDifficulty}_description`)}
+                                        </Text>
+                                    </View>
+                                    <TouchableOpacity
+                                        style={styles.difficultyApplyButton}
+                                        onPress={() => {
+                                            setDifficulty(pendingDifficulty);
+                                            setDifficultyModalVisible(false);
+                                        }}
+                                        activeOpacity={0.8}
+                                        accessibilityRole="button"
+                                    >
+                                        <Text style={styles.difficultyApplyText}>{t('campaign.apply_difficulty')}</Text>
+                                    </TouchableOpacity>
+                                </ScrollView>
                             </ExpoLinearGradient>
                         </Animated.View>
                     </BlurView>
@@ -991,20 +1043,45 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(16, 185, 129, 0.4)',
         ...shadows.lg,
     },
+    difficultyModalHeader: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginBottom: spacing.lg,
+        gap: spacing.md,
+    },
+    difficultyHeading: {
+        flex: 1,
+        gap: spacing.xs,
+    },
     difficultyHeader: {
-        fontSize: 16,
+        fontSize: 20,
         fontWeight: '900',
-        color: 'rgba(255,255,255,0.6)',
-        letterSpacing: 4,
-        marginBottom: spacing.xl,
+        color: colors.arcane.white,
+        letterSpacing: 2,
         fontFamily: 'serif',
+    },
+    difficultySubtitle: {
+        fontSize: 13,
+        lineHeight: 19,
+        color: 'rgba(255,255,255,0.62)',
+    },
+    difficultyCloseButton: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.08)',
     },
     difficultyGradient: {
         padding: spacing.xl,
         alignItems: 'center',
+        flexShrink: 1,
     },
     completedBadge: {
         position: 'absolute',
@@ -1014,10 +1091,18 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         zIndex: 10,
     },
+    difficultyScroll: {
+        width: '100%',
+        flexShrink: 1,
+    },
+    difficultyContent: {
+        width: '100%',
+        gap: spacing.md,
+    },
     difficultyList: {
         flexDirection: 'row',
         width: '100%',
-        gap: spacing.md,
+        gap: spacing.xs,
     },
     relicTrayWrapper: {
         position: 'absolute',
@@ -1027,37 +1112,72 @@ const styles = StyleSheet.create({
     },
     difficultyItem: {
         flex: 1,
+        position: 'relative',
         flexDirection: 'column',
         alignItems: 'center',
-        backgroundColor: 'rgba(255,255,255,0.03)',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.035)',
         paddingVertical: spacing.md,
         paddingHorizontal: spacing.xs,
-        borderRadius: 12,
+        borderRadius: 16,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.05)',
-    },
-    difficultyItemActive: {
-        backgroundColor: 'rgba(16, 185, 129, 0.08)',
-        borderColor: colors.arcane.emerald,
+        borderColor: 'rgba(255,255,255,0.1)',
+        gap: spacing.sm,
     },
     difficultyIconWrapper: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: 'rgba(255,255,255,0.03)',
+        width: 36,
+        height: 36,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.07)',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: spacing.xs,
+    },
+    difficultyItemCheck: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
     },
     difficultyLabel: {
-        fontSize: 10,
+        fontSize: 12,
         fontWeight: '900',
-        color: 'rgba(255,255,255,0.5)',
-        letterSpacing: 1,
+        color: 'rgba(255,255,255,0.8)',
+        letterSpacing: 0.3,
         textAlign: 'center',
     },
     difficultyLabelActive: {
         color: colors.arcane.white,
+    },
+    difficultyDescription: {
+        fontSize: 12,
+        lineHeight: 17,
+        color: 'rgba(255,255,255,0.58)',
+    },
+    difficultyDescriptionPanel: {
+        width: '100%',
+        gap: spacing.xs,
+        padding: spacing.md,
+        borderRadius: 14,
+        backgroundColor: 'rgba(255,255,255,0.04)',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
+    },
+    difficultyDescriptionTitle: {
+        color: colors.arcane.white,
+        textAlign: 'left',
+    },
+    difficultyApplyButton: {
+        width: '100%',
+        minHeight: 48,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 14,
+        backgroundColor: colors.arcane.emerald,
+    },
+    difficultyApplyText: {
+        color: colors.arcane.obsidian,
+        fontSize: 13,
+        fontWeight: '900',
+        letterSpacing: 1,
     },
     activeCheck: {
         marginLeft: spacing.sm,

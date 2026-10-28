@@ -304,10 +304,16 @@
   },
   "campaign": {
     "select_difficulty": "SELECCIONAR DIFICULTAD",
+    "difficulty_subtitle": "Elige qué tan tácticamente juega el enemigo.",
+    "close_difficulty": "Cerrar selección de dificultad",
+    "apply_difficulty": "APLICAR DIFICULTAD",
     "difficulty": {
       "easy": "FÁCIL",
       "medium": "MEDIO",
-      "hard": "DIFÍCIL"
+      "hard": "DIFÍCIL",
+      "easy_description": "El enemigo toma decisiones menos consistentes y reacciona más despacio.",
+      "medium_description": "El enemigo prioriza buenas jugadas y usa sus habilidades cuando ayudan.",
+      "hard_description": "El enemigo toma decisiones tácticas y puede pasar para conservar cartas."
     },
     "confirm_abandon": "¿Abandonar Expedición?",
     "confirm_abandon_desc": "Todo el progreso en esta carrera se perderá.",

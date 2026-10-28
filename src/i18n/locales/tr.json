@@ -379,10 +379,16 @@
   },
   "campaign": {
     "select_difficulty": "ZORLUK SEÇ",
+    "difficulty_subtitle": "Düşmanın ne kadar taktik oynayacağını seç.",
+    "close_difficulty": "Zorluk seçimini kapat",
+    "apply_difficulty": "ZORLUĞU UYGULA",
     "difficulty": {
       "easy": "KOLAY",
       "medium": "ORTA",
-      "hard": "ZOR"
+      "hard": "ZOR",
+      "easy_description": "Düşman daha tutarsız kararlar verir ve daha yavaş tepki gösterir.",
+      "medium_description": "Düşman güçlü hamleleri tercih eder ve faydalı olduğunda yeteneklerini kullanır.",
+      "hard_description": "Düşman taktiksel kararlar verir ve kart saklamak için pas geçebilir."
     },
     "confirm_abandon": "Seferi Terk Et?",
     "confirm_abandon_desc": "Bu turdaki tüm ilerlemeniz kaybolacak.",

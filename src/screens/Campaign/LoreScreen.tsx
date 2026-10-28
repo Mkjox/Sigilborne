@@ -5,6 +5,7 @@ import {
     Pressable,
     ScrollView,
     FlatList,
+    ImageBackground,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -68,16 +69,20 @@ export const LoreScreen: React.FC<Props> = ({ navigation }) => {
     const TABS_HEIGHT = 52;
 
     return (
-        <View style={styles.container}>
+        <ImageBackground
+            source={require('../../../assets/backgrounds/lore.png')}
+            style={styles.container}
+            resizeMode="cover"
+        >
             <LinearGradient
-                colors={[colors.arcane.obsidian, colors.arcane.void ?? '#050505']}
-                style={StyleSheet.absoluteFill}
+                colors={['rgba(11,15,20,0.72)', 'rgba(2,6,23,0.82)']}
+                style={[StyleSheet.absoluteFill, { zIndex: 0 }]}
             />
 
             {/* Biome tinted background accent */}
             <LinearGradient
                 colors={[`${selectedBiome.colors[0]}18`, 'transparent']}
-                style={[StyleSheet.absoluteFill, { bottom: '40%' }]}
+                style={[StyleSheet.absoluteFill, { bottom: '40%', zIndex: 0 }]}
             />
 
             {/* === SCROLL CONTENT === */}
@@ -225,7 +230,7 @@ export const LoreScreen: React.FC<Props> = ({ navigation }) => {
                     );
                 })}
             </ScrollView>
-        </View>
+        </ImageBackground>
     );
 };
 
