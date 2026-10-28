@@ -396,6 +396,7 @@
     },
     "confirm_abandon": "放弃远征？",
     "confirm_abandon_desc": "此次所有的进度都将丢失。",
+    "confirm_abandon_warning": "此操作无法撤销。",
     "descriptions": {
       "boss": "宇宙的恐怖守卫着前进的道路。为了时代的战斗而武装你的灵魂。",
       "shop": "为那些有能力支付金币的人散落的遗物和稀有卡牌。",

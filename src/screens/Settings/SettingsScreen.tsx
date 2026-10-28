@@ -5,6 +5,7 @@ import {
     Pressable,
     Switch,
     LayoutChangeEvent,
+    ImageBackground,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -15,10 +16,7 @@ import Animated, {
     FadeInDown,
     useSharedValue,
     useAnimatedStyle,
-    withRepeat,
-    withTiming,
     withSpring,
-    Easing,
 } from 'react-native-reanimated';
 import { RootStackParamList } from '../../types';
 import { Text, BoardSurface } from '../../components/ui';
@@ -35,38 +33,28 @@ type TabKey = 'sensory' | 'visuals' | 'language' | 'other';
 // ─── Background ───────────────────────────────────────────────────────────────
 const ScreenBackground: React.FC = () => (
     <View style={StyleSheet.absoluteFill}>
-        <LinearGradient
-            colors={[colors.arcane.obsidian, colors.arcane.void, colors.arcane.obsidian]}
-            locations={[0, 0.5, 1]}
+        <ImageBackground
+            source={require('../../../assets/backgrounds/settingsBackground.png')}
+            resizeMode="cover"
             style={StyleSheet.absoluteFill}
-        />
+        >
+            <LinearGradient
+                colors={['rgba(2,6,16,0.10)', 'rgba(2,6,16,0.45)', 'rgba(2,6,16,0.18)']}
+                locations={[0, 0.5, 1]}
+                style={StyleSheet.absoluteFill}
+            />
+        </ImageBackground>
     </View>
 );
-
-// ─── Pulsing corner rune ──────────────────────────────────────────────────────
-const CornerRune: React.FC<{ pos: object }> = ({ pos }) => {
-    const glow = useSharedValue(0.15);
-    React.useEffect(() => {
-        glow.value = withRepeat(
-            withTiming(0.7, { duration: 2400, easing: Easing.inOut(Easing.ease) }),
-            -1, true,
-        );
-    }, []);
-    const style = useAnimatedStyle(() => ({ opacity: glow.value }));
-    return (
-        <Animated.View style={[styles.cornerRune, pos, style]}>
-            <View style={styles.cornerRuneInner} />
-        </Animated.View>
-    );
-};
 
 // ─── Section ─────────────────────────────────────────────────────────────────
 const Section: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <Animated.View entering={FadeInDown.delay(60).duration(340)} style={styles.section}>
-        <CornerRune pos={{ top: 6, left: 6 }} />
-        <CornerRune pos={{ top: 6, right: 6 }} />
-        <CornerRune pos={{ bottom: 6, left: 6 }} />
-        <CornerRune pos={{ bottom: 6, right: 6 }} />
+        <ImageBackground
+            source={require('../../../assets/backgrounds/settingsPanelBackground.png')}
+            resizeMode="stretch"
+            style={StyleSheet.absoluteFill}
+        />
         <LinearGradient
             colors={['rgba(16,185,129,0.04)', 'transparent']}
             style={StyleSheet.absoluteFill}
@@ -115,13 +103,11 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({ tabs, activeTab, onTabPre
             {/* Sliding pill */}
             {tabHeight > 0 && (
                 <Animated.View style={[styles.segmentedPill, pillStyle]} pointerEvents="none">
-                    <LinearGradient
-                        colors={['rgba(16,185,129,0.20)', 'rgba(16,185,129,0.08)']}
-                        locations={[0, 1]}
+                    <ImageBackground
+                        source={require('../../../assets/backgrounds/settingsTabActive.png')}
+                        resizeMode="stretch"
                         style={StyleSheet.absoluteFill}
                     />
-                    {/* Pill border shimmer */}
-                    <View style={styles.segmentedPillBorder} />
                 </Animated.View>
             )}
 
@@ -134,6 +120,15 @@ const SegmentedTabs: React.FC<SegmentedTabsProps> = ({ tabs, activeTab, onTabPre
                         style={styles.segmentedTab}
                         onPress={() => onTabPress(tab.key)}
                     >
+                        {!isActive && (
+                            <View pointerEvents="none" style={StyleSheet.absoluteFill}>
+                                <ImageBackground
+                                    source={require('../../../assets/backgrounds/settingsTabInactive.png')}
+                                    resizeMode="stretch"
+                                    style={StyleSheet.absoluteFill}
+                                />
+                            </View>
+                        )}
                         <Text style={[styles.segmentedIcon, isActive && styles.segmentedIconActive]}>
                             {tab.icon}
                         </Text>
@@ -509,12 +504,6 @@ const styles = StyleSheet.create({
         borderRadius: 6,
         overflow: 'hidden',
     },
-    segmentedPillBorder: {
-        ...StyleSheet.absoluteFillObject,
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: 'rgba(16,185,129,0.40)',
-    },
     segmentedTab: {
         flex: 1,
         alignItems: 'center',
@@ -563,20 +552,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,0,0.35)',
         overflow: 'hidden',
     },
-    cornerRune: {
-        position: 'absolute',
-        width: 8,
-        height: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    cornerRuneInner: {
-        width: 4,
-        height: 4,
-        backgroundColor: colors.arcane.emerald,
-        transform: [{ rotate: '45deg' }],
-    },
-
     // Toggle row
     toggleRow: {
         flexDirection: 'row',

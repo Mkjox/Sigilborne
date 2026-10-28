@@ -392,6 +392,7 @@
     },
     "confirm_abandon": "Seferi Terk Et?",
     "confirm_abandon_desc": "Bu turdaki tüm ilerlemeniz kaybolacak.",
+    "confirm_abandon_warning": "Bu işlem geri alınamaz.",
     "descriptions": {
       "boss": "Yolun ilerisinde kozmik bir terör bekliyor. Çağların savaşı için ruhunu hazırla.",
       "shop": "Altını olanlar için saçılmış yadigarlar ve nadir kartlar.",

@@ -396,6 +396,7 @@
     },
     "confirm_abandon": "遠征を放棄しますか？",
     "confirm_abandon_desc": "このプレイの進行状況は全て失われます。",
+    "confirm_abandon_warning": "この操作は取り消せません。",
     "descriptions": {
       "boss": "宇宙の恐怖が前方の道を阻む。時代を超えた戦いのために魂を鍛えよ。",
       "shop": "お金を払える者のために散りばめられた遺物やレアカード。",

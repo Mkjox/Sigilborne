@@ -631,7 +631,7 @@ export const CampaignMapScreen: React.FC<Props> = ({ navigation }) => {
                                 {/* Warning strip */}
                                 <View style={styles.abandonWarningStrip}>
                                     <Ionicons name="warning" size={14} color="rgba(239, 68, 68, 0.8)" />
-                                    <Text style={styles.abandonWarningText}>{t('campaign.confirm_abandon_desc')}</Text>
+                                    <Text style={styles.abandonWarningText}>{t('campaign.confirm_abandon_warning')}</Text>
                                 </View>
 
                                 {/* Actions */}
